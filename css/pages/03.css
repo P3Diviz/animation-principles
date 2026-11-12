@@ -12,9 +12,8 @@
 /* ===== Draig at each drawing level ===== */
 .draig #shadow{display:none}                       /* the set has its own cast shadows */
 /* Rendered: as drawn. Lights off darken him, as they darken the crate and ball. */
-.stage-area[data-level="rendered"][data-fill="off"] .draig{filter:brightness(.62)}
-.stage-area[data-level="rendered"][data-key="off"] .draig{filter:brightness(.78)}
-.stage-area[data-level="rendered"][data-key="off"][data-fill="off"] .draig{filter:brightness(.45)}
+/* With the key off, only the fill and rim light him */
+.stage-area[data-level="rendered"][data-key="off"] .draig{filter:brightness(.5)}
 /* Flat colour: gradients swapped for flat fills, no plush texture or soft highlights */
 .stage-area[data-level="flat"] .draig [fill="url(#dg-red)"]{fill:#E0283F}
 .stage-area[data-level="flat"] .draig [fill="url(#dg-red-dark)"]{fill:#B01B36}
@@ -51,13 +50,19 @@
 
 /* Rendered: light and shadow. The fill light lifts the shadow side. */
 .stage-area[data-level="rendered"]{--wall:url(#gWall);--floor:url(#gFloor);--fig:#7E7E92;--crate:#33334C;--ball:#6262C4;--clutter:#4A4A62;--clutter-2:#38385A}
-.stage-area[data-level="rendered"][data-fill="off"]{--fig:#3E3E50;--crate:#1E1E30;--ball:#33337A;--clutter:#2A2A3C;--clutter-2:#22223A}
+.stage-area[data-level="rendered"][data-fill="off"]{--clutter:#2A2A3C;--clutter-2:#22223A}
+.stage-area[data-level="rendered"][data-key="off"]{--crate:#1E1E30;--ball:#33337A}
 
 /* Light layers only exist in the rendered drawing */
 .lt{display:none}
 .stage-area[data-level="rendered"] .lt{display:inline}
 .stage-area[data-key="off"] .key-l{display:none}
 .stage-area[data-rim="off"] .rim-l{display:none}
+/* Shadow side (away from the key): the fill softens it; without the fill it goes deep */
+.shade-l{opacity:.5}
+.stage-area[data-fill="off"] .shade-l{opacity:1}
+.stage-area[data-fill="off"] .fill-l{display:none}
+.stage-area[data-key="off"] .shade-l{display:none}
 
 /* Clutter: a busy background that competes with the figure */
 .clutter{display:none}

@@ -49,6 +49,8 @@
             <circle id="ballGeom" cx="250" cy="372" r="16"/>
             <linearGradient id="gKey" x1="0" y1="0" x2="1" y2=".25"><stop offset="0" stop-color="#FFD9A8" stop-opacity=".9"/><stop offset=".6" stop-color="#FFD9A8" stop-opacity="0"/></linearGradient>
             <linearGradient id="gRim" x1="0" y1="0" x2="1" y2="0"><stop offset=".55" stop-color="#9999FF" stop-opacity="0"/><stop offset="1" stop-color="#9999FF"/></linearGradient>
+            <linearGradient id="gShadeO" x1="0" y1="0" x2="1" y2="0"><stop offset=".4" stop-color="#05050F" stop-opacity="0"/><stop offset="1" stop-color="#05050F" stop-opacity=".7"/></linearGradient>
+            <linearGradient id="gFillO" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#A9B6FF" stop-opacity=".3"/><stop offset=".55" stop-color="#A9B6FF" stop-opacity="0"/></linearGradient>
             <radialGradient id="gSpot"><stop offset="0" stop-color="#FFD9A8" stop-opacity=".2"/><stop offset="1" stop-color="#FFD9A8" stop-opacity="0"/></radialGradient>
             <linearGradient id="gWall" x1="0" y1="0" x2="0" y2="1"><stop offset=".6" stop-color="#0C0C1C"/><stop offset="1" stop-color="#1A1A30"/></linearGradient>
             <linearGradient id="gFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22223A"/><stop offset=".12" stop-color="#14142A"/></linearGradient>
@@ -81,11 +83,15 @@
             </g>
 
             <use href="#ballGeom" class="base ball-b"/>
+            <use href="#ballGeom" class="lt shade-l" fill="url(#gShadeO)"/>
+            <use href="#ballGeom" class="lt fill-l" fill="url(#gFillO)"/>
             <use href="#ballGeom" class="lt key-l" fill="url(#gKey)"/>
             <use href="#ballGeom" class="lt rim-l" fill="none" stroke="url(#gRim)" stroke-width="2"/>
 
             <use href="#crateGeom" class="base crate-b"/>
             <path class="crate-lines" d="M520 300 L606 386 M606 300 L520 386 M520 343 L606 343"/>
+            <use href="#crateGeom" class="lt shade-l" fill="url(#gShadeO)"/>
+            <use href="#crateGeom" class="lt fill-l" fill="url(#gFillO)"/>
             <use href="#crateGeom" class="lt key-l" fill="url(#gKey)" opacity=".7"/>
             <use href="#crateGeom" class="lt rim-l" fill="none" stroke="url(#gRim)" stroke-width="2"/>
 
@@ -276,8 +282,26 @@
               </g>
               </svg>
               <!--/DRAIG-->
-              <path class="lt key-l" d="M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z" fill="url(#gKey)" opacity=".5"/>
-              <path class="lt rim-l" d="M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z" fill="none" stroke="url(#gRim)" stroke-width="5"/>
+              <!-- Light on Draig. Each layer is masked by his whole silhouette, so it reaches every part.
+                   Key: warm, from the front left, the strongest. Fill: weaker and cool, from the right,
+                   lifting only the shadow side. Rim: from behind on the right, cut from his outline. -->
+              <defs>
+                <mask id="draigSil" maskUnits="userSpaceOnUse" x="-60" y="0" width="520" height="430" style="mask-type:alpha"><use href="#rig"/></mask>
+                <linearGradient id="gKeyD" gradientUnits="userSpaceOnUse" x1="30" y1="60" x2="330" y2="300"><stop offset="0" stop-color="#FFD9A8" stop-opacity=".85"/><stop offset=".6" stop-color="#FFD9A8" stop-opacity="0"/></linearGradient>
+                <linearGradient id="gShadeD" gradientUnits="userSpaceOnUse" x1="90" y1="140" x2="390" y2="300"><stop offset=".35" stop-color="#05050F" stop-opacity="0"/><stop offset="1" stop-color="#05050F" stop-opacity=".8"/></linearGradient>
+                <linearGradient id="gFillD" gradientUnits="userSpaceOnUse" x1="400" y1="240" x2="160" y2="240"><stop offset="0" stop-color="#A9B6FF" stop-opacity=".35"/><stop offset=".65" stop-color="#A9B6FF" stop-opacity="0"/></linearGradient>
+                <filter id="rimF" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+                  <feOffset in="SourceAlpha" dx="-7" dy="1.5" result="shifted"/>
+                  <feComposite in="SourceAlpha" in2="shifted" operator="out" result="edge"/>
+                  <feGaussianBlur in="edge" stdDeviation="1.2" result="soft"/>
+                  <feFlood flood-color="#9999FF"/>
+                  <feComposite in2="soft" operator="in"/>
+                </filter>
+              </defs>
+              <rect class="lt shade-l" x="-60" y="0" width="520" height="430" fill="url(#gShadeD)" mask="url(#draigSil)"/>
+              <rect class="lt fill-l" x="-60" y="0" width="520" height="430" fill="url(#gFillD)" mask="url(#draigSil)" style="mix-blend-mode:screen"/>
+              <rect class="lt key-l" x="-60" y="0" width="520" height="430" fill="url(#gKeyD)" mask="url(#draigSil)" style="mix-blend-mode:screen"/>
+              <use class="lt rim-l" href="#rig" filter="url(#rimF)"/>
             </g>
           </g>
         </svg>
