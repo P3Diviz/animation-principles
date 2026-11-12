@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/10.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/10-exaggeration.js"></script>
@@ -39,7 +44,10 @@
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">10</span>Exaggeration</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/10-exaggeration-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage" id="stage">
       <div class="floor"></div>
       <!--DRAIG-->
@@ -238,7 +246,7 @@
       <button class="play" id="play" aria-label="Pause"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect class="i-pause" x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect class="i-pause" x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><path class="i-play" d="M3 1.5 12 7 3 12.5Z" fill="currentColor" style="display:none"/></svg></button>
       <span class="tc" id="tc">00:00:00:00</span>
       <div class="track" id="track" data-keys="20,24,27,48">
-        <div class="bar"></div><div class="span" style="left:26.667%;width:36.667%"></div><div class="ticks"></div>
+        <div class="bar"></div><div class="span" id="span" style="left:26.667%;width:36.667%"></div><div class="ticks"></div>
         <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
         <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
         <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
@@ -255,7 +263,8 @@
     <div class="seg presets" id="presets" role="group" aria-label="Exaggeration presets">
       <button data-v="15" aria-pressed="false">Realistic</button><button data-v="100" aria-pressed="true">Cartoon</button><button data-v="150" aria-pressed="false">Too far</button>
     </div>
-    <p class="small" id="note"></p>
+    <p class="small only-2d" id="note"></p>
+    <p class="small only-3d" id="note3d"></p>
     <div class="explain">
       <h2>The principle</h2>
       <p>Exaggeration pushes poses, timing and expressions beyond real life so the idea reads clearly, even from the back of the room. It has to stay true to the character: push too far and it stops being believable.</p>
