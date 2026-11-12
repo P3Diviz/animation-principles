@@ -86,7 +86,8 @@
 .stage-3d{display:none}
 .page[data-view="3d"] .stage-3d{display:block}
 .page[data-view="3d"] #stage{display:none}
-.page[data-view="2d"] .only-3d,.page[data-view="3d"] .only-2d{display:none !important}
+.page[data-view="2d"] .only-3d,.page[data-view="3d"] .only-2d,
+.page[data-view="2d"] ~ .notes .only-3d,.page[data-view="3d"] ~ .notes .only-2d{display:none !important}   /* the notes strip follows the view too */
 .panel h2.top{margin-top:0}
 .page[data-view="2d"] .panel h2.top-2d{margin-top:0}   /* first heading in 2D when 3D-only controls come first */
 .stage-3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
