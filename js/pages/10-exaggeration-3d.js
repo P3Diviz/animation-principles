@@ -52,8 +52,7 @@ export function create({ stageEl, canvas, status }) {
     const lift = inAir ? lerp(atTakeOff, atLand, (t - JUMP.takeOff) / (JUMP.land - JUMP.takeOff)) : footFix(t, k);
     rig.model.position.y = 0;
     rig.setTime(t); scalePose(rig, stand, k);
-    rig.model.position.y = lift;
-  });
+    rig.model.position.y = lift;  });
 
   return { clock, frames: FRAMES, keys: KEYS, show: () => stage.start(), hide: () => stage.stop() };
 }

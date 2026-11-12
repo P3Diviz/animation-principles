@@ -73,6 +73,10 @@ export async function loadBot(name) {
     if (!o.isMesh) return;
     o.material = /joint/i.test(o.name) ? JOINTS : CLAY;
     o.castShadow = o.receiveShadow = true;
+    // A skinned mesh's bounds are worked out once, from whatever pose it's in at the time; after
+    // the pose tools have moved it, those bounds can be wrong and three.js would skip drawing it.
+    // One figure is cheap to always draw.
+    o.frustumCulled = false;
   });
   const holder = new THREE.Group();                    // move and turn the holder, not the model
   holder.add(model);
@@ -112,12 +116,25 @@ export async function createRig(name) {
   const mixer = new THREE.AnimationMixer(model);
   let action = null, time = 0, scale = 1, keys = null;
 
-  // The bones that move the skin. (Take them from the skeleton: the cloned FBX has a second,
-  // unused copy of every bone with the same name.)
-  let skeleton = null;
-  model.traverse(o => { if (o.isSkinnedMesh && !skeleton) skeleton = o.skeleton; });
-  const bones = skeleton ? skeleton.bones : [];
+  // The bones the animation drives. Each mesh (surface, joints) has its own skeleton, and in
+  // YBot.fbx some bones come twice under the same name, one nested inside the other. The mixer
+  // drives the first one it finds by name (the outer copy), which carries the inner copy with it.
+  // Pose tools must turn those same bones, or only part of the figure moves.
+  const names = new Set();
+  model.traverse(o => { if (o.isSkinnedMesh) o.skeleton.bones.forEach(b => names.add(b.name)); });
+  const bones = [...names].map(n => THREE.PropertyBinding.findNode(model, n)).filter(Boolean);
   const byName = new Map(bones.map(b => [b.name.replace(/^mixamorig:?/, ''), b]));
+
+  // The mixer only writes a bone when its animated value has changed since the last update.
+  // While the timeline is paused (or a clip holds its last frame) it writes nothing, so a pose
+  // tool's change from the last frame would stay and build up. So every update starts from the
+  // clean pose the mixer last made: put it back, let the mixer apply its changes, remember it.
+  const clean = bones.map(b => ({ q: b.quaternion.clone(), p: b.position.clone() }));
+  function evaluate(t) {
+    bones.forEach((b, i) => { b.quaternion.copy(clean[i].q); b.position.copy(clean[i].p); });
+    mixer.setTime(t);
+    bones.forEach((b, i) => { clean[i].q.copy(b.quaternion); clean[i].p.copy(b.position); });
+  }
 
   const rig = {
     model, mixer, note, bones,
@@ -148,7 +165,7 @@ export async function createRig(name) {
       const d = rig.duration;
       let shown = d ? ((t % d) + d) % d : t;
       if (keys) shown = keys.filter(k => k <= shown + 1e-6).pop() ?? keys[0];   // blocking: hold the last key
-      mixer.setTime(shown);
+      evaluate(shown);
     },
     timeScale(x) { scale = x; },
     stepped(keyTimes) { keys = keyTimes ? [...keyTimes].sort((a, b) => a - b) : null; rig.setTime(time); },
