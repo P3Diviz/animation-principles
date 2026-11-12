@@ -1,0 +1,353 @@
+<!DOCTYPE html><html lang="en"><head><title>Reference: 06 Slow in and slow out, full page shell (approved look)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{--bg:#0A0A15;--panel:#10101D;--card:#12122A;--card-hover:#17173A;--hair:rgba(255,255,255,.08);--text:#F5F5F7;--text-2:#9C9CB3;--accent:#9999FF;--accent-wash:rgba(153,153,255,.14);--accent-line:rgba(153,153,255,.55);--ease:cubic-bezier(.33,0,.67,1);--font:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font:400 13px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono)}
+.hdr{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--hair)}
+.hdr .brand{font-weight:600;letter-spacing:-.2px;color:var(--text);text-decoration:none}
+.hdr nav{display:flex;align-items:center;gap:20px}
+.hdr nav a,.hdr nav button.link{color:var(--text-2);text-decoration:none;background:none;border:none;font:500 13px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px;transition:color var(--ease) .2s}
+.hdr nav a:hover,.hdr nav button.link:hover,.hdr nav [aria-current="page"]{color:var(--text)}
+.pill{border:1px solid var(--hair);background:transparent;color:var(--text-2);font:500 12px var(--font);padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease)}
+.pill[aria-pressed="true"]{border-color:var(--accent-line);background:var(--accent-wash);color:var(--text)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<style>
+/* Principles dropdown: right-aligned under the link. Hidden attribute toggled by JS; data-open drives the fade. */
+.menu{position:absolute;top:56px;right:120px;width:min(560px,calc(100vw - 48px));background:#15152A;border:1px solid var(--hair);border-radius:14px;padding:10px;z-index:50;box-shadow:0 24px 48px rgba(0,0,0,.45);opacity:0;transform:translateY(-6px);transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.menu[data-open]{opacity:1;transform:none}
+.menu-cols{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.menu a{display:flex;gap:12px;align-items:baseline;padding:9px 12px;border-radius:8px;color:var(--text);text-decoration:none;font-size:13px}
+.menu a:hover{background:rgba(255,255,255,.05)}
+.menu a .mono{color:var(--accent);font-size:11px;width:18px;flex:none}
+.menu a[aria-current="page"]{background:var(--accent-wash)}
+.menu .menu-all{border-top:1px solid var(--hair);border-radius:0 0 8px 8px;margin-top:6px;padding-top:12px;color:var(--text-2)}
+/* ===== Principle page shell (copy into css/shell.css) ===== */
+body{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.page{display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,22vw,320px);min-height:0}
+.stage-area{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;min-width:0}
+.stage-head{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 0}
+.stage-head h1{font-size:clamp(18px,1.6vw,24px);font-weight:600;letter-spacing:-.02em;display:flex;align-items:baseline;gap:12px}
+.stage-head h1 .mono{color:var(--accent);font-size:12px;font-weight:500}
+.stage{position:relative;min-height:0}
+.panel{background:var(--panel);border-left:1px solid var(--hair);padding:18px 18px;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
+.panel h2{color:var(--text-2);font-size:12px;font-weight:500;margin:10px 0 4px}
+.panel h2:first-child{margin-top:0}
+.seg{display:flex;background:rgba(255,255,255,.06);border-radius:8px;padding:3px;gap:2px}
+.seg button{flex:1;border:none;background:transparent;color:var(--text-2);font:500 12px var(--font);padding:7px 6px;border-radius:6px;cursor:pointer;transition:all .2s var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--accent-wash);color:var(--text)}
+.seg.compact{display:inline-flex}
+.seg.compact button{padding:5px 12px}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;border-top:1px solid var(--hair)}
+.notes section{padding:12px 24px;border-right:1px solid var(--hair)}
+.notes h3{font-size:12px;font-weight:500;margin-bottom:2px}
+.notes p{color:var(--text-2);font-size:12.5px;line-height:1.45}
+.notes .kbd{font-family:var(--mono);color:var(--text);font-size:11.5px}
+.prevnext{display:flex;align-items:center;gap:8px;padding:0 20px}
+.prevnext a{color:var(--text-2);text-decoration:none;font-size:12px;border:1px solid var(--hair);border-radius:999px;padding:6px 12px}
+.prevnext a:hover{color:var(--text);border-color:var(--hair-strong,rgba(255,255,255,.16))}
+
+/* Timeline */
+.timeline{padding:10px 24px 14px;border-top:1px solid var(--hair);display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:14px;align-items:center}
+.timeline .play{background:none;border:none;color:var(--accent);cursor:pointer;width:24px;height:24px;display:grid;place-items:center}
+.timeline .tc{font-family:var(--mono);font-size:12px;color:var(--text-2);min-width:96px}
+.track{position:relative;height:34px;cursor:pointer;touch-action:none}
+.track .bar{position:absolute;left:0;right:0;top:14px;height:6px;border-radius:3px;background:rgba(255,255,255,.06)}
+.track .span{position:absolute;top:14px;height:6px;border-radius:3px;background:rgba(153,153,255,.3)}
+.track .ticks{position:absolute;left:0;right:0;bottom:0;height:5px;background-image:linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:calc(100% / 30) 100%}
+.track .key{position:absolute;top:10px;width:14px;height:14px;margin-left:-7px}
+.track .head{position:absolute;top:0;bottom:0;width:1px;background:var(--text);pointer-events:none}
+.track .head::before{content:"";position:absolute;top:-2px;left:-4px;width:9px;height:9px;border-radius:2px;background:var(--text)}
+
+/* Present mode: press P. Header and notes hide; stage and controls fill the screen. */
+html[data-present] .hdr,html[data-present] .notes{display:none}
+html[data-present] body{grid-template-rows:minmax(0,1fr)}
+html[data-present] .panel{font-size:15px}
+html[data-present] .seg button{font-size:14px;padding:10px 8px}
+.present-hint{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#15152A;border:1px solid var(--hair);border-radius:999px;padding:6px 14px;color:var(--text-2);font-size:12px;opacity:0;transition:opacity .3s var(--ease);pointer-events:none;z-index:60}
+.present-hint[data-show]{opacity:1}
+/* Page-specific (css/pages/06.css) */
+.slide{position:absolute;left:8%;right:8%;top:50%;height:0}
+.slide .floor{position:absolute;left:0;right:0;top:0;height:1px;background:rgba(255,255,255,.14)}
+.ball{position:absolute;bottom:0;left:0;width:clamp(36px,4vw,56px);aspect-ratio:1;margin-left:calc(clamp(36px,4vw,56px) / -2);border-radius:50%;background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%)}
+.marks{position:absolute;left:0;right:0;top:14px;height:10px}
+.marks span{position:absolute;top:0;width:2px;height:10px;margin-left:-1px;border-radius:1px;background:var(--accent);opacity:.6}
+.stage-caption{position:absolute;left:8%;top:calc(50% + 34px);color:var(--text-2);font-size:12px}
+.graph{width:100%;aspect-ratio:1;max-height:34vh;display:block;touch-action:none;background:rgba(255,255,255,.025);border-radius:10px}
+.graph .h{cursor:grab}
+.presets{flex-wrap:wrap}
+.presets button{flex:1 1 40%}
+.readout{font-family:var(--mono);font-size:12px;color:var(--accent);word-break:break-all}
+.small{color:var(--text-2);font-size:12px;line-height:1.45}
+</style><style id="glass">
+/* Copied from css/glass.css for this reference (background path adjusted). */
+/* =====================================================================
+   Glass layer. Load AFTER tokens.css and shell.css on every page.
+   Static focus-stacked strands behind frosted glass panels.
+   No background animation (decision: static only).
+   ===================================================================== */
+:root{
+  --bg:#07071A;
+  --glass:linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  --glass-border:rgba(255,255,255,.12);
+  --glass-blur:blur(22px) saturate(140%);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.14);
+  --glass-shadow:0 10px 30px rgba(0,0,0,.28);
+  --well:rgba(0,0,0,.24);              /* recessed areas inside glass: graphs, timelines, segmented tracks */
+  --well-border:rgba(255,255,255,.06);
+  --strands-dim:.55;                   /* background strength on principle pages */
+}
+html,body{height:100%}
+body{background:var(--bg);padding:12px;gap:10px;isolation:isolate}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:var(--bg) url(../../assets/svg/strands.svg) center/cover no-repeat}
+body.principle::before{opacity:var(--strands-dim)}  /* principle pages: dimmer so the demo reads first */
+
+/* Shared glass surface */
+.glass,.hdr,.panel,.notes,.stage-area,.card,.menu,.controls{
+  background:var(--glass);border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-edge),var(--glass-shadow)}
+
+/* Header: floating pill */
+.hdr{height:52px;border-radius:999px;padding:0 8px 0 20px;border-bottom:1px solid var(--glass-border)}
+.hdr nav{gap:2px}
+.hdr nav a,.hdr nav button.link{padding:7px 12px;border-radius:999px}
+.hdr nav [aria-current="page"],.hdr nav button.link[aria-expanded="true"]{background:rgba(255,255,255,.1);color:var(--text)}
+.hdr .pill{margin-left:6px}
+
+/* Dropdown: more opaque so the list stays easy to read */
+.menu{background:linear-gradient(135deg,rgba(32,32,72,.82),rgba(18,18,46,.86));border-radius:16px;top:70px;right:20px}
+
+/* Principle page shell */
+.page{gap:10px}
+.stage-area{border-radius:18px;overflow:hidden}
+.panel{border-radius:18px;border-left:1px solid var(--glass-border)}
+.notes{border-radius:16px;border-top:1px solid var(--glass-border)}
+.notes section{border-right-color:rgba(255,255,255,.08)}
+.timeline{border-top:none;margin:0 12px 12px;padding:8px 14px;border-radius:12px;background:var(--well);border:1px solid var(--well-border)}
+.seg{background:var(--well);border:1px solid var(--well-border)}
+.seg button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.graph,.plot{background:var(--well);border:1px solid var(--well-border);border-radius:12px}
+.pill{background:rgba(255,255,255,.04)}
+
+/* 3D stages: NO backdrop blur behind a live WebGL canvas (expensive on college PCs) */
+.stage-area.is-3d{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(10,10,21,.9)}
+
+/* Principles index boxes */
+.card{border-radius:16px;transition:border-color .25s var(--ease),box-shadow .25s var(--ease),transform .25s var(--ease)}
+.card:hover,.card:focus-visible{border-color:rgba(153,153,255,.6);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px rgba(153,153,255,.25),0 12px 36px rgba(153,153,255,.18);background:var(--glass)}
+
+/* Home: controls sit in a glass dock */
+.controls{border-radius:999px;padding:6px 6px 6px 18px}
+
+/* Present mode: no body padding, keep the glass */
+html[data-present] body{padding:12px}
+
+</style>
+</head><body class="principle">
+<header class="hdr"><a class="brand" href="#">Principles of Animation</a><nav><a href="#">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="#">Spot it</a><a href="#">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="#"><span class="mono">01</span>Squash and stretch</a>
+    <a href="#"><span class="mono">07</span>Arc</a>
+    <a href="#"><span class="mono">02</span>Anticipation</a>
+    <a href="#"><span class="mono">08</span>Secondary action</a>
+    <a href="#"><span class="mono">03</span>Staging</a>
+    <a href="#"><span class="mono">09</span>Timing</a>
+    <a href="#"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="#"><span class="mono">10</span>Exaggeration</a>
+    <a href="#"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="#"><span class="mono">11</span>Appeal</a>
+    <a href="#"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="#"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="#">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<div class="page">
+  <section class="stage-area">
+    <div class="stage-head">
+      <h1><span class="mono">06</span>Slow in and slow out</h1>
+      <div class="seg compact" role="group" aria-label="View"><button aria-pressed="true">2D</button><button aria-pressed="false">3D</button></div>
+    </div>
+    <div class="stage" id="stage">
+      <div class="slide">
+        <div class="floor"></div>
+        <div class="ball" id="ball"></div>
+        <!-- 21 spacing marks: one per frame from frame 0 to 20. Written in HTML; JS only sets their left. -->
+        <div class="marks" id="marks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <p class="stage-caption">Spacing: one mark per frame</p>
+    </div>
+    <div class="timeline" id="timeline">
+      <button class="play" id="play" aria-label="Pause"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect class="i-pause" x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect class="i-pause" x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><path class="i-play" d="M3 1.5 12 7 3 12.5Z" fill="currentColor" style="display:none"/></svg></button>
+      <span class="tc" id="tc">00:00:00:00</span>
+      <div class="track" id="track">
+        <div class="bar"></div><div class="span" style="left:0;width:66.667%"></div><div class="ticks"></div>
+        <svg class="key" style="left:0%" viewBox="0 0 14 14" aria-hidden="true"><path id="k0l" fill="#9999FF"/><path id="k0r" fill="#9999FF"/></svg>
+        <svg class="key" style="left:66.667%" viewBox="0 0 14 14" aria-hidden="true"><path id="k1l" fill="#9999FF"/><path id="k1r" fill="#9999FF"/></svg>
+        <div class="head" id="head"></div>
+      </div>
+    </div>
+  </section>
+  <aside class="panel">
+    <h2>Graph editor</h2>
+    <svg class="graph" id="graph" viewBox="0 0 200 200" aria-label="Value graph with two draggable handles">
+      <rect x="20" y="30" width="160" height="140" fill="none" stroke="rgba(255,255,255,.08)"/>
+      <line x1="20" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,.05)"/><line x1="100" y1="30" x2="100" y2="170" stroke="rgba(255,255,255,.05)"/>
+      <line id="l1" stroke="rgba(153,153,255,.5)"/><line id="l2" stroke="rgba(153,153,255,.5)"/>
+      <path id="curve" fill="none" stroke="#F5F5F7" stroke-width="2"/>
+      <circle cx="20" cy="170" r="3.5" fill="#F5F5F7"/><circle cx="180" cy="30" r="3.5" fill="#F5F5F7"/>
+      <circle class="h" id="h1" r="7" fill="#9999FF"/><circle class="h" id="h2" r="7" fill="#9999FF"/>
+    </svg>
+    <h2>Presets</h2>
+    <div class="seg presets" id="presets" role="group" aria-label="Ease presets">
+      <button data-p=".333,.333,.667,.667" aria-pressed="false">Linear</button>
+      <button data-p=".33,0,.67,1" aria-pressed="true">Easy Ease</button>
+      <button data-p=".42,0,1,1" aria-pressed="false">Slow out only</button>
+      <button data-p="0,0,.58,1" aria-pressed="false">Slow in only</button>
+    </div>
+    <h2>CSS equivalent</h2>
+    <p class="readout" id="readout">cubic-bezier(0.33, 0, 0.67, 1)</p>
+    <p class="small">Careful: names are swapped. After Effects' Easy Ease In is CSS <span class="mono">ease-out</span>.</p>
+  </aside>
+</div>
+<footer class="notes">
+  <section><h3>What to notice</h3><p>Marks bunch up where it's slow and spread out where it's fast.</p></section>
+  <section><h3>In After Effects</h3><p>Select keys, <span class="kbd">F9</span> for Easy Ease. <span class="kbd">Shift+F3</span> opens the Graph Editor.</p></section>
+  <section><h3>Try this</h3><p>Drag a handle above the box to make it overshoot and settle back.</p></section>
+  <div class="prevnext"><a href="#" aria-label="Previous: 05 Follow through">‹ 05</a><a href="#" aria-label="Next: 07 Arc">07 ›</a></div>
+</footer>
+<script type="module">
+// Pattern for js/core/menu.js
+const btn = document.getElementById('menuBtn'), menu = document.getElementById('menu');
+function setOpen(open) {
+  btn.setAttribute('aria-expanded', open);
+  if (open) { menu.hidden = false; requestAnimationFrame(() => menu.dataset.open = ''); }
+  else { delete menu.dataset.open; setTimeout(() => { if (btn.getAttribute('aria-expanded') === 'false') menu.hidden = true; }, 220); }
+}
+btn.addEventListener('click', e => { e.stopPropagation(); setOpen(btn.getAttribute('aria-expanded') !== 'true'); });
+document.addEventListener('click', e => { if (!menu.contains(e.target)) setOpen(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') { setOpen(false); btn.focus(); } });
+</script>
+<script type="module">
+// Pattern for js/core/present.js
+const html = document.documentElement, hint = document.querySelector('.present-hint');
+function setPresent(on) {
+  if (on) html.dataset.present = ''; else delete html.dataset.present;
+  try { sessionStorage.setItem('present', on ? '1' : '0'); } catch (e) {}
+  if (on && hint) { hint.dataset.show = ''; setTimeout(() => delete hint.dataset.show, 2000); }
+  window.dispatchEvent(new Event('resize')); // lets 3D stages resize
+}
+try { if (sessionStorage.getItem('present') === '1') html.dataset.present = ''; } catch (e) {}
+document.getElementById('presentBtn').addEventListener('click', () => setPresent(!('present' in html.dataset)));
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input, textarea, select')) return;
+  if (e.key === 'p' || e.key === 'P') setPresent(!('present' in html.dataset));
+  if (e.key === 'Escape' && 'present' in html.dataset) setPresent(false);
+});
+</script>
+<script type="module">
+// ===== js/core/bezier.js =====
+const bz = (s, a, b) => { const u = 1 - s; return 3*u*u*s*a + 3*u*s*s*b + s*s*s; };
+// Solve x(s) = t by bisection (x is monotonic because handle x is clamped to 0..1), return y(s).
+function evaluate(P, t) { let lo = 0, hi = 1, s = t; for (let i = 0; i < 24; i++) { s = (lo + hi) / 2; bz(s, P[0], P[2]) < t ? lo = s : hi = s; } return bz(s, P[1], P[3]); }
+
+// ===== js/pages/06-slow.js =====
+const FPS = 25, FRAMES = 30, MOVE = 20, MS = 1000 / FPS;   // 20-frame move, 10-frame hold
+let P = [.33, 0, .67, 1];
+const $ = id => document.getElementById(id), X = x => 20 + x * 160, Y = y => 170 - y * 140;
+const ball = $('ball'), marks = [...$('marks').children], presets = [...$('presets').children];
+let anim = null;
+
+function buildAnimation() {   // Web Animations API, so the shared timeline can scrub it
+  const t = anim ? anim.currentTime : 0, playing = anim ? anim.playState === 'running' : true;
+  if (anim) anim.cancel();
+  anim = ball.animate([
+    { left: '0%', offset: 0, easing: `cubic-bezier(${P.join(',')})` },
+    { left: '100%', offset: MOVE / FRAMES },
+    { left: '100%', offset: 1 }
+  ], { duration: FRAMES * MS, iterations: Infinity });
+  anim.currentTime = t; if (!playing) anim.pause();
+}
+
+function halfIcon(side, eased) {   // AE keyframe icon halves: diamond (linear) or hourglass (eased)
+  const h = side === 'l' ? -1 : 1;
+  return eased ? `M7 1 L${7+h*6} 1 L${7+h*1.5} 7 L${7+h*6} 13 L7 13Z` : `M7 1 L${7+h*6} 7 L7 13Z`;
+}
+
+function update() {
+  $('curve').setAttribute('d', `M20 170 C${X(P[0])} ${Y(P[1])} ${X(P[2])} ${Y(P[3])} 180 30`);
+  $('h1').setAttribute('cx', X(P[0])); $('h1').setAttribute('cy', Y(P[1]));
+  $('h2').setAttribute('cx', X(P[2])); $('h2').setAttribute('cy', Y(P[3]));
+  for (const [id, ax, ay, x, y] of [['l1', 20, 170, P[0], P[1]], ['l2', 180, 30, P[2], P[3]]]) {
+    const l = $(id); l.setAttribute('x1', ax); l.setAttribute('y1', ay); l.setAttribute('x2', X(x)); l.setAttribute('y2', Y(y));
+  }
+  marks.forEach((m, i) => m.style.left = (evaluate(P, i / MOVE) * 100) + '%');
+  const outEased = P[1] < P[0] * .6, inEased = P[3] > 1 - (1 - P[2]) * .6;
+  $('k0l').setAttribute('d', halfIcon('l', false)); $('k0r').setAttribute('d', halfIcon('r', outEased));
+  $('k1l').setAttribute('d', halfIcon('l', inEased)); $('k1r').setAttribute('d', halfIcon('r', false));
+  $('readout').textContent = `cubic-bezier(${P.map(v => +v.toFixed(2)).join(', ')})`;
+  buildAnimation();
+}
+
+presets.forEach(b => b.addEventListener('click', () => {
+  P = b.dataset.p.split(',').map(Number); presets.forEach(x => x.setAttribute('aria-pressed', x === b)); update();
+}));
+
+const graph = $('graph'); let drag = null;
+['h1', 'h2'].forEach((id, i) => $(id).addEventListener('pointerdown', e => { drag = i; graph.setPointerCapture(e.pointerId); }));
+graph.addEventListener('pointermove', e => {
+  if (drag === null) return;
+  const r = graph.getBoundingClientRect(), sx = (e.clientX - r.left) / r.width * 200, sy = (e.clientY - r.top) / r.height * 200;
+  P[drag * 2] = Math.min(1, Math.max(0, (sx - 20) / 160));
+  P[drag * 2 + 1] = Math.min(1.25, Math.max(-.25, (170 - sy) / 140));
+  presets.forEach(x => x.setAttribute('aria-pressed', 'false')); update();
+});
+graph.addEventListener('pointerup', () => drag = null);
+
+// ===== js/core/timeline.js (generic: works on any Web Animation, including CSS @keyframes via el.getAnimations()) =====
+function bindTimeline({ track, head, tc, play, getAnims, frames, fps = 25 }) {
+  const ms = 1000 / fps, dur = frames * ms;
+  const anims = () => getAnims();
+  const frameNow = () => Math.floor(((anims()[0]?.currentTime ?? 0) % dur) / ms);
+  const setFrame = f => anims().forEach(a => { a.pause(); a.currentTime = ((f % frames) + frames) % frames * ms; });
+  const isPlaying = () => anims()[0]?.playState === 'running';
+  const showPlayState = () => {
+    const on = isPlaying(); play.setAttribute('aria-label', on ? 'Pause' : 'Play');
+    play.querySelectorAll('.i-pause').forEach(n => n.style.display = on ? '' : 'none');
+    play.querySelector('.i-play').style.display = on ? 'none' : '';
+  };
+  const toggle = () => { const on = isPlaying(); anims().forEach(a => on ? a.pause() : a.play()); showPlayState(); };
+  play.addEventListener('click', toggle);
+  const scrub = e => { const r = track.getBoundingClientRect(); setFrame(Math.round((e.clientX - r.left) / r.width * (frames - 1))); showPlayState(); };
+  track.addEventListener('pointerdown', e => { track.setPointerCapture(e.pointerId); scrub(e); track.onpointermove = scrub; });
+  track.addEventListener('pointerup', () => track.onpointermove = null);
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input, textarea, select')) return;
+    if (e.code === 'Space') { e.preventDefault(); toggle(); }
+    if (e.key === 'PageDown') { e.preventDefault(); setFrame(frameNow() + 1); showPlayState(); }
+    if (e.key === 'PageUp') { e.preventDefault(); setFrame(frameNow() - 1); showPlayState(); }
+    if (e.key === 'Home') { setFrame(0); showPlayState(); }
+    if (e.key === 'End') { setFrame(frames - 1); showPlayState(); }
+  });
+  (function loop() {
+    const f = frameNow();
+    head.style.left = (f / (frames - 1) * 100) + '%';
+    tc.textContent = '00:00:00:' + String(f).padStart(2, '0');
+    requestAnimationFrame(loop);
+  })();
+}
+
+update();
+bindTimeline({ track: $('track'), head: $('head'), tc: $('tc'), play: $('play'), getAnims: () => ball.getAnimations(), frames: FRAMES });
+</script></body></html>

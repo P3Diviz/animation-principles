@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Animations - Home</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding-top: 80px;
+      }
+
+      /* Navbar Styles */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        z-index: 1000;
+        padding: 15px 40px;
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .nav-logo {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: white;
+        text-decoration: none;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        list-style: none;
+      }
+
+      .nav-link {
+        color: white;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        background: rgba(255, 217, 61, 0.3);
+        transition: width 0.3s ease;
+        z-index: -1;
+        border-radius: 8px;
+      }
+
+      .nav-link:hover::before {
+        width: 100%;
+      }
+
+      .nav-link.active {
+        background: rgba(255, 217, 61, 0.3);
+        color: #ffd93d;
+        font-weight: bold;
+      }
+
+      /* Original Styles */
+      .heading {
+        margin-bottom: 3rem;
+        padding: 3rem;
+        font-size: 1.75rem;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+
+      .container {
+        width: 800px;
+        height: 480px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .ball {
+        width: 160px;
+        height: 160px;
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 50% 20%,
+          #fff9d9 0%,
+          #ffd93d 40%,
+          #b58d00 85%
+        );
+        left: 40%;
+        transform-origin: centre bottom;
+        animation: bounce 0.5s alternate infinite ease;
+      }
+
+      @keyframes bounce {
+        0% {
+          top: 60%;
+          transform: scale(1.7, 0.5);
+        }
+        40% {
+          height: 160px;
+          border-radius: 50%;
+          transform: scaleX(1);
+        }
+        100% {
+          top: 0%;
+        }
+      }
+
+      .shadow {
+        width: 160px;
+        height: 30px;
+        border-radius: 50%;
+        background: hsl(0, 0%, 10%);
+        position: absolute;
+        top: 385px;
+        transform-origin: bottom center;
+        z-index: -1;
+        left: 40%;
+        filter: blur(6px);
+        animation: shadow 0.5s alternate infinite ease;
+      }
+
+      @keyframes shadow {
+        0% {
+          transform: scaleX(1.7);
+        }
+        40% {
+          transform: scaleX(1);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scaleX(0.2);
+          opacity: 0.2;
+        }
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        .nav-links {
+          gap: 10px;
+        }
+
+        .nav-link {
+          padding: 6px 12px;
+          font-size: 0.9em;
+        }
+
+        .navbar {
+          padding: 15px 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="index.html" class="nav-logo">CSS Animations</a>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="aimObs.html" class="nav-link">Objectives</a></li>
+          <li><a href="mission.html" class="nav-link">Mission</a></li>
+          <li><a href="keyframe.html" class="nav-link">Keyframes</a></li>
+          <li><a href="animationProp.html" class="nav-link">Properties</a></li>
+          <li><a href="playground.html" class="nav-link">Playground</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="heading">
+      <h1>Creating Your First CSS Animation</h1>
+      <h2>(Web Development)</h2>
+    </div>
+
+    <div class="container">
+      <div class="ball"></div>
+      <div class="shadow"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+/* =====================================================================
+   Glass layer. Load AFTER tokens.css and shell.css on every page.
+   Static focus-stacked strands behind frosted glass panels.
+   No background animation (decision: static only).
+   ===================================================================== */
+:root{
+  --bg:#07071A;
+  --glass:linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  --glass-border:rgba(255,255,255,.12);
+  --glass-blur:blur(22px) saturate(140%);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.14);
+  --glass-shadow:0 10px 30px rgba(0,0,0,.28);
+  --well:rgba(0,0,0,.24);              /* recessed areas inside glass: graphs, timelines, segmented tracks */
+  --well-border:rgba(255,255,255,.06);
+  --strands-dim:.55;                   /* background strength on principle pages */
+}
+html,body{height:100%}
+body{background:var(--bg);padding:12px;gap:10px;isolation:isolate}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:var(--bg) url(STRANDS_URL) center/cover no-repeat}
+body.principle::before{opacity:var(--strands-dim)}  /* principle pages: dimmer so the demo reads first */
+
+/* Shared glass surface */
+.glass,.hdr,.panel,.notes,.stage-area,.card,.menu,.controls{
+  background:var(--glass);border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-edge),var(--glass-shadow)}
+
+/* Header: floating pill */
+.hdr{height:52px;border-radius:999px;padding:0 8px 0 20px;border-bottom:1px solid var(--glass-border)}
+.hdr nav{gap:2px}
+.hdr nav a,.hdr nav button.link{padding:7px 12px;border-radius:999px}
+.hdr nav [aria-current="page"],.hdr nav button.link[aria-expanded="true"]{background:rgba(255,255,255,.1);color:var(--text)}
+.hdr .pill{margin-left:6px}
+
+/* Dropdown: more opaque so the list stays easy to read */
+.menu{background:linear-gradient(135deg,rgba(32,32,72,.82),rgba(18,18,46,.86));border-radius:16px;top:70px;right:20px}
+
+/* Principle page shell */
+.page{gap:10px}
+.stage-area{border-radius:18px;overflow:hidden}
+.panel{border-radius:18px;border-left:1px solid var(--glass-border)}
+.notes{border-radius:16px;border-top:1px solid var(--glass-border)}
+.notes section{border-right-color:rgba(255,255,255,.08)}
+.timeline{border-top:none;margin:0 12px 12px;padding:8px 14px;border-radius:12px;background:var(--well);border:1px solid var(--well-border)}
+.seg{background:var(--well);border:1px solid var(--well-border)}
+.seg button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.graph,.plot{background:var(--well);border:1px solid var(--well-border);border-radius:12px}
+.pill{background:rgba(255,255,255,.04)}
+
+/* 3D stages: NO backdrop blur behind a live WebGL canvas (expensive on college PCs) */
+.stage-area.is-3d{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(10,10,21,.9)}
+
+/* Principles index boxes */
+.card{border-radius:16px;transition:border-color .25s var(--ease),box-shadow .25s var(--ease),transform .25s var(--ease)}
+.card:hover,.card:focus-visible{border-color:rgba(153,153,255,.6);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px rgba(153,153,255,.25),0 12px 36px rgba(153,153,255,.18);background:var(--glass)}
+
+/* Home: controls sit in a glass dock */
+.controls{border-radius:999px;padding:6px 6px 6px 18px}
+
+/* Present mode: no body padding, keep the glass */
+html[data-present] body{padding:12px}

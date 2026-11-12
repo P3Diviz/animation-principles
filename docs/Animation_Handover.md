@@ -1,0 +1,410 @@
+# Principles of Animation: Build Handover
+
+For Claude Code, working in Paul's VS Code workspace and GitHub repo. Read this whole file before writing any code. Last updated 12 November 2026.
+
+## 0. Start here
+
+**Deadline: the site must be fully working in class on Monday.** Build in the order in section 14 so the site is usable at the end of every phase. Paul has very little time for back-and-forth: decisions are made in this file, and the reference files in `docs/reference/` are the visual source of truth. Don't redesign; match them.
+
+Already in the repo from the starter pack (don't recreate):
+
+| Path | What it is |
+|---|---|
+| `docs/reference/home-approved.html` | Approved home page. **Contains Paul's original ball, ported exactly** (section 16) |
+| `docs/reference/principles-index-approved.html` | Approved Principles page, with the working dropdown |
+| `docs/reference/06-slow-in-slow-out-approved.html` | **The full principle page shell**: header, dropdown, stage, controls panel, Graph Editor, timeline (scrub, Space, Page Up/Down), notes strip, Present mode. Every principle page copies this structure |
+| `docs/reference/03-staging-3d-approved.html` | Approved 3D page on the vendored Three.js r170: Mixamo FBX loading with mannequin fallback, key/fill/rim, draggable light plot, Wide/Mid/Close, silhouette test |
+| `docs/reference/original-bouncing-ball.html` | Paul's original file, untouched, for comparison |
+| `assets/svg/thumbs/01.svg … 12.svg` | Final thumbnails for the Principles page |
+| `assets/svg/strands.svg` | The site background: static, focus-stacked light strands with evenly spaced keyframe dots |
+| `css/glass.css` | **Final.** The glass layer used by every page (section 4, Glass layer). Load it after `tokens.css` and `shell.css`. Replace `STRANDS_URL` with `../assets/svg/strands.svg` |
+| `vendor/three/` | Three.js r170 (`three.module.min.js`) plus FBXLoader (with its curves and fflate dependencies), GLTFLoader, OrbitControls, SkeletonUtils, BufferGeometryUtils. Already vendored |
+| `.nojekyll` | Needed for GitHub Pages |
+| `CLAUDE.md` | Tells every Claude Code session to read this file first |
+
+All reference pages were screenshot-checked at 1280×720, 1366×768 and 1920×1080 with no scrolling. They load fonts from Google Fonts for preview only; production self-hosts them (section 4). View them with Live Server: module scripts don't run from `file://`.
+
+**How to use the references:** split their `<style>` and `<script>` blocks into the files named in their comments (`css/shell.css`, `js/core/menu.js`, `js/core/timeline.js`, `js/three/lights.js` and so on). Keep values, class names and behaviour. Fill each new principle page into the same shell.
+
+## 1. What we're building
+
+An interactive teaching website for UAL Level 2 Creative Media learners (Paul Davies, North Wales). Each of the 12 principles of animation gets its own page, where learners switch the principle on and off, change settings, scrub frame by frame, and compare 2D and 3D versions.
+
+It is used in Paul's classroom on college PCs (WebGL works) and on the projector. It is **not** a public product, but see section 12 on hosting.
+
+The look: After Effects' navy and violet, built to the standard of an Apple or Adobe product page. Restrained, typographic, precise. Nothing childish: no mascots, no cartoon characters, no rainbow colours, no emoji.
+
+## 2. Fixed decisions (do not change without asking Paul)
+
+1. **Principle order follows the classroom posters.** The posters are used for the order only. Do not use their character, images, copy or colours anywhere.
+
+   | # | Principle | File |
+   |---|---|---|
+   | 01 | Squash and stretch | `principles/01-squash-and-stretch.html` |
+   | 02 | Anticipation | `principles/02-anticipation.html` |
+   | 03 | Staging | `principles/03-staging.html` |
+   | 04 | Straight ahead and pose to pose | `principles/04-straight-ahead-pose-to-pose.html` |
+   | 05 | Follow through and overlapping action | `principles/05-follow-through.html` |
+   | 06 | Slow in and slow out | `principles/06-slow-in-slow-out.html` |
+   | 07 | Arc | `principles/07-arc.html` |
+   | 08 | Secondary action | `principles/08-secondary-action.html` |
+   | 09 | Timing | `principles/09-timing.html` |
+   | 10 | Exaggeration | `principles/10-exaggeration.html` |
+   | 11 | Appeal | `principles/11-appeal.html` |
+   | 12 | Solid drawing | `principles/12-solid-drawing.html` |
+
+2. **Every page fits one screen. No scrolling, ever.** Scrolling breaks the effect. Target viewports: 1366×768 (smallest college PC), 1920×1080 (projector, most PCs). Test at 1280×720 too. Use `height: 100dvh`, CSS grid, `overflow: hidden` on `html, body`, and `clamp()` for sizes. If something doesn't fit, cut words, not layout.
+3. **No references to The Goal, or to learners' own projects, on any page.** The site is taught before The Goal starts.
+4. **HTML and CSS first. JavaScript only for interaction**, plus Three.js for 3D. No `innerHTML` to build UI. All markup is written in the HTML files (see section 6).
+5. **No build tools.** No npm, bundlers, frameworks or Tailwind. Plain files that GitHub Pages serves as they are, and that Paul can edit in GitHub's web editor.
+6. **Mixamo models** (the plain Y Bot and X Bot only) are approved for this classroom site. Both are used: Y Bot (male proportions) and X Bot (female proportions), mixed across the pages as in section 11.
+7. **No Adobe logo** or Adobe trademarks in the UI. Use "After Effects" in text only.
+
+## 3. Site map
+
+| Page | File | Purpose |
+|---|---|---|
+| Home | `index.html` | One screen. Headline, the bouncing ball hero with a Squash and stretch Off/On switch, and two buttons: "Explore the principles" and "Spot it" |
+| Principles | `principles.html` | The 12 principles as individual boxes (4×3 grid, poster order), each a link. Each box shows the principle number, a small static diagram (an SVG in `assets/svg/thumbs/NN.svg`, drawn as a motion study in violet: strobe positions, spacing marks or a path), the name and a three-word descriptor. No animated previews and no hover instruction text. Hover and focus only brighten the border. **No page-specific JavaScript**: only the shared menu and Present scripts. See `docs/reference/principles-index-approved.html`. |
+| 12 principle pages | `principles/NN-*.html` | One per principle, all using the page shell in section 5 |
+| Spot it | `spot-it.html` | Quiz built from the site's own demos (section 9) |
+| Playground | `playground.html` | One ball with every principle's controls together (section 9) |
+
+### Header (identical on every page)
+
+The wordmark "Principles of Animation" (links home) sits on the left. Everything else is grouped on the right: Home, **Principles ▾** (dropdown), Spot it, Playground, then a **Present** button showing the key hint `P`. No other text in the header.
+
+The Principles dropdown is a two-column panel listing all 12 in poster order (01–06 left, 07–12 right), each with its number in the accent colour. The menu opens right-aligned under the Principles link. The current page has `aria-current="page"` and a violet wash. It opens on click (not hover, which is unreliable on projector touch screens), closes on Esc, outside click, or choosing a link. It's a real `<nav>` of `<a>` links, written in HTML on every page. Clicking the word "Principles" itself toggles the menu; the menu's footer link "See all twelve" goes to `principles.html`.
+
+Because the header is duplicated across 17 files, keep it byte-identical apart from `aria-current` and relative paths. When the nav changes, update every file in the same commit.
+
+## 4. Design system
+
+### Tokens (`css/tokens.css`)
+
+```css
+:root {
+  --bg: #0A0A15;            /* 3D scene background and solid fallbacks; the page itself uses #07071A from glass.css */
+  --panel: #10101D;         /* side panels */
+  --card: #12122A;          /* boxes on principles.html, dropdown */
+  --card-hover: #17173A;
+  --hair: rgba(255,255,255,.08);   /* all dividers: 1px */
+  --hair-strong: rgba(255,255,255,.16);
+  --text: #F5F5F7;
+  --text-2: #9C9CB3;
+  --accent: #9999FF;        /* After Effects violet: interactive things and keyframes ONLY */
+  --accent-wash: rgba(153,153,255,.14);
+  --accent-line: rgba(153,153,255,.55);
+  --light-key: #FFD9A8;  --light-fill: #A9B6FF;  --light-rim: #9999FF;
+  --clay: #C9C9D3;          /* 3D models */
+  --ease: cubic-bezier(.33,0,.67,1);   /* After Effects Easy Ease */
+  --dur: 220ms;
+  --r-card: 12px; --r-control: 8px; --r-pill: 999px;
+  --font: "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+```
+
+### Rules
+
+- **One accent.** Violet appears only on controls, selected states, keyframes, handles and the principle number. Everything else is navy and grey.
+- **Glass layer (approved, final).** Every page sits on `assets/svg/strands.svg`: a static background of light strands at three focus depths (heavily blurred far back, soft in the middle, sharp in front) with evenly spaced dots along the sharp strands, like keyframes on a timeline. **No background animation or drift.** On top, the header (a floating pill), stage area, controls panel, notes strip, Principles boxes, dropdown and home control dock are frosted glass, all defined in `css/glass.css`. Recessed areas inside glass (graphs, the timeline, segmented control tracks) use the darker `--well` colour. Principle pages add `class="principle"` to `<body>`, which dims the strands to 55% so the demo reads first. Home and Principles show them at full strength.
+- **No backdrop blur behind a live 3D canvas.** A 3D stage area gets the class `is-3d`, which turns the blur off and uses a near-solid panel instead. Blurring behind a canvas that redraws every frame is slow on college PCs.
+- **Inside a glass panel, divide with hairlines**, not more boxes.
+- **Type:** Inter for everything; JetBrains Mono only where After Effects itself shows numbers: timecodes (`00:00:00:12`), values, the principle number, CSS readouts, key hints. Self-host both (OFL licence) as woff2 in `assets/fonts/` so the site doesn't depend on Google Fonts loading on the college network.
+- **Type scale:** 11 / 12 / 13 / 15 / 17 / 22 / 36, home headline `clamp(40px, 5vw, 64px)`. Weights 400, 500, 600 only. Headlines tight (letter-spacing about -0.02em).
+- **Copy:** sentence case, short, plain verbs. No ALL-CAPS labels, no tracked-out eyebrows, no middle-dot strings ("2D · 3D"), no single word coloured in a headline, no "→" on buttons. These were in early mockups and have been removed on purpose.
+- **Motion obeys the principles.** Every UI transition uses `var(--ease)`. Camera moves ease, never cut. Nothing animates on its own except the demo itself and the home ball. The boxes on `principles.html` are static images.
+- **Accessibility:** visible focus rings (`outline: 2px solid var(--accent); outline-offset: 2px`), `aria-pressed` on toggle buttons, `aria-expanded` on the dropdown, real `<button>` and `<a>` elements, contrast at least 4.5:1 for text. `prefers-reduced-motion`: demos stay paused until the learner presses play.
+
+### Components (`css/components.css`)
+
+- **Segmented control** (`.seg`): pill track, `aria-pressed="true"` segment filled. Used for Off/On, 2D/3D, presets.
+- **Pill toggle** (`.pill`): for Key / Fill / Rim, Wide / Mid / Close, Silhouette test.
+- **Slider** (`.slider`): custom-styled `<input type="range">` with value readout in mono.
+- **Timeline** (`.timeline`): see section 7.
+- **Keyframe icon** (inline SVG, two `<path>` halves): left half shows incoming, right half outgoing. Linear half = half diamond; eased half = half hourglass, as in After Effects.
+- **Notes strip**: three equal columns, each a 12px title and one or two short lines.
+
+## 5. Principle page shell
+
+```
+┌ header (44–52px) ─────────────────────────────────────────────┐
+│ Principles of Animation   Home  Principles ▾  Spot it  Playground      Present P │
+├ stage ──────────────────────────────────────┬ controls panel ─┤
+│ 03 Staging                        [2D][3D]  │  (≈260–300px)    │
+│                                             │  sliders, pills, │
+│        demo (2D DOM/SVG or 3D canvas)       │  presets, plot   │
+│                                             │                  │
+│ [timeline, on pages that use it]            │                  │
+├ notes strip ────────────────────────────────┴──────────────────┤
+│ What to notice │ In After Effects │ Try this      ‹ 02   04 › │
+└────────────────────────────────────────────────────────────────┘
+```
+
+- `body` is a grid: `grid-template-rows: auto minmax(0,1fr) auto; height: 100dvh`.
+- The 2D and 3D versions live on the **same page**. The switch sets `data-view="2d|3d"` on `<main>`; CSS shows one stage. When 3D is hidden, stop its render loop.
+- Prev/next principle links sit at the right end of the notes strip.
+- **Notes strip content** (no Goal references): *What to notice* (one sentence), *In After Effects* (the matching tool or shortcut), *Try this* (one small challenge).
+
+### Present mode
+
+Press `P` (or the Present button) to toggle `data-present` on `<html>`. In present mode the header and notes strip hide, the stage and controls fill the screen, controls scale up about 125% for the projector, and a small exit hint shows for two seconds. `Esc` also exits. Remember the state in `sessionStorage` so it persists across pages during a lesson (wrap in try/catch).
+
+### Keyboard (After Effects habits)
+
+`Space` play/pause · `Page Up` / `Page Down` back/forward one frame · `Home` / `End` first/last frame · `P` present mode · `Esc` close menu or exit present mode. Ignore keys while focus is in a text field.
+
+## 6. Code conventions
+
+- **State lives in data attributes; CSS does the restyling.** For example, `<main data-squash="off">` with `[data-squash="off"] .ball { animation-name: bounce-flat; }`.
+- **Sliders drive CSS custom properties:** `stage.style.setProperty('--stretch', value)`. The CSS animation reads `var(--stretch)`.
+- **2D animation is CSS `@keyframes`.** JS only scrubs and controls it through the Web Animations API (`el.getAnimations()`, `.currentTime`, `.pause()`, `.play()`, `.updatePlaybackRate()`).
+- **No `innerHTML`, no template strings of markup.** Repeated elements (spacing marks, ghost frames) are written in the HTML. JS may only set attributes, classes, `textContent`, styles and custom properties. SVG paths that depend on values may be set with `setAttribute('d', …)`.
+- **ES modules**, one entry file per page: `<script type="module" src="../js/pages/03-staging.js">`. Shared modules in `js/core/` and `js/three/`.
+- Small, readable functions with short comments where the maths isn't obvious. Learners on Paul's web units may read this code, so clarity beats cleverness.
+- All paths relative (`../css/tokens.css`), never root-relative (`/css/…`), because GitHub Pages serves from `/repo-name/`.
+
+## 7. Shared modules
+
+| Module | Job |
+|---|---|
+| `js/core/menu.js` | Principles dropdown: toggle, Esc, outside click, focus return |
+| `js/core/present.js` | Present mode and its keyboard shortcuts |
+| `js/core/toggles.js` | Wires every `.seg` and `.pill` group: updates `aria-pressed` and writes `data-*` on the target named in `data-target` |
+| `js/core/timeline.js` | Binds a timeline UI to the CSS animations inside a stage. 25 fps. Timecode `00:00:SS:FF`. Click or drag to scrub (pauses), Space to play, Page Up/Down to step a frame. Draws keyframe icons at positions given in HTML `data-keys="0,12,24"` |
+| `js/core/bezier.js` | Cubic Bézier evaluate and solve (bisection), shared by the Graph Editor and Playground |
+| `js/three/stage.js` | Creates renderer (sRGB output, ACES tone mapping, soft shadows, pixel ratio capped at 2), scene, floor, camera, resize observer, start/stop loop, `dispose()` |
+| `js/three/rig.js` | Loads the Mixamo FBX bots and clips directly (section 11), returns the model, an `AnimationMixer`, and helpers: `play(name)`, `setTime(t)`, `timeScale(x)`, `stepped(keyTimes)` |
+| `js/three/lights.js` | Key, fill and rim lights with azimuth, height, on/off; emits changes for the light plot |
+| `js/three/cameras.js` | Named shots with eased transitions (lerp, never cut) |
+| `js/three/silhouette.js` | Swaps every material to black on a pale ground and back |
+
+### Three.js
+
+- **Three.js r170 is already vendored** in `vendor/three/` (`three.module.min.js` plus the addons listed in section 0). Don't upgrade it and don't load it from a CDN: vendoring protects lessons from the college network filter.
+- r170 differences from older tutorials: colour output is sRGB by default (don't set `outputEncoding`, it no longer exists); lights use physical units, so use the intensities in the Staging reference, not values from older examples; `CapsuleGeometry` exists and is used for the fallback mannequin.
+- Each 3D page has an import map:
+  ```html
+  <script type="importmap">
+  { "imports": {
+      "three": "../vendor/three/three.module.min.js",
+      "three/addons/": "../vendor/three/addons/" } }
+  </script>
+  ```
+- Clay material for models (`--clay`, roughness about 0.5), floor `#1C1C2B`, background `--bg`.
+- Pause rendering when the 3D view is hidden or the tab isn't visible.
+
+## 8. Principle pages
+
+Each entry lists the 2D demo, the 3D demo, the controls, and the notes strip copy (draft; Paul may edit). "Timeline" means the shared timeline component.
+
+### 01 Squash and stretch
+- **2D:** Paul's original bouncing ball, ported exactly as in `docs/reference/home-approved.html` (section 16). Do **not** change `transform-origin` to `center bottom`. Shadow scales with height.
+- **3D:** clay sphere bouncing on the floor; volume preserved (`sy` stretch, `sx = sz = 1/√sy`).
+- **Controls:** Off/On · Amount slider (0–150%) · Material presets: rubber ball, bowling ball, water balloon (change amount and timing together) · Volume check overlay (outline of the original circle, so learners see the area stays about the same) · Timeline.
+- **Notes:** *Notice* Squash on impact, stretch at speed, same volume throughout. *In After Effects* Scale with the link off, keyed at contact and just after. *Try this* Find the setting that makes it feel like a bowling ball.
+
+### 02 Anticipation
+- **2D:** simple block character (SVG, a few rounded shapes) jumping onto a box; also a throw.
+- **3D:** Y Bot `Jump` clip. **Off** starts the clip after the crouch (per-clip constant `ANTICIPATION_END` in seconds), so learners see the identical jump with and without it.
+- **Controls:** Off/On · Wind-up slider (none → huge) · **Predict it**: freezes on the wind-up pose and offers three choices of what happens next, then plays · Timeline.
+- **Notes:** *Notice* The small move the opposite way first. *In After Effects* An extra keyframe just before the main move, pulling back. *Try this* Make the wind-up so big it becomes funny.
+
+### 03 Staging
+- **2D:** flat illustrated set (SVG): figure, crate, ball, back wall. Drawing level switch: line drawing → flat colour → full render with light and shadow.
+- **3D:** Y Bot `Idle` on a simple set with a crate and ball prop.
+- **Controls:** Lights: **Key / Fill / Rim** pills · **Light plot, from above**: SVG top-down plan of the set showing the figure, a camera wedge that grows and shrinks with the shot, and the three lights in their colours. Lights are draggable round the circle; dragging moves the light's azimuth in the 3D scene live. Off lights fade to 25%. · Camera: **Wide / Mid / Close** (eased moves) · **Silhouette test** (black figures on pale ground) · Clutter toggle (busy background vs clean).
+- **Notes:** *Notice* Light and framing tell you where to look before anything moves. *In After Effects* Light layers and Camera layers (Layer > New). *Try this* Turn the key off. Can you still read the pose with the rim alone?
+
+### 04 Straight ahead and pose to pose
+- **2D:** split stage. Left: flame drawn frame by frame (straight ahead), as an SVG sprite stepped with `steps()`. Right: jointed SVG figure jumping (pose to pose).
+- **3D:** Y Bot `Jump` with **Blocking** mode: the mixer is set only to the key times and held (stepped), then **Splined** mode plays normally. This is exactly how animators block in 3D.
+- **Controls:** Keys only / Keys and in-betweens · Onion skin (previous and next frame ghosts, written in HTML and shown by class) · **Make your own**: drag the figure to three key poses, then play the in-betweens · Timeline with keyframe icons.
+- **Notes:** *Notice* Straight ahead flows, pose to pose is planned. *In After Effects* You work pose to pose: set keys, After Effects makes the in-betweens. Toggle Hold Keyframe (Ctrl+Alt+H) to see blocking. *Try this* Block a jump in three poses.
+
+### 05 Follow through and overlapping action
+- **2D:** character with an antenna and a scarf; body stops, parts carry on and settle.
+- **3D:** Y Bot `Run To Stop` (or nearest Mixamo clip) with a procedural tail or scarf: a 6–8 segment verlet chain attached to the spine bone.
+- **Controls:** Off/On · Stiffness slider · **Drag it**: drag the character left and right with the mouse; the chain lags and settles (spring physics in JS) · Timeline (2D).
+- **Notes:** *Notice* Not everything stops at once. *In After Effects* Offset keyframes a few frames per layer, or parent with a delay. *Try this* Make the scarf heavy, then light.
+
+### 06 Slow in and slow out
+- **2D:** ball sliding across a track with **spacing marks**, one per frame (21 marks written in HTML, positions set by JS).
+- **3D:** clay block or simple car shape pulling away and stopping, same curve.
+- **Controls:** **Graph Editor** (value graph, SVG) with two draggable Bézier handles · Presets: Linear, Easy Ease, Slow out only, Slow in only · Keyframe icons that change shape with the curve (diamond / hourglass halves) · CSS readout `cubic-bezier(…)` in mono · Timeline.
+- **Teaching gotcha to show:** After Effects and CSS name easing the opposite way round. AE's Easy Ease In (slowing *into* a keyframe) is CSS `ease-out`. One short line under the readout.
+- **Notes:** *Notice* Marks bunch up where it's slow and spread out where it's fast. *In After Effects* Select keys, F9 for Easy Ease; Shift+F3 for the Graph Editor. *Try this* Make a curve that overshoots and settles back.
+
+### 07 Arc
+- **2D:** thrown ball and a head turn; draggable arc-height handle; Straight / Arc switch.
+- **3D:** Y Bot `Throw` and `Walking` with **motion trails** on chosen bones (hand, head, foot): a fading line from a ring buffer of world positions. A thrown sphere shows straight vs arc.
+- **Controls:** Straight / Arc · Arc height slider · Show motion path (like AE's) · Trail bone picker (3D) · Timeline.
+- **Notes:** *Notice* Living things move in curves. *In After Effects* The motion path in the Composition panel; drag its Bézier handles. *Try this* Turn the arc off. Why does it look mechanical?
+
+### 08 Secondary action
+- **2D:** character walking, with an optional bag swing and whistle notes.
+- **3D:** Y Bot `Walking` with a procedural overlay on the head and arm bones (glancing round, a wave), applied after `mixer.update()`.
+- **Controls:** **Off / Subtle / Too much** (too much shows secondary action stealing focus) · Timeline.
+- **Notes:** *Notice* Small moves support the main action without stealing it. *In After Effects* Animate a second layer, parented to the first. *Try this* Find where subtle tips into too much.
+
+### 09 Timing
+- **2D:** ball drop with **Linear / Gravity** (linear has no hang time and no speed-up, so it looks robotic) · Weight presets Balloon / Football / Bowling ball (same height, different frame counts) · Frames slider · 25 fps vs on twos · Spacing ghosts · **Guess the weight**: two balls drop, pick the heavier.
+- **3D:** spheres of different weights dropping side by side; Y Bot `Walking` at slow / normal / fast `timeScale`.
+- **Notes:** *Notice* Fewer frames feels light and fast; more frames feels heavy or slow. *In After Effects* Move keyframes closer or further apart. Alt+drag scales a group of keys. *Try this* Make the football feel like a balloon by changing frames only.
+
+### 10 Exaggeration
+- **2D:** ball hitting a wall plus a face reaction (simple SVG face).
+- **3D:** Y Bot `Jump` with an **exaggeration factor**: after `mixer.update()`, for each bone compute the rotation away from its rest pose and scale that angle by k (axis-angle), so poses push further. Fallback if it looks broken: compare two different clips.
+- **Controls:** Realism → cartoon slider (0–150%) · Timeline.
+- **Notes:** *Notice* Push it, but keep it believable. *In After Effects* Bigger value changes, overshoot keys. *Try this* Find the point where it stops being believable.
+
+### 11 Appeal
+- **2D and 3D:** a character built from primitives (SVG in 2D, Three.js primitives in 3D), so proportions are adjustable. Mixamo bots are not used here.
+- **Controls:** Shape language: circle / square / triangle · Head size and eye size sliders · Pose: stiff vs strong line of action · **Which is more appealing?**: two versions side by side, learner picks, the page reveals why.
+- **Notes:** *Notice* Clear shapes, readable silhouettes and personality. *In After Effects* Shape layers: rounded corners, consistent stroke widths. *Try this* Make a character that feels friendly, then one that feels threatening, with the same parts.
+
+### 12 Solid drawing
+- **2D:** stick figure → construction shapes → volume → shaded, as a 4-step switch.
+- **3D:** Y Bot with **OrbitControls**; display modes Wireframe / Clay / Normals (`MeshNormalMaterial`) / Lit; a rotating key light; **Twinning** toggle (mirror-symmetrical pose vs natural asymmetric pose).
+- **Notes:** *Notice* Things have weight, volume and a back as well as a front. *In After Effects* 3D layers and the camera show form from new angles. *Try this* Turn twinning on. Why does the pose look flat?
+
+## 9. Extra pages
+
+### Spot it
+A quiz built entirely from the site's own demos (no external video, so no copyright or network problems). Each round plays a demo with one principle removed or broken; learners pick which from four choices. Ten rounds, score at the end. A **Reveal** button supports whole-class play in present mode. Round content (which demo, which flag is off, the four options, the answer) lives in HTML as `<template>` elements or `data-*` on round elements; JS only shows the current round and checks answers. One screen.
+
+### Playground
+One ball, with controls for squash amount, anticipation, timing frames, ease curve (mini Graph Editor), arc height, follow-through tail and exaggeration together. A **Copy CSS** button copies the generated `@keyframes` (useful for Paul's web units). One screen.
+
+## 10. Home page
+
+One screen, no scroll. Header; headline "Twelve principles, every one switchable" (final copy is Paul's call; no single coloured word); one supporting line; the violet ball bouncing on a hairline floor with its blurred shadow; the Squash and stretch Off/On segmented control under it; a small "25 fps, Easy Ease" readout in mono at the side; two buttons: "Explore the principles" (`principles.html`) and "Spot it".
+
+## 11. 3D models (Mixamo, no Blender)
+
+The site loads Mixamo's FBX files **directly** with Three.js `FBXLoader` (already vendored, with its dependencies). There is no Blender or conversion step.
+
+**Paul's only job:** download seven files from Mixamo and put them in `assets/models/` with exactly these names (capitals matter):
+
+| File | Mixamo download |
+|---|---|
+| `YBot.fbx` | Y Bot (male), With Skin, T-pose |
+| `XBot.fbx` | X Bot (female), With Skin, T-pose |
+| `Idle.fbx` | Idle, Without Skin |
+| `Jump.fbx` | Jump (one with a clear crouch), Without Skin |
+| `Walking.fbx` | Walking, Without Skin, In Place ticked |
+| `Throw.fbx` | Throw, Without Skin |
+| `RunToStop.fbx` | Run To Stop, Without Skin, In Place ticked if offered |
+
+All downloads: Format FBX Binary (.fbx), 30 frames per second, Keyframe Reduction none. The files are committed to the repo normally (no Git LFS). Expect roughly 10–15 MB in total, cached by the browser after the first visit.
+
+**How `js/three/rig.js` works** (the working code is in the Staging reference):
+- `loadBot('YBot' | 'XBot')` loads the model, scales it to 1.8 units tall from its bounding box (Mixamo exports in centimetres), and swaps its materials for clay: `#C9C9D3` for the surface mesh, `#8E8EA0` for the joints mesh (`/joint/i` on the mesh name).
+- `loadClip(name)` loads `<name>.fbx`, takes `animations[0]`, renames it to `name`, and caches it. Both bots share the Mixamo skeleton, so any clip plays on either bot through that bot's own `AnimationMixer`.
+- Wrap these in the helper API `{ model, mixer, play(name), setTime(t), timeScale(x), stepped(keyTimes) }`.
+- **Fallbacks, so missing files never break a page:** no `XBot.fbx` → use Y Bot; no `YBot.fbx` → the primitive mannequin; a missing clip → show the model still, with a short status line. Pages work before Paul has downloaded anything.
+
+**Which bot on which page (default):**
+
+| Page | Bot |
+|---|---|
+| 02 Anticipation | Y Bot |
+| 03 Staging | **Both**: Y Bot as the subject, X Bot further back as a second figure. A "Subject" switch (Y Bot / X Bot) re-aims the key light and the Mid and Close shots at the chosen figure, so learners see staging decide who we look at. The light plot shows both figures |
+| 04 Straight ahead and pose to pose | X Bot |
+| 05 Follow through | Y Bot |
+| 07 Arc | X Bot |
+| 08 Secondary action | Y Bot |
+| 09 Timing (walk) | X Bot |
+| 10 Exaggeration | Y Bot |
+| 12 Solid drawing | X Bot, with a Y Bot / X Bot switch |
+
+Per-clip constants (for example `ANTICIPATION_END` for `Jump`, the key times for blocking mode) live in `js/three/clips.js`. Read them off the clip in the browser once the files are in; until then use sensible guesses and note them in the file.
+
+## 12. Hosting on GitHub Pages
+
+- Repo root is the site root. Add an empty `.nojekyll` file.
+- Settings › Pages › Deploy from a branch › `main` / root.
+- The site will be at `https://<user>.github.io/<repo>/`, hence relative paths everywhere.
+- **Note for Paul:** a GitHub Pages site is reachable by anyone with the URL, even from a private repo, unless the organisation is on GitHub Enterprise. It will be unlisted, not private. Add `<meta name="robots" content="noindex, nofollow">` to every page so search engines skip it.
+- Local testing: VS Code **Live Server**. Opening files by double-click (`file://`) breaks ES modules and model loading.
+
+## 13. Repo structure
+
+```
+/
+├─ index.html
+├─ principles.html
+├─ spot-it.html
+├─ playground.html
+├─ principles/01-squash-and-stretch.html … 12-solid-drawing.html
+├─ css/
+│  ├─ glass.css         (already written: load after shell.css on every page)
+│  ├─ tokens.css
+│  ├─ base.css          (reset, fonts, body grid, focus)
+│  ├─ shell.css         (header, dropdown, stage, panel, notes strip, present mode)
+│  ├─ components.css    (seg, pill, slider, timeline, keyframe icons, graph editor, light plot)
+│  └─ pages/01.css … 12.css, home.css, principles.css, spot-it.css, playground.css
+├─ js/
+│  ├─ core/   menu.js present.js toggles.js timeline.js bezier.js
+│  ├─ three/  stage.js rig.js lights.js cameras.js silhouette.js clips.js
+│  └─ pages/  01-squash.js … 12-solid.js, home.js, spot-it.js, playground.js
+├─ vendor/three/  three.module.min.js, addons/… (already vendored, r170)
+├─ assets/  fonts/  models/ (Mixamo .fbx files)  svg/strands.svg  svg/thumbs/01.svg … 12.svg
+├─ CLAUDE.md
+├─ docs/Animation_Handover.md   (this file)
+├─ docs/reference/   (approved reference pages, section 0)
+├─ README.md   (how to run locally, how to deploy)
+└─ .nojekyll
+```
+
+`CLAUDE.md` is already in the starter pack and points every session at this file.
+
+## 14. Build order for Monday
+
+Work on `main` in small commits (one page or one shared module per commit) and push after each, so Paul can check the live site at any point. Each tier leaves a complete, usable site.
+
+**Tier 1: usable in class (do first)**
+1. Shared files from the references: `css/tokens.css`, `base.css`, `shell.css`, `components.css`; `js/core/menu.js`, `present.js`, `toggles.js`, `timeline.js`, `bezier.js`. Self-hosted fonts. `README.md`, `.gitignore`, `noindex` meta.
+2. `index.html` (home) and `principles.html`, from their references.
+3. All 12 principle pages in **2D**, in poster order, each in the 06 shell. 01, 06 and 09 first.
+
+**Tier 2: 3D**
+4. `js/three/*` split out of the Staging reference. 03 Staging 3D.
+5. Procedural 3D (no model needed): 01, 06, 09, 11, 07's thrown ball.
+6. Mixamo bot pages: 02, 04, 05, 08, 10, 12, plus 07 trails. These need the FBX files in `assets/models/`; until they're there, the pages use the fallback mannequin and still work.
+
+**Tier 3: extras**
+7. Spot it. 8. Playground.
+
+If time runs out, a principle page without its 3D version hides the 2D/3D switch entirely (no "coming soon" text).
+
+**Every page must pass before it's done:**
+- No scrollbar at 1280×720, 1366×768 and 1920×1080, in normal and present mode.
+- Works from Live Server and from GitHub Pages (relative paths).
+- Keyboard only: every control reachable, visible focus, shortcuts work.
+- No `innerHTML` in the page's JS; markup lives in HTML.
+- `prefers-reduced-motion` respected.
+- 3D holds 60 fps on a college PC; render loop stops when the 3D view is hidden.
+- No references to The Goal. Principle order matches section 2.
+- Copy follows section 4 (sentence case, no ALL-CAPS labels, no middle-dot strings).
+
+## 15. Defaults (Paul can change these later; don't stop to ask)
+
+- Home headline: "Twelve principles, every one switchable".
+- Repo name: `animation-principles`.
+- Notes strip copy: as written in section 8.
+
+## 16. Things that are already solved (don't relearn them)
+
+**Paul's ball.** The original CSS said `transform-origin: centre bottom`. Browsers ignore that line because of the British spelling, so the squash has always happened from the ball's centre, and the positions (`top: 60%`, shadow at 385px) were tuned around that. Changing it to `center bottom` pushes the squashed ball about 40px below its shadow. The reference uses `center center`: valid code, identical look. The port keeps every value and converts px to container units (`container-type: size`, 160px = 20cqw, 30px = 3.75cqw, 385px top = 80.208cqh) so it scales without changing. Colours changed to violet, and the shadow became a soft violet because the original dark shadow is invisible on navy. The Off state uses the same timing with no scale and lands at `top: 51.67%`, so the unsquashed ball touches the same floor.
+
+**Timeline.** `bindTimeline()` in the 06 reference works with any Web Animation, including CSS `@keyframes` (via `el.getAnimations()`), at 25 fps. Use it on every 2D page.
+
+**Graph Editor.** Handle x is clamped to 0–1 so the curve stays solvable by bisection; y can go from -0.25 to 1.25 for overshoot. The keyframe icons switch halves (diamond for linear, hourglass for eased) from the handle positions.
+
+**3D lighting.** The light values, fog (`Fog(BG, 9, 24)`, so the floor fades into the background with no horizon line) and floor colour in the Staging reference are tuned and screenshot-checked. The silhouette test also recolours the fog and flips the title to dark (`data-silhouette` on the stage area); without that the title vanishes on the pale ground.
+
+**Dropdown.** Uses the `hidden` attribute plus a `data-open` fade; closes on Esc and outside click; right-aligned under the link. In the glass layer it's deliberately more opaque than the other panels, so the list stays readable over the page.
+
+**Glass layer.** Checked at 1280×720, 1366×768 and 1920×1080 on all four reference pages, including the open dropdown. Body padding (12px) and grid gaps (10px) are part of the layout, and nothing scrolls. The background is a CSS background on `body::before` (fixed), so it costs nothing per frame.

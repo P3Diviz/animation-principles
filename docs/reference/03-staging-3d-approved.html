@@ -1,0 +1,387 @@
+<!DOCTYPE html><html lang="en"><head><title>Reference: 03 Staging 3D with light plot (approved look)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{--bg:#0A0A15;--panel:#10101D;--card:#12122A;--card-hover:#17173A;--hair:rgba(255,255,255,.08);--text:#F5F5F7;--text-2:#9C9CB3;--accent:#9999FF;--accent-wash:rgba(153,153,255,.14);--accent-line:rgba(153,153,255,.55);--ease:cubic-bezier(.33,0,.67,1);--font:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font:400 13px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono)}
+.hdr{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--hair)}
+.hdr .brand{font-weight:600;letter-spacing:-.2px;color:var(--text);text-decoration:none}
+.hdr nav{display:flex;align-items:center;gap:20px}
+.hdr nav a,.hdr nav button.link{color:var(--text-2);text-decoration:none;background:none;border:none;font:500 13px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px;transition:color var(--ease) .2s}
+.hdr nav a:hover,.hdr nav button.link:hover,.hdr nav [aria-current="page"]{color:var(--text)}
+.pill{border:1px solid var(--hair);background:transparent;color:var(--text-2);font:500 12px var(--font);padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease)}
+.pill[aria-pressed="true"]{border-color:var(--accent-line);background:var(--accent-wash);color:var(--text)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<style>
+/* Principles dropdown: right-aligned under the link. Hidden attribute toggled by JS; data-open drives the fade. */
+.menu{position:absolute;top:56px;right:120px;width:min(560px,calc(100vw - 48px));background:#15152A;border:1px solid var(--hair);border-radius:14px;padding:10px;z-index:50;box-shadow:0 24px 48px rgba(0,0,0,.45);opacity:0;transform:translateY(-6px);transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.menu[data-open]{opacity:1;transform:none}
+.menu-cols{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.menu a{display:flex;gap:12px;align-items:baseline;padding:9px 12px;border-radius:8px;color:var(--text);text-decoration:none;font-size:13px}
+.menu a:hover{background:rgba(255,255,255,.05)}
+.menu a .mono{color:var(--accent);font-size:11px;width:18px;flex:none}
+.menu a[aria-current="page"]{background:var(--accent-wash)}
+.menu .menu-all{border-top:1px solid var(--hair);border-radius:0 0 8px 8px;margin-top:6px;padding-top:12px;color:var(--text-2)}
+/* ===== Principle page shell (copy into css/shell.css) ===== */
+body{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.page{display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,22vw,320px);min-height:0}
+.stage-area{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;min-width:0}
+.stage-head{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 0}
+.stage-head h1{font-size:clamp(18px,1.6vw,24px);font-weight:600;letter-spacing:-.02em;display:flex;align-items:baseline;gap:12px}
+.stage-head h1 .mono{color:var(--accent);font-size:12px;font-weight:500}
+.stage{position:relative;min-height:0}
+.panel{background:var(--panel);border-left:1px solid var(--hair);padding:18px 18px;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
+.panel h2{color:var(--text-2);font-size:12px;font-weight:500;margin:10px 0 4px}
+.panel h2:first-child{margin-top:0}
+.seg{display:flex;background:rgba(255,255,255,.06);border-radius:8px;padding:3px;gap:2px}
+.seg button{flex:1;border:none;background:transparent;color:var(--text-2);font:500 12px var(--font);padding:7px 6px;border-radius:6px;cursor:pointer;transition:all .2s var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--accent-wash);color:var(--text)}
+.seg.compact{display:inline-flex}
+.seg.compact button{padding:5px 12px}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;border-top:1px solid var(--hair)}
+.notes section{padding:12px 24px;border-right:1px solid var(--hair)}
+.notes h3{font-size:12px;font-weight:500;margin-bottom:2px}
+.notes p{color:var(--text-2);font-size:12.5px;line-height:1.45}
+.notes .kbd{font-family:var(--mono);color:var(--text);font-size:11.5px}
+.prevnext{display:flex;align-items:center;gap:8px;padding:0 20px}
+.prevnext a{color:var(--text-2);text-decoration:none;font-size:12px;border:1px solid var(--hair);border-radius:999px;padding:6px 12px}
+.prevnext a:hover{color:var(--text);border-color:var(--hair-strong,rgba(255,255,255,.16))}
+
+/* Timeline */
+.timeline{padding:10px 24px 14px;border-top:1px solid var(--hair);display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:14px;align-items:center}
+.timeline .play{background:none;border:none;color:var(--accent);cursor:pointer;width:24px;height:24px;display:grid;place-items:center}
+.timeline .tc{font-family:var(--mono);font-size:12px;color:var(--text-2);min-width:96px}
+.track{position:relative;height:34px;cursor:pointer;touch-action:none}
+.track .bar{position:absolute;left:0;right:0;top:14px;height:6px;border-radius:3px;background:rgba(255,255,255,.06)}
+.track .span{position:absolute;top:14px;height:6px;border-radius:3px;background:rgba(153,153,255,.3)}
+.track .ticks{position:absolute;left:0;right:0;bottom:0;height:5px;background-image:linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:calc(100% / 30) 100%}
+.track .key{position:absolute;top:10px;width:14px;height:14px;margin-left:-7px}
+.track .head{position:absolute;top:0;bottom:0;width:1px;background:var(--text);pointer-events:none}
+.track .head::before{content:"";position:absolute;top:-2px;left:-4px;width:9px;height:9px;border-radius:2px;background:var(--text)}
+
+/* Present mode: press P. Header and notes hide; stage and controls fill the screen. */
+html[data-present] .hdr,html[data-present] .notes{display:none}
+html[data-present] body{grid-template-rows:minmax(0,1fr)}
+html[data-present] .panel{font-size:15px}
+html[data-present] .seg button{font-size:14px;padding:10px 8px}
+.present-hint{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#15152A;border:1px solid var(--hair);border-radius:999px;padding:6px 14px;color:var(--text-2);font-size:12px;opacity:0;transition:opacity .3s var(--ease);pointer-events:none;z-index:60}
+.present-hint[data-show]{opacity:1}
+/* Page-specific (css/pages/03.css) */
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage-area{position:relative;grid-template-rows:minmax(0,1fr)}
+.stage-area .stage-head{position:absolute;top:0;left:0;right:0;z-index:2}
+/* Silhouette test: the stage turns pale, so the title flips to dark */
+.stage-area[data-silhouette] .stage-head h1{color:#0A0A15}
+.stage-area[data-silhouette] .seg{background:rgba(10,10,21,.08)}
+.stage-area[data-silhouette] .seg button{color:#4A4A63}
+.stage-area[data-silhouette] .loading{color:#4A4A63}
+.plot{width:100%;aspect-ratio:1;max-height:30vh;display:block;touch-action:none}
+.plot .lamp{cursor:grab}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill.key[aria-pressed="true"]{border-color:#FFD9A8;background:rgba(255,217,168,.12)}
+.pill.fill[aria-pressed="true"]{border-color:#A9B6FF;background:rgba(169,182,255,.12)}
+.small{color:var(--text-2);font-size:12px;line-height:1.45}
+.loading{position:absolute;left:24px;bottom:16px;color:var(--text-2);font-size:12px;font-family:var(--mono)}
+</style>
+<script type="importmap">{ "imports": { "three": "../../vendor/three/three.module.min.js", "three/addons/": "../../vendor/three/addons/" } }</script>
+<style id="glass">
+/* Copied from css/glass.css for this reference (background path adjusted). */
+/* =====================================================================
+   Glass layer. Load AFTER tokens.css and shell.css on every page.
+   Static focus-stacked strands behind frosted glass panels.
+   No background animation (decision: static only).
+   ===================================================================== */
+:root{
+  --bg:#07071A;
+  --glass:linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  --glass-border:rgba(255,255,255,.12);
+  --glass-blur:blur(22px) saturate(140%);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.14);
+  --glass-shadow:0 10px 30px rgba(0,0,0,.28);
+  --well:rgba(0,0,0,.24);              /* recessed areas inside glass: graphs, timelines, segmented tracks */
+  --well-border:rgba(255,255,255,.06);
+  --strands-dim:.55;                   /* background strength on principle pages */
+}
+html,body{height:100%}
+body{background:var(--bg);padding:12px;gap:10px;isolation:isolate}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:var(--bg) url(../../assets/svg/strands.svg) center/cover no-repeat}
+body.principle::before{opacity:var(--strands-dim)}  /* principle pages: dimmer so the demo reads first */
+
+/* Shared glass surface */
+.glass,.hdr,.panel,.notes,.stage-area,.card,.menu,.controls{
+  background:var(--glass);border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-edge),var(--glass-shadow)}
+
+/* Header: floating pill */
+.hdr{height:52px;border-radius:999px;padding:0 8px 0 20px;border-bottom:1px solid var(--glass-border)}
+.hdr nav{gap:2px}
+.hdr nav a,.hdr nav button.link{padding:7px 12px;border-radius:999px}
+.hdr nav [aria-current="page"],.hdr nav button.link[aria-expanded="true"]{background:rgba(255,255,255,.1);color:var(--text)}
+.hdr .pill{margin-left:6px}
+
+/* Dropdown: more opaque so the list stays easy to read */
+.menu{background:linear-gradient(135deg,rgba(32,32,72,.82),rgba(18,18,46,.86));border-radius:16px;top:70px;right:20px}
+
+/* Principle page shell */
+.page{gap:10px}
+.stage-area{border-radius:18px;overflow:hidden}
+.panel{border-radius:18px;border-left:1px solid var(--glass-border)}
+.notes{border-radius:16px;border-top:1px solid var(--glass-border)}
+.notes section{border-right-color:rgba(255,255,255,.08)}
+.timeline{border-top:none;margin:0 12px 12px;padding:8px 14px;border-radius:12px;background:var(--well);border:1px solid var(--well-border)}
+.seg{background:var(--well);border:1px solid var(--well-border)}
+.seg button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.graph,.plot{background:var(--well);border:1px solid var(--well-border);border-radius:12px}
+.pill{background:rgba(255,255,255,.04)}
+
+/* 3D stages: NO backdrop blur behind a live WebGL canvas (expensive on college PCs) */
+.stage-area.is-3d{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(10,10,21,.9)}
+
+/* Principles index boxes */
+.card{border-radius:16px;transition:border-color .25s var(--ease),box-shadow .25s var(--ease),transform .25s var(--ease)}
+.card:hover,.card:focus-visible{border-color:rgba(153,153,255,.6);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px rgba(153,153,255,.25),0 12px 36px rgba(153,153,255,.18);background:var(--glass)}
+
+/* Home: controls sit in a glass dock */
+.controls{border-radius:999px;padding:6px 6px 6px 18px}
+
+/* Present mode: no body padding, keep the glass */
+html[data-present] body{padding:12px}
+
+</style>
+</head><body class="principle">
+<header class="hdr"><a class="brand" href="#">Principles of Animation</a><nav><a href="#">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="#">Spot it</a><a href="#">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="#"><span class="mono">01</span>Squash and stretch</a>
+    <a href="#"><span class="mono">07</span>Arc</a>
+    <a href="#"><span class="mono">02</span>Anticipation</a>
+    <a href="#"><span class="mono">08</span>Secondary action</a>
+    <a href="#"><span class="mono">03</span>Staging</a>
+    <a href="#"><span class="mono">09</span>Timing</a>
+    <a href="#"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="#"><span class="mono">10</span>Exaggeration</a>
+    <a href="#"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="#"><span class="mono">11</span>Appeal</a>
+    <a href="#"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="#"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="#">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<div class="page">
+  <section class="stage-area is-3d" id="stageArea">
+    <div class="stage-head">
+      <h1><span class="mono">03</span>Staging</h1>
+      <div class="seg compact" role="group" aria-label="View"><button aria-pressed="false">2D</button><button aria-pressed="true">3D</button></div>
+    </div>
+    <div class="stage" id="stage"><canvas id="canvas"></canvas><span class="loading" id="status"></span></div>
+  </section>
+  <aside class="panel">
+    <h2>Light plot, from above</h2>
+    <svg class="plot" id="plot" viewBox="-100 -100 200 200" aria-label="Top-down plan of the set. Drag a light to move it.">
+      <circle r="72" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="3 4"/>
+      <path id="wedge" fill="rgba(245,245,247,.05)" stroke="rgba(245,245,247,.25)"/>
+      <circle r="7" fill="#C9C9D3"/>
+      <g id="lamp-key" class="lamp"><line stroke="#FFD9A8" stroke-width="1.2" opacity=".6"/><circle r="8" fill="#FFD9A8"/></g>
+      <g id="lamp-fill" class="lamp"><line stroke="#A9B6FF" stroke-width="1.2" opacity=".6"/><circle r="8" fill="#A9B6FF"/></g>
+      <g id="lamp-rim" class="lamp"><line stroke="#9999FF" stroke-width="1.2" opacity=".6"/><circle r="8" fill="#9999FF"/></g>
+    </svg>
+    <div class="pills">
+      <button class="pill key" data-light="key" aria-pressed="true">Key</button>
+      <button class="pill fill" data-light="fill" aria-pressed="true">Fill</button>
+      <button class="pill" data-light="rim" aria-pressed="true">Rim</button>
+    </div>
+    <h2>Camera</h2>
+    <div class="seg" id="shots" role="group" aria-label="Camera">
+      <button data-shot="wide" aria-pressed="true">Wide</button><button data-shot="mid" aria-pressed="false">Mid</button><button data-shot="close" aria-pressed="false">Close</button>
+    </div>
+    <h2>Readability</h2>
+    <div class="pills"><button class="pill" id="silhouette" aria-pressed="false">Silhouette test</button></div>
+  </aside>
+</div>
+<footer class="notes">
+  <section><h3>What to notice</h3><p>Light and framing tell you where to look before anything moves.</p></section>
+  <section><h3>In After Effects</h3><p>Light and Camera layers: Layer › New › Light, Layer › New › Camera.</p></section>
+  <section><h3>Try this</h3><p>Turn the key off. Can you still read the pose with the rim alone?</p></section>
+  <div class="prevnext"><a href="#" aria-label="Previous: 02 Anticipation">‹ 02</a><a href="#" aria-label="Next: 04 Straight ahead and pose to pose">04 ›</a></div>
+</footer>
+<script type="module">
+// Pattern for js/core/menu.js
+const btn = document.getElementById('menuBtn'), menu = document.getElementById('menu');
+function setOpen(open) {
+  btn.setAttribute('aria-expanded', open);
+  if (open) { menu.hidden = false; requestAnimationFrame(() => menu.dataset.open = ''); }
+  else { delete menu.dataset.open; setTimeout(() => { if (btn.getAttribute('aria-expanded') === 'false') menu.hidden = true; }, 220); }
+}
+btn.addEventListener('click', e => { e.stopPropagation(); setOpen(btn.getAttribute('aria-expanded') !== 'true'); });
+document.addEventListener('click', e => { if (!menu.contains(e.target)) setOpen(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') { setOpen(false); btn.focus(); } });
+</script>
+<script type="module">
+// Pattern for js/core/present.js
+const html = document.documentElement, hint = document.querySelector('.present-hint');
+function setPresent(on) {
+  if (on) html.dataset.present = ''; else delete html.dataset.present;
+  try { sessionStorage.setItem('present', on ? '1' : '0'); } catch (e) {}
+  if (on && hint) { hint.dataset.show = ''; setTimeout(() => delete hint.dataset.show, 2000); }
+  window.dispatchEvent(new Event('resize')); // lets 3D stages resize
+}
+try { if (sessionStorage.getItem('present') === '1') html.dataset.present = ''; } catch (e) {}
+document.getElementById('presentBtn').addEventListener('click', () => setPresent(!('present' in html.dataset)));
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input, textarea, select')) return;
+  if (e.key === 'p' || e.key === 'P') setPresent(!('present' in html.dataset));
+  if (e.key === 'Escape' && 'present' in html.dataset) setPresent(false);
+});
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+
+// ===== js/three/stage.js =====
+const stageEl = document.getElementById('stage'), canvas = document.getElementById('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;          // r170: output colour space is sRGB by default
+const scene = new THREE.Scene(), BG = new THREE.Color('#0A0A15'), PALE = new THREE.Color('#E9E9F2');
+scene.background = BG;
+scene.fog = new THREE.Fog(BG, 9, 24);                         // floor fades into the background: no hard horizon
+const camera = new THREE.PerspectiveCamera(35, 1, .1, 100);
+new ResizeObserver(() => {
+  const w = stageEl.clientWidth, h = stageEl.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}).observe(stageEl);
+
+const meshes = [];
+const std = (color, roughness = .6) => new THREE.MeshStandardMaterial({ color, roughness });
+function add(geo, mat, x, y, z, parent = scene) {
+  const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true;
+  parent.add(m); meshes.push(m); return m;
+}
+const floor = add(new THREE.PlaneGeometry(40, 40), std('#181826', .95), 0, 0, 0); floor.rotation.x = -Math.PI / 2;
+add(new THREE.BoxGeometry(.9, .9, .9), std('#34344A'), 1.7, .45, -.6).rotation.y = .5;
+add(new THREE.SphereGeometry(.3, 32, 32), std('#9999FF', .35), -1.4, .3, .6);
+
+// ===== js/three/rig.js: load the Mixamo bot from FBX, or fall back to a primitive mannequin =====
+const CLAY = std('#C9C9D3', .5);
+let mixer = null, breathe = null;
+function mannequin() {
+  const g = new THREE.Group(); scene.add(g);
+  breathe = add(new THREE.CapsuleGeometry(.3, .6, 8, 24), CLAY, 0, 1.55, 0, g);
+  add(new THREE.SphereGeometry(.26, 32, 32), CLAY, 0, 2.38, 0, g);
+  [-.16, .16].forEach(x => add(new THREE.CapsuleGeometry(.1, .8, 6, 16), CLAY, x, .55, 0, g));
+  [[-.48, .3], [.48, -.3]].forEach(([x, rz]) => add(new THREE.CapsuleGeometry(.08, .7, 6, 16), CLAY, x, 1.6, 0, g).rotation.z = rz);
+  g.rotation.y = -.35;
+}
+const status = document.getElementById('status');
+status.textContent = 'Loading model…';
+// Mixamo FBX files are loaded directly: no Blender step. Files live in assets/models/.
+const MODELS = '../../assets/models/';
+const fbxLoader = new FBXLoader();
+const loadFBX = url => new Promise((resolve, reject) => fbxLoader.load(url, resolve, undefined, reject));
+const clipCache = {};
+// Each clip file (Without Skin) holds one animation; it's named after its file and works on either bot.
+function loadClip(name) {
+  clipCache[name] ??= loadFBX(MODELS + name + '.fbx').then(f => { const c = f.animations[0]; c.name = name; return c; });
+  return clipCache[name];
+}
+const JOINTS = std('#8E8EA0', .5);   // Mixamo bots have a joints mesh and a surface mesh
+async function loadBot(file) {        // 'YBot' or 'XBot'
+  const model = await loadFBX(MODELS + file + '.fbx');
+  const box = new THREE.Box3().setFromObject(model), size = box.getSize(new THREE.Vector3());
+  model.scale.setScalar(1.8 / size.y);                         // always 1.8 units tall (Mixamo exports in cm)
+  model.position.y = -box.min.y * model.scale.y;
+  model.traverse(o => { if (o.isMesh) { o.material = /joint/i.test(o.name) ? JOINTS : CLAY; o.castShadow = o.receiveShadow = true; meshes.push(o); } });
+  return model;
+}
+(async () => {
+  try {
+    const model = await loadBot('YBot');
+    model.rotation.y = -.35; scene.add(model);
+    mixer = new THREE.AnimationMixer(model);
+    status.textContent = '';
+    try { mixer.clipAction(await loadClip('Idle')).play(); } catch (e) { status.textContent = 'Idle.fbx not found: model shown without animation'; }
+  } catch (e) {
+    mannequin(); status.textContent = 'Stand-in mannequin (no YBot.fbx yet)';
+  }
+  originals = meshes.map(m => m.material);
+})();
+
+// ===== js/three/lights.js =====
+// r155+ uses physically based light units. These values are tuned by eye for r170 (screenshot-checked).
+scene.add(new THREE.AmbientLight('#ffffff', .08));
+const lights = {
+  key:  { light: new THREE.DirectionalLight('#FFF0DC', 3.2), angle: .9, height: 5 },
+  fill: { light: new THREE.DirectionalLight('#A9B6FF', .7), angle: 2.5, height: 2.5 },
+  rim:  { light: new THREE.DirectionalLight('#9999FF', 6), angle: Math.PI + .35, height: 4 }
+};
+Object.values(lights).forEach(l => scene.add(l.light));
+const key = lights.key.light; key.castShadow = true; key.shadow.mapSize.set(1024, 1024);
+Object.assign(key.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5 }); key.shadow.bias = -.0005;
+
+const PLOT_R = 72, WORLD_R = 6;
+function placeLight(name) {
+  const l = lights[name], x = Math.cos(l.angle), z = Math.sin(l.angle);
+  l.light.position.set(x * WORLD_R, l.height, z * WORLD_R);
+  const g = document.getElementById('lamp-' + name), c = g.querySelector('circle'), line = g.querySelector('line');
+  c.setAttribute('cx', x * PLOT_R); c.setAttribute('cy', z * PLOT_R);
+  line.setAttribute('x1', x * PLOT_R); line.setAttribute('y1', z * PLOT_R); line.setAttribute('x2', 0); line.setAttribute('y2', 0);
+  g.style.opacity = l.light.visible ? 1 : .25;
+}
+Object.keys(lights).forEach(placeLight);
+
+const plot = document.getElementById('plot'); let dragging = null;
+Object.keys(lights).forEach(n => document.querySelector(`#lamp-${n} circle`).addEventListener('pointerdown', e => { dragging = n; plot.setPointerCapture(e.pointerId); }));
+plot.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const r = plot.getBoundingClientRect(), s = Math.min(r.width, r.height);
+  lights[dragging].angle = Math.atan2((e.clientY - r.top - r.height / 2) / s, (e.clientX - r.left - r.width / 2) / s);
+  placeLight(dragging);
+});
+plot.addEventListener('pointerup', () => dragging = null);
+document.querySelectorAll('[data-light]').forEach(b => b.addEventListener('click', () => {
+  const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on);
+  lights[b.dataset.light].light.visible = on; placeLight(b.dataset.light);
+}));
+
+// ===== js/three/cameras.js: eased moves, never cuts =====
+const SHOTS = { wide: { pos: [0, 2.3, 8], look: [0, 1.2, 0], wedge: 90 }, mid: { pos: [.3, 1.9, 4.8], look: [0, 1.5, 0], wedge: 58 }, close: { pos: [.4, 2.3, 2.8], look: [0, 2.05, 0], wedge: 36 } };
+let shot = SHOTS.wide, wedgeY = 90;
+const camPos = new THREE.Vector3(...shot.pos), camLook = new THREE.Vector3(...shot.look), tPos = new THREE.Vector3(), tLook = new THREE.Vector3();
+const shotBtns = [...document.querySelectorAll('[data-shot]')];
+shotBtns.forEach(b => b.addEventListener('click', () => { shot = SHOTS[b.dataset.shot]; shotBtns.forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+
+// ===== js/three/silhouette.js =====
+let originals = [];
+const BLACK = new THREE.MeshBasicMaterial({ color: '#05050A' }), GROUND = new THREE.MeshBasicMaterial({ color: '#E9E9F2' });
+document.getElementById('silhouette').addEventListener('click', e => {
+  const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; e.currentTarget.setAttribute('aria-pressed', on);
+  meshes.forEach((m, i) => m.material = on ? (m === floor ? GROUND : BLACK) : originals[i]);
+  scene.background = on ? PALE : BG; scene.fog.color.copy(on ? PALE : BG);
+  const area = document.getElementById('stageArea'); if (on) area.dataset.silhouette = ''; else delete area.dataset.silhouette;
+});
+
+// ===== render loop (stop it when the 3D view is hidden) =====
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = clock.getDelta(), t = clock.elapsedTime;
+  if (mixer) mixer.update(dt);
+  if (breathe) breathe.scale.set(1 + Math.sin(t * 1.4) * .015, 1, 1 + Math.sin(t * 1.4) * .015);
+  tPos.set(...shot.pos); tLook.set(...shot.look);
+  camPos.lerp(tPos, .06); camLook.lerp(tLook, .06); wedgeY += (shot.wedge - wedgeY) * .06;
+  document.getElementById('wedge').setAttribute('d', `M0 ${wedgeY} L-28 0 L28 0 Z`);
+  camera.position.copy(camPos); camera.lookAt(camLook);
+  renderer.render(scene, camera);
+});
+</script></body></html>

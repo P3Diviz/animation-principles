@@ -1,0 +1,159 @@
+<!DOCTYPE html><html lang="en"><head><title>Reference: principles index (approved look)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{--bg:#0A0A15;--panel:#10101D;--card:#12122A;--card-hover:#17173A;--hair:rgba(255,255,255,.08);--text:#F5F5F7;--text-2:#9C9CB3;--accent:#9999FF;--accent-wash:rgba(153,153,255,.14);--accent-line:rgba(153,153,255,.55);--ease:cubic-bezier(.33,0,.67,1);--font:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font:400 13px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono)}
+.hdr{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--hair)}
+.hdr .brand{font-weight:600;letter-spacing:-.2px;color:var(--text);text-decoration:none}
+.hdr nav{display:flex;align-items:center;gap:20px}
+.hdr nav a,.hdr nav button.link{color:var(--text-2);text-decoration:none;background:none;border:none;font:500 13px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px;transition:color var(--ease) .2s}
+.hdr nav a:hover,.hdr nav button.link:hover,.hdr nav [aria-current="page"]{color:var(--text)}
+.pill{border:1px solid var(--hair);background:transparent;color:var(--text-2);font:500 12px var(--font);padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease)}
+.pill[aria-pressed="true"]{border-color:var(--accent-line);background:var(--accent-wash);color:var(--text)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<style>
+/* Principles dropdown: right-aligned under the link. Hidden attribute toggled by JS; data-open drives the fade. */
+.menu{position:absolute;top:56px;right:120px;width:min(560px,calc(100vw - 48px));background:#15152A;border:1px solid var(--hair);border-radius:14px;padding:10px;z-index:50;box-shadow:0 24px 48px rgba(0,0,0,.45);opacity:0;transform:translateY(-6px);transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.menu[data-open]{opacity:1;transform:none}
+.menu-cols{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.menu a{display:flex;gap:12px;align-items:baseline;padding:9px 12px;border-radius:8px;color:var(--text);text-decoration:none;font-size:13px}
+.menu a:hover{background:rgba(255,255,255,.05)}
+.menu a .mono{color:var(--accent);font-size:11px;width:18px;flex:none}
+.menu a[aria-current="page"]{background:var(--accent-wash)}
+.menu .menu-all{border-top:1px solid var(--hair);border-radius:0 0 8px 8px;margin-top:6px;padding-top:12px;color:var(--text-2)}
+body{display:grid;grid-template-rows:auto auto minmax(0,1fr)}
+.title{display:flex;align-items:baseline;justify-content:space-between;padding:clamp(16px,3vh,28px) 24px clamp(12px,2vh,20px)}
+.title h1{font-size:clamp(22px,2.2vw,30px);font-weight:600;letter-spacing:-.025em}
+.title p{color:var(--text-2)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:clamp(8px,1.2vw,14px);padding:0 24px clamp(16px,3vh,24px);min-height:0}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:clamp(12px,1.4vw,18px);display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:6px;color:var(--text);text-decoration:none;transition:border-color .22s var(--ease),background .22s var(--ease);min-height:0}
+.card:hover,.card:focus-visible{border-color:var(--accent-line);background:var(--card-hover)}
+.card .num{color:var(--accent);font-size:11px}
+.card img{width:100%;height:100%;object-fit:contain;min-height:0}
+.card b{display:block;font-weight:500;font-size:clamp(13px,1.05vw,15px);letter-spacing:-.01em}
+.card span.d{color:var(--text-2);font-size:12px}
+</style><style id="glass">
+/* Copied from css/glass.css for this reference (background path adjusted). */
+/* =====================================================================
+   Glass layer. Load AFTER tokens.css and shell.css on every page.
+   Static focus-stacked strands behind frosted glass panels.
+   No background animation (decision: static only).
+   ===================================================================== */
+:root{
+  --bg:#07071A;
+  --glass:linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  --glass-border:rgba(255,255,255,.12);
+  --glass-blur:blur(22px) saturate(140%);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.14);
+  --glass-shadow:0 10px 30px rgba(0,0,0,.28);
+  --well:rgba(0,0,0,.24);              /* recessed areas inside glass: graphs, timelines, segmented tracks */
+  --well-border:rgba(255,255,255,.06);
+  --strands-dim:.55;                   /* background strength on principle pages */
+}
+html,body{height:100%}
+body{background:var(--bg);padding:12px;gap:10px;isolation:isolate}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:var(--bg) url(../../assets/svg/strands.svg) center/cover no-repeat}
+body.principle::before{opacity:var(--strands-dim)}  /* principle pages: dimmer so the demo reads first */
+
+/* Shared glass surface */
+.glass,.hdr,.panel,.notes,.stage-area,.card,.menu,.controls{
+  background:var(--glass);border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-edge),var(--glass-shadow)}
+
+/* Header: floating pill */
+.hdr{height:52px;border-radius:999px;padding:0 8px 0 20px;border-bottom:1px solid var(--glass-border)}
+.hdr nav{gap:2px}
+.hdr nav a,.hdr nav button.link{padding:7px 12px;border-radius:999px}
+.hdr nav [aria-current="page"],.hdr nav button.link[aria-expanded="true"]{background:rgba(255,255,255,.1);color:var(--text)}
+.hdr .pill{margin-left:6px}
+
+/* Dropdown: more opaque so the list stays easy to read */
+.menu{background:linear-gradient(135deg,rgba(32,32,72,.82),rgba(18,18,46,.86));border-radius:16px;top:70px;right:20px}
+
+/* Principle page shell */
+.page{gap:10px}
+.stage-area{border-radius:18px;overflow:hidden}
+.panel{border-radius:18px;border-left:1px solid var(--glass-border)}
+.notes{border-radius:16px;border-top:1px solid var(--glass-border)}
+.notes section{border-right-color:rgba(255,255,255,.08)}
+.timeline{border-top:none;margin:0 12px 12px;padding:8px 14px;border-radius:12px;background:var(--well);border:1px solid var(--well-border)}
+.seg{background:var(--well);border:1px solid var(--well-border)}
+.seg button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.graph,.plot{background:var(--well);border:1px solid var(--well-border);border-radius:12px}
+.pill{background:rgba(255,255,255,.04)}
+
+/* 3D stages: NO backdrop blur behind a live WebGL canvas (expensive on college PCs) */
+.stage-area.is-3d{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(10,10,21,.9)}
+
+/* Principles index boxes */
+.card{border-radius:16px;transition:border-color .25s var(--ease),box-shadow .25s var(--ease),transform .25s var(--ease)}
+.card:hover,.card:focus-visible{border-color:rgba(153,153,255,.6);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px rgba(153,153,255,.25),0 12px 36px rgba(153,153,255,.18);background:var(--glass)}
+
+/* Home: controls sit in a glass dock */
+.controls{border-radius:999px;padding:6px 6px 6px 18px}
+
+/* Present mode: no body padding, keep the glass */
+html[data-present] body{padding:12px}
+
+/* Index page spacing inside the glass layout */
+.title{padding:14px 8px 12px}
+.grid{padding:0}
+
+</style>
+</head><body>
+<header class="hdr"><a class="brand" href="#">Principles of Animation</a><nav><a href="#">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="#">Spot it</a><a href="#">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="#"><span class="mono">01</span>Squash and stretch</a>
+    <a href="#"><span class="mono">07</span>Arc</a>
+    <a href="#"><span class="mono">02</span>Anticipation</a>
+    <a href="#"><span class="mono">08</span>Secondary action</a>
+    <a href="#"><span class="mono">03</span>Staging</a>
+    <a href="#"><span class="mono">09</span>Timing</a>
+    <a href="#"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="#"><span class="mono">10</span>Exaggeration</a>
+    <a href="#"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="#"><span class="mono">11</span>Appeal</a>
+    <a href="#"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="#"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="#">See all twelve</a>
+</nav>
+<div class="title"><h1>The twelve principles</h1><p>In the order of the classroom posters</p></div><main class="grid">
+  <a class="card" href="#"><span class="num mono">01</span><img src="../../assets/svg/thumbs/01.svg" alt=""><div><b>Squash and stretch</b><span class="d">Weight and flex</span></div></a>
+  <a class="card" href="#"><span class="num mono">02</span><img src="../../assets/svg/thumbs/02.svg" alt=""><div><b>Anticipation</b><span class="d">The wind-up</span></div></a>
+  <a class="card" href="#"><span class="num mono">03</span><img src="../../assets/svg/thumbs/03.svg" alt=""><div><b>Staging</b><span class="d">Lights, camera</span></div></a>
+  <a class="card" href="#"><span class="num mono">04</span><img src="../../assets/svg/thumbs/04.svg" alt=""><div><b>Straight ahead and pose to pose</b><span class="d">Two ways to work</span></div></a>
+  <a class="card" href="#"><span class="num mono">05</span><img src="../../assets/svg/thumbs/05.svg" alt=""><div><b>Follow through and overlap</b><span class="d">Parts settle late</span></div></a>
+  <a class="card" href="#"><span class="num mono">06</span><img src="../../assets/svg/thumbs/06.svg" alt=""><div><b>Slow in and slow out</b><span class="d">Easing</span></div></a>
+  <a class="card" href="#"><span class="num mono">07</span><img src="../../assets/svg/thumbs/07.svg" alt=""><div><b>Arc</b><span class="d">Curved paths</span></div></a>
+  <a class="card" href="#"><span class="num mono">08</span><img src="../../assets/svg/thumbs/08.svg" alt=""><div><b>Secondary action</b><span class="d">Supporting moves</span></div></a>
+  <a class="card" href="#"><span class="num mono">09</span><img src="../../assets/svg/thumbs/09.svg" alt=""><div><b>Timing</b><span class="d">Frames make weight</span></div></a>
+  <a class="card" href="#"><span class="num mono">10</span><img src="../../assets/svg/thumbs/10.svg" alt=""><div><b>Exaggeration</b><span class="d">Push it further</span></div></a>
+  <a class="card" href="#"><span class="num mono">11</span><img src="../../assets/svg/thumbs/11.svg" alt=""><div><b>Appeal</b><span class="d">Why we care</span></div></a>
+  <a class="card" href="#"><span class="num mono">12</span><img src="../../assets/svg/thumbs/12.svg" alt=""><div><b>Solid drawing</b><span class="d">Form and volume</span></div></a>
+</main>
+<script type="module">
+// Pattern for js/core/menu.js
+const btn = document.getElementById('menuBtn'), menu = document.getElementById('menu');
+function setOpen(open) {
+  btn.setAttribute('aria-expanded', open);
+  if (open) { menu.hidden = false; requestAnimationFrame(() => menu.dataset.open = ''); }
+  else { delete menu.dataset.open; setTimeout(() => { if (btn.getAttribute('aria-expanded') === 'false') menu.hidden = true; }, 220); }
+}
+btn.addEventListener('click', e => { e.stopPropagation(); setOpen(btn.getAttribute('aria-expanded') !== 'true'); });
+document.addEventListener('click', e => { if (!menu.contains(e.target)) setOpen(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') { setOpen(false); btn.focus(); } });
+</script>
+</body></html>

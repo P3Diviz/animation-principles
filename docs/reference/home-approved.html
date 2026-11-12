@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="en"><head><title>Reference: home (approved look)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{--bg:#0A0A15;--panel:#10101D;--card:#12122A;--card-hover:#17173A;--hair:rgba(255,255,255,.08);--text:#F5F5F7;--text-2:#9C9CB3;--accent:#9999FF;--accent-wash:rgba(153,153,255,.14);--accent-line:rgba(153,153,255,.55);--ease:cubic-bezier(.33,0,.67,1);--font:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font:400 13px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono)}
+.hdr{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--hair)}
+.hdr .brand{font-weight:600;letter-spacing:-.2px;color:var(--text);text-decoration:none}
+.hdr nav{display:flex;align-items:center;gap:20px}
+.hdr nav a,.hdr nav button.link{color:var(--text-2);text-decoration:none;background:none;border:none;font:500 13px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px;transition:color var(--ease) .2s}
+.hdr nav a:hover,.hdr nav button.link:hover,.hdr nav [aria-current="page"]{color:var(--text)}
+.pill{border:1px solid var(--hair);background:transparent;color:var(--text-2);font:500 12px var(--font);padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease)}
+.pill[aria-pressed="true"]{border-color:var(--accent-line);background:var(--accent-wash);color:var(--text)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<style>
+/* One-screen home. Header row, hero row. */
+body{display:grid;grid-template-rows:auto minmax(0,1fr)}
+.hero{display:grid;grid-template-rows:auto minmax(0,1fr) auto;justify-items:center;padding:clamp(20px,4vh,48px) 24px clamp(16px,3vh,32px);min-height:0}
+.hero h1{font-size:clamp(36px,4.6vw,60px);font-weight:600;letter-spacing:-.035em;line-height:1.04;text-align:center}
+.hero p{color:var(--text-2);font-size:clamp(14px,1.2vw,17px);max-width:46ch;text-align:center;margin:12px auto 0}
+
+/* ===== Paul's original ball, ported exactly =====
+   Source: docs/reference/original-bouncing-ball.html (800 x 480 container).
+   Every px value is converted to container units so the look is identical at any size:
+   160px = 20cqw, 30px = 3.75cqw, 385px top = 80.208cqh. Percentages and timing are unchanged.
+   transform-origin: the original said "centre bottom", which browsers ignore, so the squash
+   always happened from the CENTRE. The positions were tuned around that, so we use
+   "center center" (valid, identical look). Do NOT change it to "center bottom". */
+.stage{container-type:size;aspect-ratio:800/480;height:100%;max-height:480px;max-width:100%;position:relative;align-self:center;min-height:0}
+.ball{width:20cqw;height:20cqw;position:absolute;border-radius:50%;left:40%;
+  background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%); /* original: #fff9d9, #ffd93d, #b58d00 */
+  transform-origin:center center;animation:bounce .5s alternate infinite ease}
+@keyframes bounce{
+  0%{top:60%;transform:scale(1.7,.5)}
+  40%{height:20cqw;border-radius:50%;transform:scaleX(1)}
+  100%{top:0%}}
+.shadow{width:20cqw;height:3.75cqw;border-radius:50%;position:absolute;top:80.208cqh;left:40%;z-index:-1;transform-origin:bottom center;
+  background:rgba(153,153,255,.38); /* original hsl(0,0%,10%) is invisible on the dark navy page */
+  filter:blur(.75cqw);animation:shadow .5s alternate infinite ease}
+@keyframes shadow{0%{transform:scaleX(1.7)}40%{transform:scaleX(1);opacity:.8}100%{transform:scaleX(.2);opacity:.2}}
+/* Squash and stretch OFF: same timing, no scale. The squashed ball's lowest edge sits at
+   about 85% of the height (408px), so an unsquashed 160px ball touches that same floor at top 51.67%. */
+.stage[data-squash="off"] .ball{animation-name:bounce-flat}
+@keyframes bounce-flat{0%{top:51.67%}100%{top:0%}}
+.stage{z-index:0}
+
+.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+.seg{display:inline-flex;background:rgba(255,255,255,.06);border-radius:999px;padding:3px}
+.seg button{border:none;background:transparent;color:var(--text-2);font:500 12px var(--font);padding:7px 16px;border-radius:999px;cursor:pointer;transition:all .22s var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.btn{font:500 13px var(--font);padding:10px 18px;border-radius:999px;text-decoration:none;transition:all .22s var(--ease)}
+.btn.primary{background:var(--accent);color:#0A0A15}
+.btn.secondary{border:1px solid var(--hair);color:var(--text)}
+.btn:hover{transform:translateY(-1px)}
+.label{color:var(--text-2);font-size:12px}
+</style><style id="glass">
+/* Copied from css/glass.css for this reference (background path adjusted). */
+/* =====================================================================
+   Glass layer. Load AFTER tokens.css and shell.css on every page.
+   Static focus-stacked strands behind frosted glass panels.
+   No background animation (decision: static only).
+   ===================================================================== */
+:root{
+  --bg:#07071A;
+  --glass:linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.03));
+  --glass-border:rgba(255,255,255,.12);
+  --glass-blur:blur(22px) saturate(140%);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.14);
+  --glass-shadow:0 10px 30px rgba(0,0,0,.28);
+  --well:rgba(0,0,0,.24);              /* recessed areas inside glass: graphs, timelines, segmented tracks */
+  --well-border:rgba(255,255,255,.06);
+  --strands-dim:.55;                   /* background strength on principle pages */
+}
+html,body{height:100%}
+body{background:var(--bg);padding:12px;gap:10px;isolation:isolate}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:var(--bg) url(../../assets/svg/strands.svg) center/cover no-repeat}
+body.principle::before{opacity:var(--strands-dim)}  /* principle pages: dimmer so the demo reads first */
+
+/* Shared glass surface */
+.glass,.hdr,.panel,.notes,.stage-area,.card,.menu,.controls{
+  background:var(--glass);border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-edge),var(--glass-shadow)}
+
+/* Header: floating pill */
+.hdr{height:52px;border-radius:999px;padding:0 8px 0 20px;border-bottom:1px solid var(--glass-border)}
+.hdr nav{gap:2px}
+.hdr nav a,.hdr nav button.link{padding:7px 12px;border-radius:999px}
+.hdr nav [aria-current="page"],.hdr nav button.link[aria-expanded="true"]{background:rgba(255,255,255,.1);color:var(--text)}
+.hdr .pill{margin-left:6px}
+
+/* Dropdown: more opaque so the list stays easy to read */
+.menu{background:linear-gradient(135deg,rgba(32,32,72,.82),rgba(18,18,46,.86));border-radius:16px;top:70px;right:20px}
+
+/* Principle page shell */
+.page{gap:10px}
+.stage-area{border-radius:18px;overflow:hidden}
+.panel{border-radius:18px;border-left:1px solid var(--glass-border)}
+.notes{border-radius:16px;border-top:1px solid var(--glass-border)}
+.notes section{border-right-color:rgba(255,255,255,.08)}
+.timeline{border-top:none;margin:0 12px 12px;padding:8px 14px;border-radius:12px;background:var(--well);border:1px solid var(--well-border)}
+.seg{background:var(--well);border:1px solid var(--well-border)}
+.seg button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.graph,.plot{background:var(--well);border:1px solid var(--well-border);border-radius:12px}
+.pill{background:rgba(255,255,255,.04)}
+
+/* 3D stages: NO backdrop blur behind a live WebGL canvas (expensive on college PCs) */
+.stage-area.is-3d{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(10,10,21,.9)}
+
+/* Principles index boxes */
+.card{border-radius:16px;transition:border-color .25s var(--ease),box-shadow .25s var(--ease),transform .25s var(--ease)}
+.card:hover,.card:focus-visible{border-color:rgba(153,153,255,.6);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px rgba(153,153,255,.25),0 12px 36px rgba(153,153,255,.18);background:var(--glass)}
+
+/* Home: controls sit in a glass dock */
+.controls{border-radius:999px;padding:6px 6px 6px 18px}
+
+/* Present mode: no body padding, keep the glass */
+html[data-present] body{padding:12px}
+
+</style>
+</head><body>
+<header class="hdr"><a class="brand" href="#">Principles of Animation</a><nav><a href="#">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="#">Spot it</a><a href="#">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<main class="hero">
+  <div><h1>Twelve principles, every one switchable</h1>
+  <p>Turn each principle on and off, scrub it frame by frame, and see why good animation feels alive.</p></div>
+  <div class="stage" id="stage" data-squash="on"><div class="ball"></div><div class="shadow"></div></div>
+  <div class="controls">
+    <span class="label">Squash and stretch</span>
+    <div class="seg" role="group" aria-label="Squash and stretch" data-target="stage" data-attr="squash">
+      <button data-value="off" aria-pressed="false">Off</button><button data-value="on" aria-pressed="true">On</button></div>
+    <a class="btn primary" href="#">Explore the principles</a>
+    <a class="btn secondary" href="#">Spot it</a>
+  </div>
+</main>
+<script type="module">
+// Pattern for js/core/toggles.js: buttons set a data attribute on the target; CSS does the rest.
+document.querySelectorAll('.seg[data-target]').forEach(group => {
+  const target = document.getElementById(group.dataset.target);
+  group.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+    target.dataset[group.dataset.attr] = btn.dataset.value;
+    group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === btn));
+  }));
+});
+</script></body></html>
