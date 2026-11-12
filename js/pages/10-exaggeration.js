@@ -1,5 +1,6 @@
 // 10 Exaggeration: Draig's take. The pose code is docs/reference/10-exaggeration-draig-demo.html
-// as it is; the only change is that time comes from a clock the shared timeline can scrub.
+// as it is, with two changes: time comes from a clock the shared timeline can scrub, and the
+// mouth opens a little even at the realistic setting.
 import { showSlider } from '../core/sliders.js';
 import { bindTimeline } from '../core/timeline.js';
 import { scalePart, rotatePart, movePart, mouth, rigClock, runRig } from '../core/draig.js';
@@ -46,7 +47,8 @@ function frame(now) {
   scalePart('eye-left', 1 + up * .55, 1 + up * 1.1); scalePart('eye-right', 1 + up * .55, 1 + up * 1.1);
   scalePart('pupil-left', Math.max(.3, 1 - up * 1.4)); scalePart('pupil-right', Math.max(.3, 1 - up * 1.4));
   movePart('brows', 0, -up * 36);
-  mouth(up > .1); scalePart('mouth', 1 + up * .7);
+  // Mouth: even a realistic flinch opens it a little (a small "o"), growing into the full open mouth
+  mouth(up > .01); scalePart('mouth', up < .1 ? .45 + 6 * up : 1 + up * .7);
   rotatePart('arm-left', up * 120); rotatePart('arm-right', -up * 120);
   rotatePart('wing-left', -up * 30); rotatePart('wing-right', up * 30);
   rotatePart('tail', -up * 25); scalePart('crest', 1, 1 + up * .8);
