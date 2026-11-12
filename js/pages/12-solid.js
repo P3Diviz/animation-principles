@@ -1,66 +1,61 @@
-// 12 Solid drawing: every shape is placed from one table of joints, so the stick figure,
-// construction shapes, volume and shading always line up. Twinning swaps in a mirror-perfect pose.
+// 12 Solid drawing: Draig as a stick figure, construction shapes, flat colour and full render.
+// The pose (natural or twinning) and the head turn drive Draig and the drawing aids together.
 import '../core/toggles.js';
 import { showSlider } from '../core/sliders.js';
+import { rotatePart, posePart, movePart } from '../core/draig.js';
 
 const $ = id => document.getElementById(id);
 const stage = $('stage'), turn = $('turn');
 
-// Natural pose: weight on the right leg, so the hips tilt one way and the shoulders the other
-const NATURAL = {
-  head: [404, 100], neck: [401, 138], chest: [400, 182], pelvis: [398, 250],
-  shL: [362, 158], shR: [438, 166], elL: [345, 214], elR: [470, 208], haL: [343, 266], haR: [434, 244],
-  hipL: [381, 258], hipR: [417, 250], knL: [370, 312], knR: [426, 306], ftL: [352, 360], ftR: [432, 360],
-};
-// Twinning: both sides identical, as if folded down the middle
-const TWIN = {
-  head: [400, 100], neck: [400, 138], chest: [400, 182], pelvis: [400, 252],
-  shL: [362, 162], shR: [438, 162], elL: [348, 216], elR: [452, 216], haL: [346, 268], haR: [454, 268],
-  hipL: [383, 254], hipR: [417, 254], knL: [380, 310], knR: [420, 310], ftL: [378, 360], ftR: [422, 360],
-};
+// Natural pose: weight on one side, one arm up, head tilted. Twinning: everything mirrored.
+const NATURAL = { lean: 3, armL: 40, armR: -6, wingL: -12, wingR: 4, tail: -12, tilt: -6 };
+const TWIN    = { lean: 0, armL: 0,  armR: 0,  wingL: 0,   wingR: 0, tail: 0,   tilt: 0 };
 
-const svg = stage.querySelector('svg');
-const angle = (a, b) => Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+// Arms hang from their pivots, already turned 22° out in the artwork
+const ARMS = { L: { x: 98, y: 262, base: 22 }, R: { x: 302, y: 262, base: -22 } };
+// A point `len` along a limb that hangs from (x, y), turned by deg (0 = straight down)
+const along = (x, y, deg, len) => { const a = deg * Math.PI / 180; return [x - Math.sin(a) * len, y + Math.cos(a) * len]; };
 
-// A centre line on a round form turned by t degrees: half an ellipse from top to bottom.
-// Its width is r x sin(t): flat when facing us, fuller as the form turns.
-function centreLine(rw, rh, t) {
-  const rx = Math.abs(rw * Math.sin(t * Math.PI / 180));
-  if (rx < .5) return `M0 ${-rh} L0 ${rh}`;
-  return `M0 ${-rh} A${rx.toFixed(1)} ${rh} 0 0 ${t > 0 ? 1 : 0} 0 ${rh}`;
+function line(id, [x1, y1], [x2, y2]) {
+  const l = $(id); l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+}
+
+// Half an ellipse from top to bottom of a form turned by t degrees: width r x sin(t)
+function centreLine(cx, top, bottom, r, t) {
+  const rx = Math.abs(r * Math.sin(t * Math.PI / 180)), ry = (bottom - top) / 2;
+  if (rx < .5) return `M${cx} ${top} L${cx} ${bottom}`;
+  return `M${cx} ${top} A${rx.toFixed(1)} ${ry} 0 0 ${t > 0 ? 1 : 0} ${cx} ${bottom}`;
 }
 
 function draw() {
-  const J = stage.dataset.twin === 'on' ? TWIN : NATURAL;
-  const t = +turn.value;
+  const P = stage.dataset.twin === 'on' ? TWIN : NATURAL;
+  const t = +turn.value, shift = 40 * Math.sin(t * Math.PI / 180);   // turning slides the face across the body
 
-  // Lines between two joints
-  svg.querySelectorAll('line[data-a]').forEach(l => {
-    const a = J[l.dataset.a], b = J[l.dataset.b];
-    l.setAttribute('x1', a[0]); l.setAttribute('y1', a[1]); l.setAttribute('x2', b[0]); l.setAttribute('y2', b[1]);
-  });
-  // Circles sitting on a joint
-  svg.querySelectorAll('circle[data-at]').forEach(c => {
-    const p = J[c.dataset.at];
-    c.setAttribute('cx', p[0]); c.setAttribute('cy', p[1]);
-  });
-  // Groups (head, chest, pelvis): moved to their joint and tilted to match the shoulders or hips
-  svg.querySelectorAll('g[data-g]').forEach(g => {
-    const p = J[g.dataset.g];
-    const tilt = g.dataset.tilt ? angle(...g.dataset.tilt.split(',').map(k => J[k])) : 0;
-    g.setAttribute('transform', `translate(${p[0]} ${p[1]}) rotate(${tilt.toFixed(2)})`);
-  });
-  // Wrap lines halfway along each limb: a short curve across it, bowed along the limb
-  svg.querySelectorAll('path.contour').forEach(c => {
-    const a = J[c.dataset.a], b = J[c.dataset.b], w = +c.dataset.w;
-    const len = Math.hypot(b[0] - a[0], b[1] - a[1]), u = [(b[0] - a[0]) / len, (b[1] - a[1]) / len], n = [-u[1], u[0]];
-    const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-    c.setAttribute('d', `M${m[0] - n[0] * w} ${m[1] - n[1] * w} Q${m[0] + u[0] * w * .7} ${m[1] + u[1] * w * .7} ${m[0] + n[0] * w} ${m[1] + n[1] * w}`);
-  });
-  // Turning: the head's centre line follows the turn; the chest turns a little with it
-  $('headCentre').setAttribute('d', centreLine(30, 30, t));
-  $('headEyes').setAttribute('d', 'M-30 4 A30 8 0 0 0 30 4');
-  $('chestCentre').setAttribute('d', centreLine(38, 48, t * .4));
+  // Draig
+  $('rig').setAttribute('transform', `rotate(${P.lean} 200 380)`);
+  rotatePart('arm-left', P.armL); rotatePart('arm-right', P.armR);
+  rotatePart('wing-left', P.wingL); rotatePart('wing-right', P.wingR);
+  rotatePart('tail', P.tail);
+  posePart('face', { dx: shift, r: P.tilt });
+  movePart('pupil-left', shift * .15, 0); movePart('pupil-right', shift * .15, 0);
+
+  // Stick figure, from the same angles
+  const hand = side => along(ARMS[side].x, ARMS[side].y, ARMS[side].base + P['arm' + side], 62);
+  line('sk-armL', [ARMS.L.x, ARMS.L.y], hand('L'));
+  line('sk-armR', [ARMS.R.x, ARMS.R.y], hand('R'));
+  line('sk-wingL', [98, 262], along(98, 262, 150 - P.wingL, 150));
+  line('sk-wingR', [302, 262], along(302, 262, -150 - P.wingR, 150));
+  // The aids lean with Draig, so they stay on him
+  ['aid-stick', 'aid-cons'].forEach(id => $(id).setAttribute('transform', `rotate(${P.lean} 200 380)`));
+
+  // Construction: arm capsules follow the arms; the centre line follows the turn
+  for (const side of ['L', 'R']) {
+    const a = ARMS[side], deg = a.base + P['arm' + side], [cx, cy] = along(a.x, a.y, deg, 34);
+    const e = $('c-arm' + side);
+    e.setAttribute('cx', cx); e.setAttribute('cy', cy); e.setAttribute('transform', `rotate(${deg} ${cx} ${cy})`);
+  }
+  $('c-face').setAttribute('transform', `translate(${shift} 0)`);
+  $('c-centre').setAttribute('d', centreLine(200, 96, 380, 132, t));
 }
 
 turn.addEventListener('input', () => { showSlider(turn); draw(); });
