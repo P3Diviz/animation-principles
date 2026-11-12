@@ -62,6 +62,12 @@
             <radialGradient id="gSpot"><stop offset="0" stop-color="#FFD9A8" stop-opacity=".2"/><stop offset="1" stop-color="#FFD9A8" stop-opacity="0"/></radialGradient>
             <linearGradient id="gWall" x1="0" y1="0" x2="0" y2="1"><stop offset=".6" stop-color="#0C0C1C"/><stop offset="1" stop-color="#1A1A30"/></linearGradient>
             <linearGradient id="gFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22223A"/><stop offset=".12" stop-color="#14142A"/></linearGradient>
+            <!-- Light on the clutter, across the whole set: key from the front left, shade away from it,
+                 fill from the right lifting the shade side. Masked by the clutter's own shapes. -->
+            <radialGradient id="gKeyC" gradientUnits="userSpaceOnUse" cx="260" cy="180" r="560"><stop offset="0" stop-color="#FFD9A8" stop-opacity=".5"/><stop offset="1" stop-color="#FFD9A8" stop-opacity="0"/></radialGradient>
+            <linearGradient id="gShadeC" gradientUnits="userSpaceOnUse" x1="260" y1="0" x2="800" y2="0"><stop offset="0" stop-color="#05050F" stop-opacity="0"/><stop offset="1" stop-color="#05050F" stop-opacity=".75"/></linearGradient>
+            <linearGradient id="gFillC" gradientUnits="userSpaceOnUse" x1="800" y1="0" x2="330" y2="0"><stop offset="0" stop-color="#A9B6FF" stop-opacity=".35"/><stop offset="1" stop-color="#A9B6FF" stop-opacity="0"/></linearGradient>
+            <mask id="clutterSil" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="450" style="mask-type:alpha"><use href="#clutterShapes"/></mask>
           </defs>
           <g class="cam">
             <!-- Back wall and floor run well past the frame so camera moves never show an edge -->
@@ -70,7 +76,17 @@
             <line class="horizon" x1="-1200" y1="330" x2="2000" y2="330"/>
             <ellipse class="lt key-l" cx="330" cy="250" rx="230" ry="170" fill="url(#gSpot)"/>
 
-            <g class="clutter">
+            <!-- Clutter cast shadows from the key, falling to the right like the crate's -->
+            <g class="clutter"><g class="lt key-l" fill="rgba(0,0,0,.45)">
+              <path d="M140 386 L196 386 L168 376 L140 376Z"/>
+              <path d="M770 386 L826 386 L798 376 L770 376Z"/>
+              <ellipse cx="480" cy="388" rx="28" ry="4"/>
+              <ellipse cx="665" cy="388" rx="17" ry="3.5"/>
+              <ellipse cx="193" cy="388" rx="13" ry="3"/>
+            </g></g>
+
+            <!-- The mask reuses the inner group: the outer one carries the show/hide class -->
+            <g class="clutter"><g id="clutterShapes">
               <rect class="cl2" x="40" y="140" width="190" height="8"/>
               <rect class="cl" x="56" y="98" width="34" height="42"/><rect class="cl2" x="96" y="112" width="48" height="28"/><rect class="cl" x="150" y="90" width="22" height="50"/><circle class="cl" cx="200" cy="124" r="16"/>
               <rect class="cl2" x="40" y="214" width="190" height="8"/>
@@ -81,6 +97,11 @@
               <rect class="cl2" x="60" y="300" width="80" height="86"/><rect class="cl" x="72" y="250" width="58" height="50"/>
               <ellipse class="cl" cx="455" cy="372" rx="22" ry="16"/><rect class="cl2" x="430" y="300" width="10" height="70" transform="rotate(-16 435 300)"/>
               <circle class="cl" cx="650" cy="374" r="12"/><circle class="cl2" cx="180" cy="378" r="10"/>
+            </g></g>
+            <g class="clutter">
+              <rect class="lt shade-l" x="0" y="0" width="800" height="450" fill="url(#gShadeC)" mask="url(#clutterSil)"/>
+              <rect class="lt fill-l" x="0" y="0" width="800" height="450" fill="url(#gFillC)" mask="url(#clutterSil)" style="mix-blend-mode:screen"/>
+              <rect class="lt key-l" x="0" y="0" width="800" height="450" fill="url(#gKeyC)" mask="url(#clutterSil)" style="mix-blend-mode:screen"/>
             </g>
 
             <!-- Cast shadows from the key light (upper left), falling to the right -->

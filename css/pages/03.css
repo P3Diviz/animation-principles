@@ -49,9 +49,9 @@
 .stage-area[data-level="line"] .horizon{stroke:rgba(255,255,255,.35)}
 
 /* Rendered: light and shadow. The fill light lifts the shadow side. */
-.stage-area[data-level="rendered"]{--wall:url(#gWall);--floor:url(#gFloor);--fig:#7E7E92;--crate:#33334C;--ball:#6262C4;--clutter:#4A4A62;--clutter-2:#38385A}
-.stage-area[data-level="rendered"][data-fill="off"]{--clutter:#2A2A3C;--clutter-2:#22223A}
-.stage-area[data-level="rendered"][data-key="off"]{--crate:#1E1E30;--ball:#33337A}
+.stage-area[data-level="rendered"]{--wall:url(#gWall);--floor:url(#gFloor);--fig:#7E7E92;--crate:#33334C;--ball:#6262C4;--clutter:#42425A;--clutter-2:#333350}
+/* The clutter is lit by its own key, shade and fill layers (03-staging.html), like the crate and ball */
+.stage-area[data-level="rendered"][data-key="off"]{--crate:#1E1E30;--ball:#33337A;--clutter:#26263A;--clutter-2:#1F1F33}
 
 /* Light layers only exist in the rendered drawing */
 .lt{display:none}
