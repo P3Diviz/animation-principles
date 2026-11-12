@@ -16,8 +16,12 @@ html[data-present] body{grid-template-rows:minmax(0,1fr)}
 .ball{width:20cqw;height:20cqw;position:absolute;border-radius:50%;left:40%;
   background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%); /* original: #fff9d9, #ffd93d, #b58d00 */
   transform-origin:center center;animation:bounce .5s alternate infinite ease}
+/* 10% and 30%: a little stretch at speed (added at Paul's request, as on page 01). 10% holds the shape
+   his ball already has there, so it never dips below the floor. 0%, 40% and 100% are his values unchanged. */
 @keyframes bounce{
   0%{top:60%;transform:scale(1.7,.5)}
+  10%{transform:scale(1.41,.7)}
+  30%{transform:scale(.9,1.15)}
   40%{height:20cqw;border-radius:50%;transform:scaleX(1)}
   100%{top:0%}}
 .shadow{width:20cqw;height:3.75cqw;border-radius:50%;position:absolute;top:80.208cqh;left:40%;z-index:-1;transform-origin:bottom center;
