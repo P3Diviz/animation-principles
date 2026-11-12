@@ -7,6 +7,8 @@
 .hdr nav{display:flex;align-items:center;gap:20px}
 .hdr nav a,.hdr nav button.link{color:var(--text-2);text-decoration:none;background:none;border:none;font:500 13px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px;transition:color var(--ease) .2s}
 .hdr nav a:hover,.hdr nav button.link:hover,.hdr nav [aria-current="page"]{color:var(--text)}
+/* Pages not built yet (Spot it, Playground): greyed out, not clickable. Give them an href when they exist. */
+a[aria-disabled="true"]{opacity:.4;cursor:default;pointer-events:none}
 
 /* ===== Principles dropdown =====
    Right-aligned under the link. Hidden attribute toggled by JS; data-open drives the fade. */
