@@ -1,8 +1,11 @@
-// 05 Follow through, 3D view: Y Bot's Mixamo Run To Stop with a long ponytail.
-// The hair is a chain of points tied to the back of the head (verlet physics): each point keeps
-// its last movement, so when he stops running the hair carries on forward, then swings back and
-// settles. Gravity hangs it down; the Stiffness slider pulls it back towards its resting shape.
-// It's kept outside the head and upper back. Off: the hair is rigid.
+// 05 Follow through, 3D view: Y Bot's Mixamo Run To Stop wearing a cloak.
+// The cloak swings like two linked pendulums hung from his shoulders: the upper half, and the
+// lower half hanging from it (the same idea as the 2D page's springs: parts pushed by the body's
+// acceleration). While he runs, the air holds it out behind him at an angle set by his speed.
+// When he stops, the cloak carries on forward (follow through), the lower half a moment later
+// than the upper (overlapping action), its edges wrapping round his legs, then it settles.
+// Damping is built in, so it settles within a second or two and can't whip around.
+// Stiffness: how firmly the lower half follows the upper. Off: the cloak hangs straight.
 // Watch: the run plays and loops. Drag it: the figure stands (Idle) and follows the pointer.
 // The physics runs live, so this view has no timeline.
 import * as THREE from 'three';
@@ -11,55 +14,53 @@ import { std, reducedMotion } from '../three/stage.js';
 import { RUN_STOP } from '../three/clips.js';
 
 const $ = id => document.getElementById(id);
-const N = 10, SEG = .043;                        // points along the hair, and the gap between them (about 39 cm long)
-const LOOP = 1.8 + 1.6;                          // the run, then a hold while the hair settles
+const COLS = 9, ROWS = 14;                       // cloth mesh grid
+const UPPER = .4, LOWER = .42;                   // lengths of the two halves (shoulders to below the knee)
+const TOP_W = .36, BOTTOM_W = .66;               // width across the shoulders and at the hem
+const LOOP = 1.8 + 2;                            // the run, then a hold while the cloak settles
 const START_X = -1.4;                            // where the run starts (it travels about 2.6 to the right)
-const ROWS = 28, SIDES = 10;                     // the hair's tube mesh
-
-// Hair thickness along its length (0 = the tie, 1 = the tip): fuller just below the tie, then tapering
-const thickness = u => u < .2 ? .02 + .026 * (u / .2) : .046 * Math.pow(1 - (u - .2) / .8, 1.1) + .004;
+const STEP = 1 / 120, G = 9.8;
+const AIR = 2.2;                                 // air drag: holds the cloak out behind as he runs (and slows its swing)
+const deg = Math.PI / 180;
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const idx = (i, j) => j * COLS + i;
 
 export function create({ stageEl, canvas, status }) {
-  const { stage } = studio(stageEl, canvas, { pos: [.2, 1.4, 4.4], look: [0, 1, 0] });
+  // Three-quarter view from behind him, so the cloak shows its surface rather than its edge
+  const { stage } = studio(stageEl, canvas, { pos: [-2.6, 1.75, 3.9], look: [.1, .95, 0] });
   const main = $('main'), stiffInput = $('stiff');
-  const v = new THREE.Vector3(), w = new THREE.Vector3(), q = new THREE.Quaternion();
+  const v = new THREE.Vector3(), q = new THREE.Quaternion();
   const UP = new THREE.Vector3(0, 1, 0);
 
-  // ----- The hair mesh: a tapered tube through the chain, rebuilt each frame -----
+  // ----- The cloth mesh -----
   const geo = new THREE.BufferGeometry();
-  const posAttr = new THREE.BufferAttribute(new Float32Array(ROWS * SIDES * 3), 3);
+  const posAttr = new THREE.BufferAttribute(new Float32Array(COLS * ROWS * 3), 3);
   geo.setAttribute('position', posAttr);
   const index = [];
-  for (let r = 0; r < ROWS - 1; r++) for (let s = 0; s < SIDES; s++) {
-    const a = r * SIDES + s, b = r * SIDES + (s + 1) % SIDES, c = a + SIDES, d = b + SIDES;
+  for (let j = 0; j < ROWS - 1; j++) for (let i = 0; i < COLS - 1; i++) {
+    const a = idx(i, j), b = idx(i + 1, j), c = idx(i, j + 1), d = idx(i + 1, j + 1);
     index.push(a, c, b, b, c, d);
   }
   geo.setIndex(index);
-  const hairMat = std('#9A9AB2', .75);           // a grey between the clay and the joints, so it reads against the dark background
-  hairMat.side = THREE.DoubleSide;
-  const hair = new THREE.Mesh(geo, hairMat);
-  hair.castShadow = true; hair.frustumCulled = false; hair.visible = false;
-  stage.scene.add(hair);
+  const mat = std('#8E8E9A', .9);
+  mat.side = THREE.DoubleSide;
+  const cloak = new THREE.Mesh(geo, mat);
+  cloak.castShadow = true; cloak.frustumCulled = false; cloak.visible = false;
+  stage.scene.add(cloak);
 
-  const pts = Array.from({ length: N }, () => new THREE.Vector3());
-  const prev = Array.from({ length: N }, () => new THREE.Vector3());
-  const curve = new THREE.CatmullRomCurve3(pts);
-  const anchor = new THREE.Vector3(), lastAnchor = new THREE.Vector3();
-  const back = new THREE.Vector3(), restDir = new THREE.Vector3();
-  const headCentre = new THREE.Vector3(), neck = new THREE.Vector3();
-  const headRest = new THREE.Quaternion(), headTurn = new THREE.Quaternion();
+  // ----- The swing: two angles from hanging straight down (+ = out behind him, - = forward) -----
+  let a1 = 0, w1 = 0, a2 = 0, w2 = 0;              // upper half, lower half: angle and its speed
+  let speed = 0, accel = 0;                        // his forward speed and acceleration (smoothed)
+  const pin = new THREE.Vector3(), lastPin = new THREE.Vector3();
+  const back = new THREE.Vector3(), side = new THREE.Vector3(), fwd = new THREE.Vector3();
 
-  let rig = null, t = 0, dragX = 0, targetX = 0, spare = 0;
-  const STEP = 1 / 120;
+  let rig = null, t = 0, dragX = 0, targetX = 0, spare = 0, fresh = true;
   const mode = () => main.dataset.mode === 'drag' ? 'drag' : 'watch';
   addBot(stage, status, 'YBot', null, { at: [START_X, 0, 0], turn: Math.PI / 2 }).then(async r => {
     if (!r.bones.length) return;
     rig = r;
-    // How the head is turned at rest, so the tie point can turn with the head
-    rig.model.updateMatrixWorld(true);
-    rig.bone('Head').getWorldQuaternion(headRest).invert();
     await startMode();
-    hair.visible = true;
+    cloak.visible = true;
   });
 
   async function startMode() {
@@ -68,88 +69,92 @@ export function create({ stageEl, canvas, status }) {
     rig.model.position.x = mode() === 'drag' ? 0 : START_X;
     await rig.play(mode() === 'drag' ? 'Idle' : 'RunToStop');
     rig.setTime(0);
-    findAnchor(); resetHair();
+    fresh = true;
   }
   main.addEventListener('statechange', e => { if (e.detail.attr === 'mode') startMode(); });
 
-  // The tie point: high on the back of the head, turning with it. Also the body parts the hair can't pass through.
-  function findAnchor() {
+  // Where the cloak is pinned: across his shoulders, just behind his neck. And which way is back.
+  const L = new THREE.Vector3(), R = new THREE.Vector3(), N = new THREE.Vector3();
+  function readBody() {
     rig.model.updateMatrixWorld(true);
-    const head = rig.bone('Head'), top = rig.bone('HeadTop_End');
-    head.getWorldPosition(v);
-    if (top) top.getWorldPosition(w); else w.copy(v).y += .2;
-    headCentre.lerpVectors(v, w, .5);
-    // The figure faces +z in its own space, so its back is -z; turn that with the head
+    rig.bone('LeftArm').getWorldPosition(L); rig.bone('RightArm').getWorldPosition(R); rig.bone('Neck').getWorldPosition(N);
     rig.model.getWorldQuaternion(q);
-    head.getWorldQuaternion(headTurn).multiply(headRest);
-    back.set(0, 0, -1).applyQuaternion(q).applyQuaternion(headTurn);
-    anchor.copy(headCentre).addScaledVector(back, .1).addScaledVector(UP, .07);      // tied high on the crown
-    // At rest the ponytail stands out from the head a little, then falls
-    restDir.set(0, 0, -1).applyQuaternion(q).multiplyScalar(.6).addScaledVector(UP, -.8).normalize();
-    rig.bone('Neck').getWorldPosition(neck);
-  }
-  function resetHair() {
-    pts.forEach((p, i) => { p.copy(anchor).addScaledVector(restDir, SEG * i); prev[i].copy(p); });
-    lastAnchor.copy(anchor);
+    back.set(0, 0, -1).applyQuaternion(q);       // he faces +z in his own space
+    fwd.copy(back).negate();
+    side.crossVectors(UP, back).normalize();
+    pin.lerpVectors(L, R, .5).addScaledVector(back, .1);
+    pin.y = N.y - .04;
   }
 
-  // Push a point out of the head (a sphere)
-  function keepOut(p, c, r) {
-    v.subVectors(p, c);
-    const d = v.length();
-    if (d < r && d > 1e-6) p.copy(c).addScaledVector(v, r / d);
-  }
-  // Below the top of the neck, keep the hair behind his back (a flat limit just behind the neck)
-  function keepBehind(p) {
-    if (p.y > neck.y + .04) return;
-    const d = v.subVectors(p, neck).dot(back);
-    if (d < .08) p.addScaledVector(back, .08 - d);
-  }
-
-  // One step of the chain
-  function stepHair(dt) {
-    if (main.dataset.follow === 'off') { resetHair(); return; }
-    if (anchor.distanceTo(lastAnchor) > .5) resetHair();       // the loop jumped back to the start
-    lastAnchor.copy(anchor);
-    const stiff = +stiffInput.value / 100;                      // 0 loose .. 1 stiff
-    const pull = 1 - Math.pow(1 - (.006 + .12 * stiff), dt * 60);
-    pts[0].copy(anchor); prev[0].copy(anchor);
-    for (let i = 1; i < N; i++) {
-      const p = pts[i];
-      v.subVectors(p, prev[i]).multiplyScalar(.99);            // keep moving (a little air drag)
-      prev[i].copy(p);
-      p.add(v);
-      p.y -= 6 * dt * dt;                                       // gravity
+  // His forward speed and acceleration, from the pin's movement (smoothed, so the bounce of each
+  // stride doesn't jiggle the cloak). A jump back to the start of the loop is ignored.
+  function measure(dt) {
+    if (fresh || pin.distanceTo(lastPin) > .5) {
+      // Start already moving with him: the cloak streams out at his speed, nothing yanks it
+      speed = fresh && mode() === 'drag' ? 0 : runStartSpeed();
+      accel = 0; w1 = w2 = 0;
+      a1 = a2 = Math.atan(AIR * speed / G);
+      lastPin.copy(pin); fresh = false;
+      return;
     }
-    for (let pass = 0; pass < 4; pass++) {
-      for (let i = 1; i < N; i++) {
-        const p = pts[i], parent = pts[i - 1];
-        if (pass === 0) p.lerp(w.copy(parent).addScaledVector(restDir, SEG), pull);   // back towards its shape
-        v.subVectors(p, parent);
-        p.copy(parent).addScaledVector(v, SEG / (v.length() || 1));                    // keep its length
-        keepOut(p, headCentre, .115); keepBehind(p);                // sized to the Y Bot
+    const s = v.subVectors(pin, lastPin).dot(fwd) / dt;
+    lastPin.copy(pin);
+    const k = 1 - Math.exp(-dt / .08);             // smoothing over about 80 ms
+    const newSpeed = speed + (s - speed) * k;
+    accel += ((newSpeed - speed) / dt - accel) * k;
+    speed = newSpeed;
+  }
+  function runStartSpeed() {
+    if (mode() !== 'watch') return 0;
+    const h = new THREE.Vector3(), h2 = new THREE.Vector3();
+    rig.setTime(0); rig.model.updateMatrixWorld(true); rig.bone('Hips').getWorldPosition(h);
+    rig.setTime(.1); rig.model.updateMatrixWorld(true); rig.bone('Hips').getWorldPosition(h2);
+    rig.setTime(Math.min(t, RUN_STOP.stopped + .79)); readBody();
+    return h2.sub(h).dot(fwd) * 10;
+  }
+
+  // One step of the two pendulums. A pivot that slows down throws the pendulum forward; the air
+  // pushes it back while he moves; gravity hangs it down; damping settles it.
+  function swing(dt) {
+    if (main.dataset.follow === 'off') { a1 = a2 = w1 = w2 = 0; return; }
+    const stiff = +stiffInput.value / 100;
+    const bend = 30 + 260 * stiff, bendDamp = 3 + 10 * stiff;    // how firmly the lower half follows the upper
+    const damp = 3.2;                                            // the cloth's own damping
+    // Upper half, hung from his shoulders
+    const e1 = (accel * Math.cos(a1) - G * Math.sin(a1) + AIR * speed * Math.cos(a1)) / UPPER
+      - (AIR + damp) * w1 - bend * .3 * (a1 - a2);
+    // Lower half, hung from the upper half's hem (which moves as the upper half swings)
+    const jointAccel = accel + UPPER * e1 * Math.cos(a1);
+    const e2 = (jointAccel * Math.cos(a2) - G * Math.sin(a2) + AIR * speed * Math.cos(a2)) / LOWER
+      - (AIR + damp) * w2 - bend * (a2 - a1) - bendDamp * (w2 - w1);
+    w1 += e1 * dt; w2 += e2 * dt;
+    a1 += w1 * dt; a2 += w2 * dt;
+    // It can't swing through him: at most a little forward (its edges wrap round his legs)
+    if (a1 < -12 * deg) { a1 = -12 * deg; w1 = Math.max(0, w1); }
+    if (a2 < -22 * deg) { a2 = -22 * deg; w2 = Math.max(0, w2); }
+    a1 = clamp(a1, -12 * deg, 75 * deg); a2 = clamp(a2, -22 * deg, 85 * deg);
+  }
+
+  // Build the cloth: each column runs down from the shoulders, turning from the upper half's angle
+  // to the lower half's. The middle rests against his back; the edges can come further forward.
+  const p = new THREE.Vector3(), dir = new THREE.Vector3();
+  function drawCloth() {
+    const rowLen = (UPPER + LOWER) / (ROWS - 1);
+    for (let i = 0; i < COLS; i++) {
+      const u = i / (COLS - 1) - .5, edge = Math.abs(u) * 2;    // 0 in the middle, 1 at the edges
+      p.copy(pin).addScaledVector(side, u * TOP_W).addScaledVector(back, .04 * (1 - edge * edge));
+      for (let j = 0; j < ROWS; j++) {
+        const f = j / (ROWS - 1);
+        const mix = clamp((f * (UPPER + LOWER) - UPPER * .6) / (UPPER * .8), 0, 1);   // smooth bend at the join
+        let a = a1 + (a2 - a1) * (mix * mix * (3 - 2 * mix));
+        if (a < 0) a *= .25 + .75 * edge;                                  // the middle can't go far forward
+        // the edges flare out and trail a touch behind the middle
+        const width = TOP_W + (BOTTOM_W - TOP_W) * f;
+        posAttr.setXYZ(idx(i, j), p.x + side.x * u * (width - TOP_W), p.y, p.z + side.z * u * (width - TOP_W));
+        // + a slight outward drape, so it falls over his back and hips instead of through them
+        dir.copy(back).multiplyScalar(Math.sin(a) + .06 * edge + .17 * (1 - f)).addScaledVector(UP, -Math.cos(a));
+        p.addScaledVector(dir.normalize(), rowLen);
         if (p.y < .02) p.y = .02;
-      }
-    }
-  }
-
-  // Rebuild the tube: a ring round the curve at each row, sized by thickness()
-  const centre = new THREE.Vector3(), tangent = new THREE.Vector3(), side = new THREE.Vector3(), normal = new THREE.Vector3();
-  function drawHair() {
-    curve.points = pts;
-    for (let r = 0; r < ROWS; r++) {
-      const u = r / (ROWS - 1);
-      curve.getPointAt(u, centre);
-      curve.getTangentAt(u, tangent);
-      side.crossVectors(tangent, back).normalize();
-      if (side.lengthSq() < 1e-6) side.set(1, 0, 0);
-      normal.crossVectors(side, tangent).normalize();
-      const rad = thickness(u);
-      for (let s = 0; s < SIDES; s++) {
-        const a = s / SIDES * Math.PI * 2;
-        // a little flatter side to side than front to back, like a real ponytail
-        v.copy(centre).addScaledVector(side, Math.cos(a) * rad * .8).addScaledVector(normal, Math.sin(a) * rad);
-        posAttr.setXYZ(r * SIDES + s, v.x, v.y, v.z);
       }
     }
     posAttr.needsUpdate = true;
@@ -160,23 +165,23 @@ export function create({ stageEl, canvas, status }) {
     if (!rig) return;
     if (mode() === 'watch') {
       if (!reducedMotion) t = (t + dt) % LOOP;
-      rig.setTime(Math.min(t, RUN_STOP.stopped + .79));       // after the stop he holds still
+      rig.setTime(Math.min(t, RUN_STOP.stopped + .79));             // after the stop he holds still
     } else {
       if (!reducedMotion) t += dt;
       rig.setTime(t);
-      dragX += (targetX - dragX) * Math.min(1, dt * 10);       // follows the pointer smoothly
+      dragX += (targetX - dragX) * Math.min(1, dt * 10);             // follows the pointer smoothly
       rig.model.position.x = dragX;
     }
-    findAnchor();
-    // Fixed physics steps of 1/120 s, so the hair moves the same on a fast or a slow computer
+    readBody();
+    if (dt > 0) measure(dt);
     spare = Math.min(spare + dt, .1);
-    while (spare >= STEP) { stepHair(STEP); spare -= STEP; }
-    drawHair();
+    while (spare >= STEP) { swing(STEP); spare -= STEP; }
+    drawCloth();
   });
 
   // Drag it: pointer position to a point on the floor line, across the stage
   const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit = new THREE.Vector3();
-  const clampX = x => Math.max(-2.2, Math.min(2.2, x));
+  const clampX = x => clamp(x, -2.2, 2.2);
   function pointerX(e) {
     const r = canvas.getBoundingClientRect();
     ray.setFromCamera({ x: (e.clientX - r.left) / r.width * 2 - 1, y: -((e.clientY - r.top) / r.height * 2 - 1) }, stage.camera);
