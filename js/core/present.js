@@ -26,7 +26,7 @@ try { if (sessionStorage.getItem('present') === '1') html.dataset.present = ''; 
 document.getElementById('presentBtn')?.addEventListener('click', () => setPresent(!isPresent()));
 
 document.addEventListener('keydown', e => {
-  if (e.target.closest('input, textarea, select')) return;   // ignore keys while typing
+  if (e.target.closest?.('input, textarea, select')) return;  // ignore keys while typing
   if (e.ctrlKey || e.metaKey || e.altKey) return;            // leave Ctrl+P (print) alone
   if (e.key === 'p' || e.key === 'P') setPresent(!isPresent());
   if (e.key === 'Escape' && isPresent()) setPresent(false);

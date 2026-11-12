@@ -91,7 +91,7 @@ export function bindTimeline({ track, head, tc, play, getAnims, frames, fps = 25
 
   // After Effects keyboard habits
   document.addEventListener('keydown', e => {
-    if (e.target.closest('input, textarea, select')) return;
+    if (e.target.closest?.('input, textarea, select')) return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
     if (e.key === 'PageDown') { e.preventDefault(); setFrame(frameNow() + 1); showPlayState(); }
