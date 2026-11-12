@@ -4,16 +4,18 @@ import '../core/toggles.js';
 import { showSlider } from '../core/sliders.js';
 import { bindTimeline } from '../core/timeline.js';
 import { scalePart, rotatePart, posePart, mouth, placeDraig, groundShadow, rigClock, runRig, toScene, ease, span, lerp } from '../core/draig.js';
+import { bindView, handOver } from '../three/view.js';
 
 const $ = id => document.getElementById(id);
 const stage = $('stage'), scene = $('scene'), pos = $('draigPos'), ball = $('ball');
 const LOOP = 2000, S = .4;               // Draig at 40%: about 168 units tall
 const FLOOR = 330, BOX = 250;
 const clock = rigClock($('clock'), LOOP);
+let view3d = null;                       // the 3D view while it's showing (02-anticipation-3d.js)
 
 const tl = bindTimeline({
   track: $('track'), head: $('head'), tc: $('tc'), play: $('play'),
-  getAnims: () => [clock], frames: 50
+  getAnims: () => [view3d ? view3d.clock : clock], frames: 50
 });
 
 // How big the wind-up is: 0 (none, same as Off) to 2 (huge)
@@ -116,13 +118,31 @@ const ACTIONS = {
   jump:  { keys: [8, 18, 20, 26, 32], windUp: 18 },
   throw: { keys: [8, 20, 24, 30, 40], windUp: 20 },
 };
-$('wind').addEventListener('input', () => { showSlider($('wind')); redraw(); });
-stage.addEventListener('statechange', e => {
-  if (e.detail.attr === 'action') {
-    const a = ACTIONS[e.detail.value];
-    tl.setKeys(a.keys);
-    // Highlight the wind-up on the timeline: from frame 8 to the biggest wind-up pose
-    $('span').style.width = ((a.windUp - 8) / 50 * 100) + '%';
+// The timeline's keys and wind-up highlight, for whichever view is showing
+function showKeys() {
+  if (view3d) {
+    const [left, width] = view3d.span();
+    tl.setKeys(view3d.keys());
+    $('span').style.left = left + '%'; $('span').style.width = width + '%';
+    return;
   }
+  const a = ACTIONS[stage.dataset.action];
+  tl.setKeys(a.keys);
+  // Highlight the wind-up on the timeline: from frame 8 to the biggest wind-up pose
+  $('span').style.left = '16%'; $('span').style.width = ((a.windUp - 8) / 50 * 100) + '%';
+}
+$('wind').addEventListener('input', () => { showSlider($('wind')); redraw(); if (view3d) showKeys(); });
+stage.addEventListener('statechange', e => {
+  if (e.detail.attr === 'action' || view3d) showKeys();
   redraw();
+});
+
+// 2D / 3D: the timeline follows the clock of the view on screen
+bindView(() => import('./02-anticipation-3d.js'), {
+  onSwitch(is3d, v) {
+    view3d = is3d ? v : null;
+    if (is3d) handOver([clock], [v.clock]); else if (v) handOver([v.clock], [clock]);
+    tl.setFrames(is3d ? v.frames : 50);
+    showKeys();
+  }
 });

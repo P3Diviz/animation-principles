@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/02.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/02-anticipation.js"></script>
@@ -39,7 +44,10 @@
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">02</span>Anticipation</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/02-anticipation-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage" data-anticipation="on" data-action="jump">
       <div class="scene">
         <svg viewBox="0 0 800 400" id="scene" aria-label="Draig jumps onto a box, or throws a ball">
@@ -255,8 +263,8 @@
     <div class="seg" role="group" aria-label="Anticipation" data-target="stage" data-attr="anticipation">
       <button data-value="off" aria-pressed="false">Off</button><button data-value="on" aria-pressed="true">On</button>
     </div>
-    <h2>Action</h2>
-    <div class="seg" role="group" aria-label="Action" data-target="stage" data-attr="action">
+    <h2 class="only-2d">Action</h2>
+    <div class="seg only-2d" role="group" aria-label="Action" data-target="stage" data-attr="action">
       <button data-value="jump" aria-pressed="true">Jump</button><button data-value="throw" aria-pressed="false">Throw</button>
     </div>
     <h2>Wind-up</h2>
