@@ -2,7 +2,7 @@
 import { evaluate, toCSS } from '../core/bezier.js';
 import { bindTimeline, setKeyIcon } from '../core/timeline.js';
 
-const FPS = 25, FRAMES = 30, MOVE = 20, MS = 1000 / FPS;   // 20-frame move, 10-frame hold
+const FPS = 25, FRAMES = 45, MOVE = 30, MS = 1000 / FPS;   // 30-frame move (1.2 s), 15-frame hold
 let P = [.33, 0, .67, 1];                                   // cubic-bezier handles (Easy Ease)
 const $ = id => document.getElementById(id);
 const X = x => 20 + x * 160, Y = y => 170 - y * 140;        // graph units -> SVG units
