@@ -65,7 +65,6 @@
 .stage.has-scene{container-type:size}
 .scene{position:absolute;left:50%;top:50%;translate:-50% -50%;width:min(100cqw,calc(100cqh * var(--ar,2)));aspect-ratio:var(--ar,2);container-type:size}
 .scene > svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
-.stage-caption{position:absolute;left:24px;bottom:12px;color:var(--text-2);font-size:12px}
 
 /* Choice cards (Predict it, Guess the weight, Which is more appealing?) */
 .ask{display:grid;gap:6px}

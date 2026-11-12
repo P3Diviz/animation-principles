@@ -1,0 +1,35 @@
+/* 01 Squash and stretch.
+   Paul's original ball, ported exactly as on the home page (handover section 16).
+   The scene is his 800 x 480 container; every px value is in container units:
+   160px = 20cqw, 30px = 3.75cqw, 385px top = 80.208cqh.
+   transform-origin stays "center center". Do NOT change it to "center bottom". */
+.scene{--ar:800/480}
+.scene{z-index:0}
+
+/* --amount: 1 = Paul's ball exactly (scale 1.7 x .5 at contact, top 60%).
+   The contact top is worked out so the squashed ball's lowest edge stays on the same
+   floor (408px of 480) at any amount: top = (248 + 40 x amount)px of 480.
+   At amount 1 that is 288px = 60%, Paul's value. At amount 0 it is 51.67%, the Off value. */
+.ball{width:20cqw;height:20cqw;position:absolute;border-radius:50%;left:40%;
+  background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%);
+  transform-origin:center center;animation:bounce var(--dur,.5s) alternate infinite ease}
+@keyframes bounce{
+  0%{top:calc((248 + 40 * var(--amount,1)) / 4.8 * 1cqh);transform:scale(calc(1 + .7 * var(--amount,1)),calc(1 - .5 * var(--amount,1)))}
+  40%{height:20cqw;border-radius:50%;transform:scaleX(1)}
+  100%{top:0%}}
+.shadow{width:20cqw;height:3.75cqw;border-radius:50%;position:absolute;top:80.208cqh;left:40%;z-index:-1;transform-origin:bottom center;
+  background:rgba(153,153,255,.38);filter:blur(.75cqw);animation:shadow var(--dur,.5s) alternate infinite ease}
+@keyframes shadow{0%{transform:scaleX(1.7)}40%{transform:scaleX(1);opacity:.8}100%{transform:scaleX(.2);opacity:.2}}
+
+/* Off: same timing, no scale; the unsquashed ball touches the same floor at top 51.67% */
+.stage[data-squash="off"] .ball{animation-name:bounce-flat}
+@keyframes bounce-flat{0%{top:51.67%}100%{top:0%}}
+
+/* Volume check: the ball's original circle, travelling with it but never scaled */
+.ghost{display:none;width:20cqw;height:20cqw;position:absolute;left:40%;border-radius:50%;
+  border:1.5px dashed rgba(245,245,247,.7);pointer-events:none;animation:ghost var(--dur,.5s) alternate infinite ease}
+@keyframes ghost{0%{top:calc((248 + 40 * var(--amount,1)) / 4.8 * 1cqh)}100%{top:0%}}
+.stage[data-squash="off"] .ghost{animation-name:bounce-flat}
+.stage[data-volume="on"] .ghost{display:block}
+
+.presets button{flex:1 1 auto}
