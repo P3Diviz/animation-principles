@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>05 Follow through and overlapping action</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/shell.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages/05.css">
+<link rel="stylesheet" href="../css/glass.css">
+<script type="module" src="../js/core/menu.js"></script>
+<script type="module" src="../js/core/present.js"></script>
+<script type="module" src="../js/pages/05-follow.js"></script>
+</head>
+<body class="principle">
+<header class="hdr"><a class="brand" href="../index.html">Principles of Animation</a><nav><a href="../index.html">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="../spot-it.html">Spot it</a><a href="../playground.html">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="01-squash-and-stretch.html"><span class="mono">01</span>Squash and stretch</a>
+    <a href="07-arc.html"><span class="mono">07</span>Arc</a>
+    <a href="02-anticipation.html"><span class="mono">02</span>Anticipation</a>
+    <a href="08-secondary-action.html"><span class="mono">08</span>Secondary action</a>
+    <a href="03-staging.html"><span class="mono">03</span>Staging</a>
+    <a href="09-timing.html"><span class="mono">09</span>Timing</a>
+    <a href="04-straight-ahead-pose-to-pose.html"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="10-exaggeration.html"><span class="mono">10</span>Exaggeration</a>
+    <a href="05-follow-through.html" aria-current="page"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="11-appeal.html"><span class="mono">11</span>Appeal</a>
+    <a href="06-slow-in-slow-out.html"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="12-solid-drawing.html"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="../principles.html">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<main class="page" id="main" data-view="2d" data-follow="on" data-mode="watch">
+  <section class="stage-area">
+    <div class="stage-head">
+      <h1><span class="mono">05</span>Follow through and overlapping action</h1>
+    </div>
+    <div class="stage has-scene" id="stage">
+      <div class="scene">
+        <svg viewBox="0 0 800 400" id="svg" aria-label="A character slides and stops; its antenna and scarf carry on, then settle">
+          <line class="floor" x1="40" y1="330" x2="760" y2="330"/>
+          <g class="mover" id="mover">
+            <!-- Scarf: five segments, each hung from the end of the one before -->
+            <g transform="translate(-20 -62)"><g class="flop s1" id="s1">
+              <path class="scarf" d="M2 -7 L-19 -6 L-19 6 L2 7Z"/>
+              <g transform="translate(-17 0)"><g class="flop s2" id="s2">
+                <path class="scarf" d="M0 -6 L-19 -5.5 L-19 5.5 L0 6Z"/>
+                <g transform="translate(-17 0)"><g class="flop s3" id="s3">
+                  <path class="scarf" d="M0 -5.5 L-19 -5 L-19 5 L0 5.5Z"/>
+                  <g transform="translate(-17 0)"><g class="flop s4" id="s4">
+                    <path class="scarf" d="M0 -5 L-19 -4.5 L-19 4.5 L0 5Z"/>
+                    <g transform="translate(-17 0)"><g class="flop s5" id="s5">
+                      <path class="scarf" d="M0 -4.5 L-22 -4 L-28 -6 L-19 0 L-28 6 L-22 4 L0 4.5Z"/>
+                    </g></g>
+                  </g></g>
+                </g></g>
+              </g></g>
+            </g></g>
+            <rect class="body" x="-32" y="-100" width="64" height="100" rx="24"/>
+            <circle class="eye" cx="10" cy="-76" r="3"/><circle class="eye" cx="21" cy="-76" r="3"/>
+            <path class="scarf" d="M-31 -68 L31 -66 L31 -56 L-31 -58Z"/>
+            <g transform="translate(0 -100)"><g class="flop ant" id="ant">
+              <line class="stalk" x1="0" y1="0" x2="0" y2="-40"/><circle class="tip" cx="0" cy="-46" r="7"/>
+            </g></g>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="timeline">
+      <button class="play" id="play" aria-label="Pause"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect class="i-pause" x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect class="i-pause" x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><path class="i-play" d="M3 1.5 12 7 3 12.5Z" fill="currentColor" style="display:none"/></svg></button>
+      <span class="tc" id="tc">00:00:00:00</span>
+      <div class="track" id="track" data-keys="5,18,30,43">
+        <div class="bar"></div><div class="span" style="left:10%;width:26%"></div><div class="ticks"></div>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <div class="head" id="head"></div>
+      </div>
+    </div>
+  </section>
+  <aside class="panel">
+    <h2>Follow through</h2>
+    <div class="seg" role="group" aria-label="Follow through" data-target="main" data-attr="follow">
+      <button data-value="off" aria-pressed="false">Off</button><button data-value="on" aria-pressed="true">On</button>
+    </div>
+    <h2>Stiffness</h2>
+    <label class="slider"><span class="row"><span>Loose to stiff</span><output>40%</output></span>
+      <input type="range" id="stiff" min="0" max="100" step="5" value="40" data-target="main" data-var="--stiff" data-scale="0.01" data-unit="%"></label>
+    <h2>Mode</h2>
+    <div class="seg" role="group" aria-label="Mode" data-target="main" data-attr="mode">
+      <button data-value="watch" aria-pressed="true">Watch</button><button data-value="drag" aria-pressed="false">Drag it</button>
+    </div>
+    <p class="small drag-only">Drag the character left and right, or use the arrow keys. Watch the scarf catch up.</p>
+    <p class="small">The body stops on the key. The antenna and scarf stop later, one part after another.</p>
+  </aside>
+</main>
+<footer class="notes">
+  <section><h3>What to notice</h3><p>Not everything stops at once.</p></section>
+  <section><h3>In After Effects</h3><p>Offset keyframes a few frames per layer, or parent with a delay.</p></section>
+  <section><h3>Try this</h3><p>Make the scarf heavy, then light.</p></section>
+  <div class="prevnext"><a href="04-straight-ahead-pose-to-pose.html" aria-label="Previous: 04 Straight ahead and pose to pose">‹ 04</a><a href="06-slow-in-slow-out.html" aria-label="Next: 06 Slow in and slow out">06 ›</a></div>
+</footer>
+</body>
+</html>
