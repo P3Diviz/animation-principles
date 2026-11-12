@@ -77,6 +77,11 @@
 .ask .choices button[data-result="wrong"]{opacity:.5}
 .ask .answer{color:var(--text-2);font-size:12px;line-height:1.45;min-height:1.45em}
 
+/* ===== The principle: a short explanation at the foot of the controls panel ===== */
+.explain{margin-top:auto;padding-top:12px;border-top:1px solid var(--hair)}
+.panel .explain h2{margin:0 0 4px}
+.explain p{color:var(--text-2);font-size:12px;line-height:1.5}
+
 /* ===== Present mode: controls about 125% for the projector ===== */
 html[data-present] .panel h2{font-size:14px}
 html[data-present] .pill{font-size:14px;padding:8px 14px}

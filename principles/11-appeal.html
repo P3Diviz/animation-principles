@@ -615,7 +615,6 @@
     </div>
   </section>
   <aside class="panel">
-    <h2>Mode</h2>
     <div class="seg" role="group" aria-label="Mode" data-target="main" data-attr="mode">
       <button data-value="build" aria-pressed="true">Build</button><button data-value="compare" aria-pressed="false">Compare</button>
     </div>
@@ -629,7 +628,6 @@
       <input type="range" id="headSize" min="70" max="140" step="5" value="100" data-unit="%"></label>
     <label class="slider build-only"><span class="row"><span>Eye size</span><output>100%</output></span>
       <input type="range" id="eyeSize" min="40" max="160" step="5" value="100" data-unit="%"></label>
-    <p class="small build-only">A bigger face and eyes read younger and cuter.</p>
     <h2 class="build-only">Pose</h2>
     <div class="seg build-only" role="group" aria-label="Pose" data-target="build" data-attr="pose">
       <button data-value="stiff" aria-pressed="true">Stiff</button><button data-value="strong" aria-pressed="false">Line of action</button>
@@ -638,6 +636,10 @@
       <p class="q">Same dragon, two ways. Which is more appealing?</p>
       <div class="choices"><button data-pick="left">Left</button><button data-pick="right">Right</button></div>
       <p class="answer" id="answer" aria-live="polite"></p>
+    </div>
+    <div class="explain">
+      <h2>The principle</h2>
+      <p>Appeal is what makes a character pleasing to watch, hero or villain: clear shape language, readable proportions and a strong pose. A bigger face and eyes read younger and cuter.</p>
     </div>
   </aside>
 </main>

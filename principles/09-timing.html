@@ -66,7 +66,6 @@
     </div>
   </section>
   <aside class="panel">
-    <h2>Mode</h2>
     <div class="seg" role="group" aria-label="Mode" data-target="main" data-attr="mode">
       <button data-value="drop" aria-pressed="true">Drop</button><button data-value="guess" aria-pressed="false">Guess the weight</button>
     </div>
@@ -86,14 +85,17 @@
     <div class="seg" role="group" aria-label="Frame rate" data-target="main" data-attr="rate">
       <button data-value="ones" aria-pressed="true">25 fps</button><button data-value="twos" aria-pressed="false">On twos</button>
     </div>
-    <div class="pills drop-only" style="margin-top:8px"><button class="pill" data-target="stage" data-attr="ghosts" aria-pressed="true">Spacing ghosts</button></div>
-    <p class="small drop-only" id="readout">Football: 14 frames to fall, 0.56 seconds.</p>
+    <div class="pills drop-only"><button class="pill" data-target="stage" data-attr="ghosts" aria-pressed="true">Spacing ghosts</button></div>
     <div class="ask guess-only" id="guess">
       <h2>Guess the weight</h2>
       <p class="q">Same height, same size. Which ball is heavier?</p>
       <div class="choices"><button data-pick="L">Left</button><button data-pick="R">Right</button></div>
       <p class="answer" id="guessAnswer" aria-live="polite"></p>
       <div><button class="btn secondary small-btn" id="nextPair">Next pair</button></div>
+    </div>
+    <div class="explain">
+      <h2>The principle</h2>
+      <p>Timing is how many frames an action takes: more feels slower and heavier, fewer feels lighter. On twos, each drawing is held for two frames: 12 drawings a second instead of 25.</p>
     </div>
   </aside>
 </main>

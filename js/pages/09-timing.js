@@ -95,9 +95,9 @@ function build() {
       g.hidden = !show;
       if (show) g.style.top = (c.at(f) * 100) + '%';
     });
-    $('fallLabel').textContent = `${current.frames} frames`;
-    const name = current.name ? current.name + ': ' : 'Your own: ';
-    $('readout').textContent = `${name}${current.frames} frames to fall, ${(current.frames / FPS).toFixed(2)} seconds.`;
+    // Under the ball: what it is, and how long it takes to fall
+    const name = current.name ? current.name + ': ' : '';
+    $('fallLabel').textContent = `${name}${current.frames} frames to fall, ${(current.frames / FPS).toFixed(2)} s`;
   }
   tl.setFrames(total);
   tl.setKeys(keys);

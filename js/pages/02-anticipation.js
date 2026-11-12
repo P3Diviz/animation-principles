@@ -1,4 +1,4 @@
-// 02 Anticipation: Draig jumps onto a box, or throws a ball. Wind-up slider, Predict it.
+// 02 Anticipation: Draig jumps onto a box, or throws a ball. Wind-up slider.
 // 50 frames (2 s). Frame 8-18 wind-up, 20 take-off (or 24 release), then the action.
 import '../core/toggles.js';
 import { showSlider } from '../core/sliders.js';
@@ -6,7 +6,7 @@ import { bindTimeline } from '../core/timeline.js';
 import { scalePart, rotatePart, posePart, mouth, placeDraig, groundShadow, rigClock, runRig, toScene, ease, span, lerp } from '../core/draig.js';
 
 const $ = id => document.getElementById(id);
-const stage = $('stage'), scene = $('scene'), pos = $('draigPos'), ball = $('ball'), answer = $('predictAnswer');
+const stage = $('stage'), scene = $('scene'), pos = $('draigPos'), ball = $('ball');
 const LOOP = 2000, S = .4;               // Draig at 40%: about 168 units tall
 const FLOOR = 330, BOX = 250;
 const clock = rigClock($('clock'), LOOP);
@@ -116,34 +116,13 @@ const ACTIONS = {
   jump:  { keys: [8, 18, 20, 26, 32], windUp: 18 },
   throw: { keys: [8, 20, 24, 30, 40], windUp: 20 },
 };
-function hideQuestions() {
-  document.querySelectorAll('.ask').forEach(a => a.hidden = true);
-  answer.textContent = '';
-}
 $('wind').addEventListener('input', () => { showSlider($('wind')); redraw(); });
 stage.addEventListener('statechange', e => {
   if (e.detail.attr === 'action') {
     const a = ACTIONS[e.detail.value];
     tl.setKeys(a.keys);
+    // Highlight the wind-up on the timeline: from frame 8 to the biggest wind-up pose
     $('span').style.width = ((a.windUp - 8) / 50 * 100) + '%';
   }
-  hideQuestions(); redraw();
+  redraw();
 });
-
-// Predict it: freeze on the wind-up pose, ask, then play on
-$('predictBtn').addEventListener('click', () => {
-  tl.setFrame(ACTIONS[stage.dataset.action].windUp);
-  hideQuestions();
-  const ask = $('ask-' + stage.dataset.action);
-  ask.querySelectorAll('button').forEach(b => b.removeAttribute('data-result'));
-  ask.hidden = false;
-  ask.querySelector('button').focus();
-});
-document.querySelectorAll('.ask .choices button').forEach(b => b.addEventListener('click', () => {
-  const ask = b.closest('.ask');
-  ask.querySelectorAll('button').forEach(x => x.dataset.result = 'right' in x.dataset ? 'right' : 'wrong');
-  if (wind() === 0) answer.textContent = 'With no wind-up there was nothing to read. That is what anticipation gives the audience.';
-  else if ('right' in b.dataset) answer.textContent = 'Yes. The wind-up told you, before the move started.';
-  else answer.textContent = 'Watch the wind-up: it pulls the opposite way to the move that follows.';
-  setTimeout(() => tl.play(), 500);
-}));
