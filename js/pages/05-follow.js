@@ -6,6 +6,7 @@ import '../core/toggles.js';
 import { showSlider } from '../core/sliders.js';
 import { bindTimeline } from '../core/timeline.js';
 import { rotatePart, scalePart, placeDraig, groundShadow, rigClock, runRig, ease, span, lerp } from '../core/draig.js';
+import { bindView } from '../three/view.js';
 
 const $ = id => document.getElementById(id);
 const main = $('main'), svg = $('svg'), pos = $('draigPos'), stiffInput = $('stiff');
@@ -127,7 +128,18 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { target = clampX(target + 90); e.preventDefault(); }
 });
 
+// 2D / 3D. The 3D tail runs live physics, so the 3D view has no timeline;
+// the 2D clock pauses while 3D is showing and carries on when the learner comes back.
+let wasPlaying = false;
+bindView(() => import('./05-follow-3d.js'), {
+  onSwitch(is3d) {
+    if (is3d) { wasPlaying = clock.playState === 'running'; clock.pause(); }
+    else if (wasPlaying) clock.play();
+  }
+});
+
 main.addEventListener('statechange', e => {
+  if (e.detail.attr === 'view') return;
   if (e.detail.attr === 'mode' && e.detail.value === 'drag') {
     x = target = 220; vel = 0; last = 0; live = PARTS.map(() => ({ angle: 0, spin: 0 })); running = true;
     requestAnimationFrame(dragStep);

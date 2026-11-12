@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/05.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/05-follow.js"></script>
@@ -39,7 +44,10 @@
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">05</span>Follow through and overlapping action</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/05-follow-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage">
       <div class="scene">
         <svg viewBox="0 0 800 400" id="svg" aria-label="Draig hops and lands; his tail, wings and crest carry on, then settle">
@@ -234,7 +242,7 @@
       </div>
       <span id="clock" hidden></span>
     </div>
-    <div class="timeline">
+    <div class="timeline only-2d">
       <button class="play" id="play" aria-label="Pause"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect class="i-pause" x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect class="i-pause" x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><path class="i-play" d="M3 1.5 12 7 3 12.5Z" fill="currentColor" style="display:none"/></svg></button>
       <span class="tc" id="tc">00:00:00:00</span>
       <div class="track" id="track" data-keys="9,19,32,42">
@@ -259,8 +267,10 @@
     <div class="seg" role="group" aria-label="Mode" data-target="main" data-attr="mode">
       <button data-value="watch" aria-pressed="true">Watch</button><button data-value="drag" aria-pressed="false">Drag it</button>
     </div>
-    <p class="small drag-only">Drag Draig left and right, or use the arrow keys. Watch the tail and wings catch up.</p>
-    <p class="small">His body lands on the key. The tail, wings and crest stop later, one after another.</p>
+    <p class="small drag-only only-2d">Drag Draig left and right, or use the arrow keys. Watch the tail and wings catch up.</p>
+    <p class="small only-2d">His body lands on the key. The tail, wings and crest stop later, one after another.</p>
+    <p class="small drag-only only-3d">Drag the figure left and right, or use the arrow keys. Watch the tail catch up.</p>
+    <p class="small only-3d">The body stops running. The tail carries on, then settles.</p>
     <div class="explain">
       <h2>The principle</h2>
       <p>Follow through: loose parts keep moving after the body stops, then settle. Overlapping action: parts move at different rates, so nothing starts or stops all at once. Both make movement feel natural and give it weight.</p>
