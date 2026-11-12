@@ -1,11 +1,13 @@
 // 05 Follow through, 3D view: Y Bot's Mixamo Run To Stop wearing a cloak.
-// The cloak swings like two linked pendulums hung from his shoulders: the upper half, and the
-// lower half hanging from it (the same idea as the 2D page's springs: parts pushed by the body's
+// The cloak swings like a chain of three linked pendulums hung from his shoulders: top, middle
+// and bottom bands (the same idea as the 2D page's springs: parts pushed by the body's
 // acceleration). While he runs, the air holds it out behind him at an angle set by his speed.
-// When he stops, the cloak carries on forward (follow through), the lower half a moment later
-// than the upper (overlapping action), its edges wrapping round his legs, then it settles.
-// Damping is built in, so it settles within a second or two and can't whip around.
-// Stiffness: how firmly the lower half follows the upper. Off: the cloak hangs straight.
+// When he stops, it carries on forward (follow through), each band a moment after the one above
+// (overlapping action), then settles. Damping is built in, so it can't whip around.
+// The cloth is built down from his shoulders and pushed out round his body and legs as it goes,
+// so it drapes over them instead of passing through.
+// Stiffness: loose fabric bends between the bands (a wave runs down it, the hem lags well behind);
+// stiff fabric moves almost as one panel. Off: the cloak hangs straight.
 // Watch: the run plays and loops. Drag it: the figure stands (Idle) and follows the pointer.
 // The physics runs live, so this view has no timeline.
 import * as THREE from 'three';
@@ -14,22 +16,29 @@ import { std, reducedMotion } from '../three/stage.js';
 import { RUN_STOP } from '../three/clips.js';
 
 const $ = id => document.getElementById(id);
-const COLS = 9, ROWS = 14;                       // cloth mesh grid
-const UPPER = .4, LOWER = .42;                   // lengths of the two halves (shoulders to below the knee)
+const COLS = 9, ROWS = 16;                       // cloth mesh grid
+const BANDS = [.28, .28, .27];                   // lengths of the three bands (shoulders to below the knee)
+const TOTAL = BANDS.reduce((a, b) => a + b);
 const TOP_W = .36, BOTTOM_W = .66;               // width across the shoulders and at the hem
-const LOOP = 1.8 + 2;                            // the run, then a hold while the cloak settles
+const LOOP = 1.8 + 2.2;                          // the run, then a hold while the cloak settles
 const START_X = -1.4;                            // where the run starts (it travels about 2.6 to the right)
 const STEP = 1 / 120, G = 9.8;
-const AIR = 2.2;                                 // air drag: holds the cloak out behind as he runs (and slows its swing)
+const AIR = 2.2;                                 // air drag: holds the cloak out behind as he runs
 const deg = Math.PI / 180;
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
 const idx = (i, j) => j * COLS + i;
+
+// Capsules round his body that the cloth drapes over: [from bone, to bone, radius]
+const BODY = [['Hips', 'Spine2', .15], ['Spine2', 'Neck', .12],
+              ['LeftUpLeg', 'LeftLeg', .09], ['LeftLeg', 'LeftFoot', .07],
+              ['RightUpLeg', 'RightLeg', .09], ['RightLeg', 'RightFoot', .07]];
 
 export function create({ stageEl, canvas, status }) {
   // Three-quarter view from behind him, so the cloak shows its surface rather than its edge
   const { stage } = studio(stageEl, canvas, { pos: [-2.6, 1.75, 3.9], look: [.1, .95, 0] });
   const main = $('main'), stiffInput = $('stiff');
-  const v = new THREE.Vector3(), q = new THREE.Quaternion();
+  const v = new THREE.Vector3(), w = new THREE.Vector3(), q = new THREE.Quaternion();
   const UP = new THREE.Vector3(0, 1, 0);
 
   // ----- The cloth mesh -----
@@ -48,11 +57,14 @@ export function create({ stageEl, canvas, status }) {
   cloak.castShadow = true; cloak.frustumCulled = false; cloak.visible = false;
   stage.scene.add(cloak);
 
-  // ----- The swing: two angles from hanging straight down (+ = out behind him, - = forward) -----
-  let a1 = 0, w1 = 0, a2 = 0, w2 = 0;              // upper half, lower half: angle and its speed
+  // ----- The swing: each band's angle from hanging straight down (+ = out behind him, - = forward) -----
+  const ang = [0, 0, 0], spin = [0, 0, 0], turn = [0, 0, 0];
   let speed = 0, accel = 0;                        // his forward speed and acceleration (smoothed)
   const pin = new THREE.Vector3(), lastPin = new THREE.Vector3();
   const back = new THREE.Vector3(), side = new THREE.Vector3(), fwd = new THREE.Vector3();
+  const bones = {};
+  ['Hips', 'Spine2', 'Neck', 'LeftArm', 'RightArm', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot']
+    .forEach(n => { bones[n] = new THREE.Vector3(); });
 
   let rig = null, t = 0, dragX = 0, targetX = 0, spare = 0, fresh = true;
   const mode = () => main.dataset.mode === 'drag' ? 'drag' : 'watch';
@@ -73,17 +85,17 @@ export function create({ stageEl, canvas, status }) {
   }
   main.addEventListener('statechange', e => { if (e.detail.attr === 'mode') startMode(); });
 
-  // Where the cloak is pinned: across his shoulders, just behind his neck. And which way is back.
-  const L = new THREE.Vector3(), R = new THREE.Vector3(), N = new THREE.Vector3();
+  // Where the cloak is pinned (across his shoulders, just behind his neck), which way is back,
+  // and where his body and legs are
   function readBody() {
     rig.model.updateMatrixWorld(true);
-    rig.bone('LeftArm').getWorldPosition(L); rig.bone('RightArm').getWorldPosition(R); rig.bone('Neck').getWorldPosition(N);
+    for (const n in bones) rig.bone(n).getWorldPosition(bones[n]);
     rig.model.getWorldQuaternion(q);
     back.set(0, 0, -1).applyQuaternion(q);       // he faces +z in his own space
     fwd.copy(back).negate();
     side.crossVectors(UP, back).normalize();
-    pin.lerpVectors(L, R, .5).addScaledVector(back, .1);
-    pin.y = N.y - .04;
+    pin.lerpVectors(bones.LeftArm, bones.RightArm, .5).addScaledVector(back, .1);
+    pin.y = bones.Neck.y - .04;
   }
 
   // His forward speed and acceleration, from the pin's movement (smoothed, so the bounce of each
@@ -91,9 +103,9 @@ export function create({ stageEl, canvas, status }) {
   function measure(dt) {
     if (fresh || pin.distanceTo(lastPin) > .5) {
       // Start already moving with him: the cloak streams out at his speed, nothing yanks it
-      speed = fresh && mode() === 'drag' ? 0 : runStartSpeed();
-      accel = 0; w1 = w2 = 0;
-      a1 = a2 = Math.atan(AIR * speed / G);
+      speed = runStartSpeed();
+      accel = 0;
+      ang.fill(Math.atan(AIR * speed / G)); spin.fill(0);
       lastPin.copy(pin); fresh = false;
       return;
     }
@@ -113,48 +125,73 @@ export function create({ stageEl, canvas, status }) {
     return h2.sub(h).dot(fwd) * 10;
   }
 
-  // One step of the two pendulums. A pivot that slows down throws the pendulum forward; the air
-  // pushes it back while he moves; gravity hangs it down; damping settles it.
+  // One step of the chain. Each band hangs from the bottom of the one above: when that point
+  // slows down, the band is thrown forward; the air pushes it back while he moves; gravity hangs
+  // it down; the fabric's stiffness pulls neighbouring bands into line; damping settles it.
   function swing(dt) {
-    if (main.dataset.follow === 'off') { a1 = a2 = w1 = w2 = 0; return; }
-    const stiff = +stiffInput.value / 100;
-    const bend = 30 + 260 * stiff, bendDamp = 3 + 10 * stiff;    // how firmly the lower half follows the upper
-    const damp = 3.2;                                            // the cloth's own damping
-    // Upper half, hung from his shoulders
-    const e1 = (accel * Math.cos(a1) - G * Math.sin(a1) + AIR * speed * Math.cos(a1)) / UPPER
-      - (AIR + damp) * w1 - bend * .3 * (a1 - a2);
-    // Lower half, hung from the upper half's hem (which moves as the upper half swings)
-    const jointAccel = accel + UPPER * e1 * Math.cos(a1);
-    const e2 = (jointAccel * Math.cos(a2) - G * Math.sin(a2) + AIR * speed * Math.cos(a2)) / LOWER
-      - (AIR + damp) * w2 - bend * (a2 - a1) - bendDamp * (w2 - w1);
-    w1 += e1 * dt; w2 += e2 * dt;
-    a1 += w1 * dt; a2 += w2 * dt;
-    // It can't swing through him: at most a little forward (its edges wrap round his legs)
-    if (a1 < -12 * deg) { a1 = -12 * deg; w1 = Math.max(0, w1); }
-    if (a2 < -22 * deg) { a2 = -22 * deg; w2 = Math.max(0, w2); }
-    a1 = clamp(a1, -12 * deg, 75 * deg); a2 = clamp(a2, -22 * deg, 85 * deg);
+    if (main.dataset.follow === 'off') { ang.fill(0); spin.fill(0); return; }
+    const s = +stiffInput.value / 100;              // 0 loose .. 1 stiff
+    const bend = lerp(14, 420, s * s), bendDamp = lerp(3, 16, s);
+    const damp = lerp(3.4, 5, s);                   // stiff fabric settles a little sooner
+    let pivotAccel = accel;
+    for (let k = 0; k < 3; k++) {
+      const a = ang[k], L = BANDS[k];
+      let e = (pivotAccel * Math.cos(a) - G * Math.sin(a) + AIR * speed * Math.cos(a)) / L - (AIR + damp) * spin[k];
+      if (k > 0) e -= bend * (a - ang[k - 1]) + bendDamp * (spin[k] - spin[k - 1]);
+      if (k < 2) e -= .4 * bend * (a - ang[k + 1]);   // the band below pulls back a little
+      turn[k] = e;
+      pivotAccel += L * e * Math.cos(a);             // the next band hangs from this one's hem
+    }
+    for (let k = 0; k < 3; k++) {
+      spin[k] += turn[k] * dt;
+      ang[k] = clamp(ang[k] + spin[k] * dt, -50 * deg, 85 * deg);
+    }
   }
 
-  // Build the cloth: each column runs down from the shoulders, turning from the upper half's angle
-  // to the lower half's. The middle rests against his back; the edges can come further forward.
-  const p = new THREE.Vector3(), dir = new THREE.Vector3();
+  // The angle at a distance d down the cloak, blending smoothly from band to band
+  const MID = [BANDS[0] / 2, BANDS[0] + BANDS[1] / 2, BANDS[0] + BANDS[1] + BANDS[2] / 2];
+  function angleAt(d) {
+    if (d <= MID[0]) return ang[0];
+    if (d >= MID[2]) return ang[2];
+    const k = d < MID[1] ? 0 : 1, f = (d - MID[k]) / (MID[k + 1] - MID[k]);
+    return lerp(ang[k], ang[k + 1], f * f * (3 - 2 * f));
+  }
+
+  // Push a point out of a capsule round the bone segment a-b
+  function pushOut(p, a, b, r) {
+    v.subVectors(b, a);
+    const len2 = v.lengthSq() || 1;
+    const k = clamp(w.subVectors(p, a).dot(v) / len2, 0, 1);
+    w.copy(a).addScaledVector(v, k);                // nearest point on the bone
+    v.subVectors(p, w);
+    const d = v.length();
+    if (d >= r) return false;
+    if (d < 1e-6) v.copy(back); else v.multiplyScalar(1 / d);
+    p.copy(w).addScaledVector(v, r);
+    return true;
+  }
+
+  // Build the cloth: each column runs down from the shoulders at the bands' angles, and is pushed
+  // out round his body and legs as it goes, so the rest of the column drapes from there.
+  const p = new THREE.Vector3(), dir = new THREE.Vector3(), out = new THREE.Vector3();
   function drawCloth() {
-    const rowLen = (UPPER + LOWER) / (ROWS - 1);
+    const rowLen = TOTAL / (ROWS - 1);
     for (let i = 0; i < COLS; i++) {
       const u = i / (COLS - 1) - .5, edge = Math.abs(u) * 2;    // 0 in the middle, 1 at the edges
       p.copy(pin).addScaledVector(side, u * TOP_W).addScaledVector(back, .04 * (1 - edge * edge));
       for (let j = 0; j < ROWS; j++) {
         const f = j / (ROWS - 1);
-        const mix = clamp((f * (UPPER + LOWER) - UPPER * .6) / (UPPER * .8), 0, 1);   // smooth bend at the join
-        let a = a1 + (a2 - a1) * (mix * mix * (3 - 2 * mix));
-        if (a < 0) a *= .25 + .75 * edge;                                  // the middle can't go far forward
-        // the edges flare out and trail a touch behind the middle
-        const width = TOP_W + (BOTTOM_W - TOP_W) * f;
-        posAttr.setXYZ(idx(i, j), p.x + side.x * u * (width - TOP_W), p.y, p.z + side.z * u * (width - TOP_W));
-        // + a slight outward drape, so it falls over his back and hips instead of through them
+        // the cloak widens towards the hem: spread this point out sideways from the column line
+        out.copy(p).addScaledVector(side, u * (BOTTOM_W - TOP_W) * f);
+        for (const [a, b, r] of BODY) pushOut(out, bones[a], bones[b], r);
+        if (out.y < .02) out.y = .02;
+        posAttr.setXYZ(idx(i, j), out.x, out.y, out.z);
+        // carry on down from where the cloth actually is (after any push), minus the widening
+        p.copy(out).addScaledVector(side, -u * (BOTTOM_W - TOP_W) * f);
+        // + a slight outward drape, so it falls over his back and hips
+        const a = angleAt(f * TOTAL);
         dir.copy(back).multiplyScalar(Math.sin(a) + .06 * edge + .17 * (1 - f)).addScaledVector(UP, -Math.cos(a));
         p.addScaledVector(dir.normalize(), rowLen);
-        if (p.y < .02) p.y = .02;
       }
     }
     posAttr.needsUpdate = true;
