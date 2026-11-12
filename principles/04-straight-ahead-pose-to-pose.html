@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>04 Straight ahead and pose to pose</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/shell.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages/04.css">
+<link rel="stylesheet" href="../css/glass.css">
+<script type="module" src="../js/core/menu.js"></script>
+<script type="module" src="../js/core/present.js"></script>
+<script type="module" src="../js/pages/04-straight-ahead.js"></script>
+</head>
+<body class="principle">
+<header class="hdr"><a class="brand" href="../index.html">Principles of Animation</a><nav><a href="../index.html">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="../spot-it.html">Spot it</a><a href="../playground.html">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="01-squash-and-stretch.html"><span class="mono">01</span>Squash and stretch</a>
+    <a href="07-arc.html"><span class="mono">07</span>Arc</a>
+    <a href="02-anticipation.html"><span class="mono">02</span>Anticipation</a>
+    <a href="08-secondary-action.html"><span class="mono">08</span>Secondary action</a>
+    <a href="03-staging.html"><span class="mono">03</span>Staging</a>
+    <a href="09-timing.html"><span class="mono">09</span>Timing</a>
+    <a href="04-straight-ahead-pose-to-pose.html" aria-current="page"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="10-exaggeration.html"><span class="mono">10</span>Exaggeration</a>
+    <a href="05-follow-through.html"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="11-appeal.html"><span class="mono">11</span>Appeal</a>
+    <a href="06-slow-in-slow-out.html"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="12-solid-drawing.html"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="../principles.html">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<main class="page" id="main" data-view="2d">
+  <section class="stage-area">
+    <div class="stage-head">
+      <h1><span class="mono">04</span>Straight ahead and pose to pose</h1>
+    </div>
+    <div class="stage has-scene" id="stage" data-mode="inbetweens" data-onion="off" data-own="off">
+      <div class="scene">
+        <svg viewBox="0 0 800 400" id="svg" aria-label="Left: a flame drawn frame by frame. Right: a figure jumping, posed at the keys.">
+          <defs>
+            <clipPath id="flameWin"><rect x="0" y="150" width="120" height="190"/></clipPath>
+            <!-- Eight flame drawings side by side, 120 units apart. The strip slides one drawing at a time. -->
+            <g id="flames">
+              <path class="fo" d="M60 330 C25.9 330 23.9 285 41.9 258 C50.9 240 52 228 60 208 C64 230 88.1 238 94.1 266 C106.1 292 98 330 60 330Z"/><path class="fi" d="M60 330 C40 330 40 300 50 288 C56 280 62.5 272 65.5 262 C68.5 276 72 284 75 298 C80 312 78 330 60 330Z"/>
+              <path class="fo" d="M180 330 C146.8 330 144.8 285 162.8 258 C171.4 240 179.1 228 187.1 196 C191.1 230 204 238 210 266 C222 292 218 330 180 330Z"/><path class="fi" d="M180 330 C160 330 160 300 170 288 C176 280 179.1 272 182.1 268.4 C185.1 276 192 284 195 298 C200 312 198 330 180 330Z"/>
+              <path class="fo" d="M300 330 C263.8 330 261.8 285 279.8 258 C289.9 240 302 228 310 184 C314 230 318.6 238 324.6 266 C336.6 292 338 330 300 330Z"/><path class="fi" d="M300 330 C280 330 280 300 290 288 C296 280 294.5 272 297.5 253 C300.5 276 312 284 315 298 C320 312 318 330 300 330Z"/>
+              <path class="fo" d="M420 330 C378.5 330 376.5 285 394.5 258 C407.3 240 419.1 228 427.1 196 C431.1 230 435.3 238 441.3 266 C453.3 292 458 330 420 330Z"/><path class="fi" d="M420 330 C400 330 400 300 410 288 C416 280 411.4 272 414.4 268.4 C417.4 276 432 284 435 298 C440 312 438 330 420 330Z"/>
+              <path class="fo" d="M540 330 C494.1 330 492.1 285 510.1 258 C525.1 240 532 228 540 208 C544 230 555.9 238 561.9 266 C573.9 292 578 330 540 330Z"/><path class="fi" d="M540 330 C520 330 520 300 530 288 C536 280 531.5 272 534.5 262 C537.5 276 552 284 555 298 C560 312 558 330 540 330Z"/>
+              <path class="fo" d="M660 330 C613.2 330 611.2 285 629.2 258 C644.6 240 644.9 228 652.9 196 C656.9 230 680 238 686 266 C698 292 698 330 660 330Z"/><path class="fi" d="M660 330 C640 330 640 300 650 288 C656 280 654.9 272 657.9 255.6 C660.9 276 672 284 675 298 C680 312 678 330 660 330Z"/>
+              <path class="fo" d="M780 330 C736.2 330 734.2 285 752.2 258 C766.1 240 762 228 770 184 C774 230 805.4 238 811.4 266 C823.4 292 818 330 780 330Z"/><path class="fi" d="M780 330 C760 330 760 300 770 288 C776 280 779.5 272 782.5 271 C785.5 276 792 284 795 298 C800 312 798 330 780 330Z"/>
+              <path class="fo" d="M900 330 C861.5 330 859.5 285 877.5 258 C888.7 240 884.9 228 892.9 196 C896.9 230 928.7 238 934.7 266 C946.7 292 938 330 900 330Z"/><path class="fi" d="M900 330 C880 330 880 300 890 288 C896 280 902.6 272 905.6 255.6 C908.6 276 912 284 915 298 C920 312 918 330 900 330Z"/>
+            </g>
+          </defs>
+          <text class="lbl" x="200" y="56" text-anchor="middle">Straight ahead</text>
+          <text class="lbl" x="600" y="56" text-anchor="middle">Pose to pose</text>
+          <line class="divider" x1="400" y1="40" x2="400" y2="390"/>
+          <line class="floor" x1="60" y1="360" x2="340" y2="360"/>
+          <line class="floor" x1="440" y1="380" x2="780" y2="380"/>
+
+          <!-- Straight ahead: the flame -->
+          <g transform="translate(140 30)" clip-path="url(#flameWin)">
+            <use href="#flames" class="strip onion o-prev"/>
+            <use href="#flames" class="strip onion o-next"/>
+            <use href="#flames" class="strip"/>
+          </g>
+
+          <!-- Pose to pose: onion-skin ghosts (two frames either side), then the figure -->
+          <g class="p2p-fig onion fig-ghost o-prev" transform="translate(620 0)"><g class="j hip">
+            <g class="j thighB"><rect class="back" x="-6" y="-3" width="12" height="50" rx="6"/><g transform="translate(0 45)"><g class="j shinB"><rect class="back" x="-5.5" y="-3" width="11" height="50" rx="5.5"/></g></g></g>
+            <g class="j torso"><g transform="translate(0 -60)"><g class="j armB"><rect class="back" x="-5" y="-4" width="10" height="54" rx="5"/></g></g><rect class="front" x="-13" y="-72" width="26" height="78" rx="12"/><circle class="front" cx="0" cy="-90" r="15"/><g transform="translate(0 -60)"><g class="j armF"><rect class="front" x="-5" y="-4" width="10" height="54" rx="5"/></g></g></g>
+            <g class="j thighF"><rect class="front" x="-6" y="-3" width="12" height="50" rx="6"/><g transform="translate(0 45)"><g class="j shinF"><rect class="front" x="-5.5" y="-3" width="11" height="50" rx="5.5"/></g></g></g>
+          </g></g>
+          <g class="p2p-fig onion fig-ghost o-next" transform="translate(620 0)"><g class="j hip">
+            <g class="j thighB"><rect class="back" x="-6" y="-3" width="12" height="50" rx="6"/><g transform="translate(0 45)"><g class="j shinB"><rect class="back" x="-5.5" y="-3" width="11" height="50" rx="5.5"/></g></g></g>
+            <g class="j torso"><g transform="translate(0 -60)"><g class="j armB"><rect class="back" x="-5" y="-4" width="10" height="54" rx="5"/></g></g><rect class="front" x="-13" y="-72" width="26" height="78" rx="12"/><circle class="front" cx="0" cy="-90" r="15"/><g transform="translate(0 -60)"><g class="j armF"><rect class="front" x="-5" y="-4" width="10" height="54" rx="5"/></g></g></g>
+            <g class="j thighF"><rect class="front" x="-6" y="-3" width="12" height="50" rx="6"/><g transform="translate(0 45)"><g class="j shinF"><rect class="front" x="-5.5" y="-3" width="11" height="50" rx="5.5"/></g></g></g>
+          </g></g>
+          <g class="p2p-fig" transform="translate(620 0)"><g class="j hip">
+            <g class="j thighB"><rect class="back" x="-6" y="-3" width="12" height="50" rx="6"/><g transform="translate(0 45)"><g class="j shinB"><rect class="back" x="-5.5" y="-3" width="11" height="50" rx="5.5"/></g></g></g>
+            <g class="j torso"><g transform="translate(0 -60)"><g class="j armB"><rect class="back" x="-5" y="-4" width="10" height="54" rx="5"/></g></g><rect class="front" x="-13" y="-72" width="26" height="78" rx="12"/><circle class="front" cx="0" cy="-90" r="15"/><g transform="translate(0 -60)"><g class="j armF"><rect class="front" x="-5" y="-4" width="10" height="54" rx="5"/></g></g></g>
+            <g class="j thighF"><rect class="front" x="-6" y="-3" width="12" height="50" rx="6"/><g transform="translate(0 45)"><g class="j shinF"><rect class="front" x="-5.5" y="-3" width="11" height="50" rx="5.5"/></g></g></g>
+          </g></g>
+
+          <!-- Make your own: drag the three keys; the in-betweens are worked out for you -->
+          <g class="own">
+            <path class="own-path" id="ownPath"/>
+            <g id="ownChar"><rect class="front" x="-18" y="-46" width="36" height="46" rx="13"/><circle class="front" cx="0" cy="-60" r="13"/></g>
+            <g class="key-h" tabindex="0" aria-label="Key 1. Drag it, or use the arrow keys"><circle r="11"/><text>1</text></g>
+            <g class="key-h" tabindex="0" aria-label="Key 2. Drag it, or use the arrow keys"><circle r="11"/><text>2</text></g>
+            <g class="key-h" tabindex="0" aria-label="Key 3. Drag it, or use the arrow keys"><circle r="11"/><text>3</text></g>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="timeline">
+      <button class="play" id="play" aria-label="Pause"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect class="i-pause" x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect class="i-pause" x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><path class="i-play" d="M3 1.5 12 7 3 12.5Z" fill="currentColor" style="display:none"/></svg></button>
+      <span class="tc" id="tc">00:00:00:00</span>
+      <div class="track" id="track" data-keys="0,10,16,24,32,40">
+        <div class="bar"></div><div class="span" style="left:0;width:80%"></div><div class="ticks"></div>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <div class="head" id="head"></div>
+      </div>
+    </div>
+  </section>
+  <aside class="panel">
+    <h2>Pose to pose</h2>
+    <div class="seg presets" role="group" aria-label="Pose to pose" data-target="stage" data-attr="mode">
+      <button data-value="keys" aria-pressed="false">Keys only</button><button data-value="inbetweens" aria-pressed="true">Keys and in-betweens</button>
+    </div>
+    <p class="small">Keys only holds each pose, like blocking. The flame is always drawn straight ahead.</p>
+    <h2>View</h2>
+    <div class="pills"><button class="pill" data-target="stage" data-attr="onion" aria-pressed="false">Onion skin</button></div>
+    <h2>Make your own</h2>
+    <div class="pills"><button class="pill" data-target="stage" data-attr="own" aria-pressed="false">Make your own</button></div>
+    <p class="small">Drag keys 1, 2 and 3 into three poses, then play. Switch to keys only to see your blocking.</p>
+  </aside>
+</main>
+<footer class="notes">
+  <section><h3>What to notice</h3><p>Straight ahead flows, pose to pose is planned.</p></section>
+  <section><h3>In After Effects</h3><p>You set the keys, After Effects makes the in-betweens. <span class="kbd">Ctrl+Alt+H</span> toggles Hold Keyframe.</p></section>
+  <section><h3>Try this</h3><p>Block a jump in three poses.</p></section>
+  <div class="prevnext"><a href="03-staging.html" aria-label="Previous: 03 Staging">‹ 03</a><a href="05-follow-through.html" aria-label="Next: 05 Follow through and overlapping action">05 ›</a></div>
+</footer>
+</body>
+</html>
