@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/09.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/09-timing.js"></script>
@@ -35,11 +40,14 @@
   <a class="menu-all" href="../principles.html">See all twelve</a>
 </nav>
 <div class="present-hint">Present mode. Press P or Esc to exit</div>
-<main class="page" id="main" data-view="2d" data-mode="drop" data-motion="gravity" data-rate="ones">
+<main class="page" id="main" data-view="2d" data-mode="drop" data-motion="gravity" data-rate="ones" data-demo="drop" data-speed="normal">
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">09</span>Timing</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/09-timing-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage" data-ghosts="on">
       <div class="scene">
         <div class="fall" id="fallMain">
@@ -66,27 +74,36 @@
     </div>
   </section>
   <aside class="panel">
-    <div class="seg" role="group" aria-label="Mode" data-target="main" data-attr="mode">
+    <div class="seg only-2d" role="group" aria-label="Mode" data-target="main" data-attr="mode">
       <button data-value="drop" aria-pressed="true">Drop</button><button data-value="guess" aria-pressed="false">Guess the weight</button>
     </div>
-    <h2>Motion</h2>
-    <div class="seg" role="group" aria-label="Motion" data-target="main" data-attr="motion">
+    <div class="seg only-3d" role="group" aria-label="Demo" data-target="main" data-attr="demo">
+      <button data-value="drop" aria-pressed="true">Drop</button><button data-value="walk" aria-pressed="false">Walk</button>
+    </div>
+    <p class="small only-3d drop3d">Left to right: balloon (36 frames), football (14), bowling ball (10). Same height.</p>
+    <h2 class="only-3d walk3d">Walk speed</h2>
+    <div class="seg only-3d walk3d" role="group" aria-label="Walk speed" data-target="main" data-attr="speed">
+      <button data-value="slow" aria-pressed="false">Slow</button><button data-value="normal" aria-pressed="true">Normal</button><button data-value="fast" aria-pressed="false">Fast</button>
+    </div>
+    <p class="small only-3d walk3d">One walk cycle (two steps) in 40, 26 or 16 frames.</p>
+    <h2 class="drop3d">Motion</h2>
+    <div class="seg drop3d" role="group" aria-label="Motion" data-target="main" data-attr="motion">
       <button data-value="linear" aria-pressed="false">Linear</button><button data-value="gravity" aria-pressed="true">Gravity</button>
     </div>
-    <h2 class="drop-only">Weight</h2>
-    <div class="seg presets drop-only" id="weights" role="group" aria-label="Weight presets">
+    <h2 class="drop-only only-2d">Weight</h2>
+    <div class="seg presets drop-only only-2d" id="weights" role="group" aria-label="Weight presets">
       <button data-w="balloon" aria-pressed="false">Balloon</button>
       <button data-w="football" aria-pressed="true">Football</button>
       <button data-w="bowling" aria-pressed="false">Bowling ball</button>
     </div>
-    <label class="slider drop-only"><span class="row"><span>Frames to fall</span><output>14</output></span>
+    <label class="slider drop-only only-2d"><span class="row"><span>Frames to fall</span><output>14</output></span>
       <input type="range" id="frames" min="6" max="40" step="1" value="14"></label>
     <h2>Frame rate</h2>
     <div class="seg" role="group" aria-label="Frame rate" data-target="main" data-attr="rate">
       <button data-value="ones" aria-pressed="true">25 fps</button><button data-value="twos" aria-pressed="false">On twos</button>
     </div>
-    <div class="pills drop-only"><button class="pill" data-target="stage" data-attr="ghosts" aria-pressed="true">Spacing ghosts</button></div>
-    <div class="ask guess-only" id="guess">
+    <div class="pills drop-only only-2d"><button class="pill" data-target="stage" data-attr="ghosts" aria-pressed="true">Spacing ghosts</button></div>
+    <div class="ask guess-only only-2d" id="guess">
       <h2>Guess the weight</h2>
       <p class="q">Same height, same size. Which ball is heavier?</p>
       <div class="choices"><button data-pick="L">Left</button><button data-pick="R">Right</button></div>

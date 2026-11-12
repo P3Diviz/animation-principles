@@ -5,40 +5,16 @@ import '../core/toggles.js';
 import { showSlider, setSlider } from '../core/sliders.js';
 import { bindTimeline, reducedMotion } from '../core/timeline.js';
 
-const FPS = 25, MS = 1000 / FPS, HOLD = 12;   // frames resting on the floor before it loops
+import { PRESETS, dropCurve } from '../core/drop.js';
+import { bindView, handOver } from '../three/view.js';
+
+const FPS = 25, MS = 1000 / FPS;
 const $ = id => document.getElementById(id);
 const main = $('main'), stage = $('stage'), framesInput = $('frames');
 const ghosts = [...$('ghosts').children];
 const weights = [...$('weights').querySelectorAll('button')];
-
-// Same height for all three. Only the frame count and the bounce change.
-const PRESETS = {
-  balloon:  { name: 'Balloon',      frames: 36, bounce: .3 },
-  football: { name: 'Football',     frames: 14, bounce: .45 },
-  bowling:  { name: 'Bowling ball', frames: 10, bounce: .03 },
-};
 let current = { ...PRESETS.football };
-
-// Height of the ball at time t (in frames). 0 = top of the drop, 1 = the floor.
-// Gravity: y = s² falling, so it starts slow and speeds up; bounces rise to
-// bounce^k of the height and take frames * sqrt(height) each way.
-// Linear: constant speed with the same frame counts (no hang time, no speed-up).
-function dropCurve({ frames, bounce }, gravity) {
-  const phases = [{ len: frames, y: s => gravity ? s * s : s }];
-  for (let k = 1; k <= 2; k++) {
-    const h = Math.pow(bounce, k), len = frames * Math.sqrt(h);
-    if (len < 1.5) break;                       // too small to see: it just lands
-    phases.push({ len, y: s => 1 - h * (gravity ? 1 - (1 - s) * (1 - s) : s) });   // rising, slowing down
-    phases.push({ len, y: s => 1 - h * (gravity ? 1 - s * s : 1 - s) });           // falling again
-  }
-  const keys = [0]; let end = 0;
-  phases.forEach(p => { p.start = end; end += p.len; keys.push(Math.round(end)); });
-  const at = t => {
-    const p = phases.find(p => t <= p.start + p.len);
-    return p ? p.y((t - p.start) / p.len) : 1;
-  };
-  return { at, keys, length: Math.ceil(end) + HOLD };
-}
+let view3d = null;   // the 3D view while it's showing (09-timing-3d.js)
 
 // One keyframe per frame. On twos, each drawing is held for two frames.
 function keyframesFor(curve, total, twos) {
@@ -72,6 +48,7 @@ function stop(...balls) {
 }
 
 function build() {
+  if (view3d) return view3d.build();   // the 3D view rebuilds its own drop and walk
   const gravity = main.dataset.motion === 'gravity', twos = main.dataset.rate === 'twos';
   let keys, total, fallFrames;
   const guess = main.dataset.mode === 'guess';
@@ -145,6 +122,21 @@ main.addEventListener('statechange', build);
 newPair();
 tl = bindTimeline({
   track: $('track'), head: $('head'), tc: $('tc'), play: $('play'),
-  getAnims: () => [...anims.values()], frames: 30
+  getAnims: () => view3d ? [view3d.clock] : [...anims.values()], frames: 30
 });
 build();
+
+// 2D / 3D: the timeline follows the clock of the view on screen
+bindView(() => import('./09-timing-3d.js'), {
+  onSwitch(is3d, v) {
+    view3d = is3d ? v : null;
+    if (is3d) {
+      handOver([...anims.values()], [v.clock]);
+      v.timeline = (frames, keys, span) => { tl.setFrames(frames); tl.setKeys(keys); $('span').style.width = span + '%'; };
+      v.build();
+    } else {
+      if (v) handOver([v.clock], [...anims.values()]);
+      build();
+    }
+  }
+});

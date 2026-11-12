@@ -20,3 +20,7 @@ main[data-mode="guess"] #fallL,main[data-mode="guess"] #fallR{display:block}
 main[data-mode="guess"] .drop-only{display:none}
 main:not([data-mode="guess"]) .guess-only{display:none}
 .presets button{flex:1 1 auto}
+
+/* 3D view: the Drop and Walk demos each show their own controls */
+.page[data-view="3d"][data-demo="walk"] .drop3d,
+.page[data-view="3d"][data-demo="drop"] .walk3d{display:none}
