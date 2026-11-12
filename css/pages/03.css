@@ -6,8 +6,35 @@
 
 /* Camera: eased moves, never cuts */
 .cam{transform-origin:0 0;transition:transform .9s var(--ease)}
-.stage-area[data-shot="mid"] .cam{transform:translate(-284px,-345px) scale(1.9)}     /* frames the figure from the knees up */
-.stage-area[data-shot="close"] .cam{transform:translate(-896px,-610px) scale(3.6)}  /* frames the head */
+.stage-area[data-shot="mid"] .cam{transform:translate(-284px,-379px) scale(1.9)}     /* frames Draig */
+.stage-area[data-shot="close"] .cam{transform:translate(-752px,-735px) scale(3.2)}  /* frames his face */
+
+/* ===== Draig at each drawing level ===== */
+.draig #shadow{display:none}                       /* the set has its own cast shadows */
+/* Rendered: as drawn. Lights off darken him, as they darken the crate and ball. */
+.stage-area[data-level="rendered"][data-fill="off"] .draig{filter:brightness(.62)}
+.stage-area[data-level="rendered"][data-key="off"] .draig{filter:brightness(.78)}
+.stage-area[data-level="rendered"][data-key="off"][data-fill="off"] .draig{filter:brightness(.45)}
+/* Flat colour: gradients swapped for flat fills, no plush texture or soft highlights */
+.stage-area[data-level="flat"] .draig [fill="url(#dg-red)"]{fill:#E0283F}
+.stage-area[data-level="flat"] .draig [fill="url(#dg-red-dark)"]{fill:#B01B36}
+.stage-area[data-level="flat"] .draig [stroke="url(#dg-red-dark)"]{stroke:#B01B36}
+.stage-area[data-level="flat"] .draig [fill="url(#dg-belly)"]{fill:#FBE0B4}
+.stage-area[data-level="flat"] .draig [fill="url(#dg-muzzle)"]{fill:#F25A6B}
+.stage-area[data-level="flat"] .draig [fill="url(#dg-horn)"]{fill:#F3DDAE}
+.stage-area[data-level="flat"] .draig [fill="url(#dg-membrane)"]{fill:#D9354F}
+.stage-area[data-level="flat"] .draig [stroke="url(#dg-wing)"]{stroke:#A3163A}
+.stage-area[data-level="flat"] .draig [fill="url(#dg-sclera)"]{fill:#F5F5F8}
+.stage-area[data-level="flat"] .draig [fill="url(#dg-iris)"]{fill:#22A35A}
+.stage-area:is([data-level="flat"],[data-level="line"]) .draig [filter]{filter:none}
+.stage-area:is([data-level="flat"],[data-level="line"]) .draig [filter*="dg-soft"]{display:none}
+/* Line: outlines only */
+.stage-area[data-level="line"] .draig :is(path,ellipse,circle,rect){fill:none;stroke:#C9C9D3;stroke-width:3.5}
+/* Silhouette test: solid black */
+.stage-area[data-silhouette="on"] .draig :is(path,ellipse,circle,rect){fill:#05050A;stroke:#05050A}
+.stage-area[data-silhouette="on"] .draig [fill="none"]{fill:none}
+.stage-area[data-silhouette="on"] .draig [filter]{filter:none}
+.stage-area[data-silhouette="on"] .draig [filter*="dg-soft"]{display:none}
 
 /* ===== Drawing level: colours per level ===== */
 .stage-area{--wall:#17172B;--floor:#202036;--fig:#C9C9D3;--crate:#4A4A66;--ball:#9999FF;--clutter:#5C5C78;--clutter-2:#45456A;--line:none}
