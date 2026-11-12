@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/08.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/08-secondary.js"></script>
@@ -39,7 +44,10 @@
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">08</span>Secondary action</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/08-secondary-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage" data-sec="subtle">
       <div class="scene">
         <svg viewBox="0 0 800 400" id="svg" aria-label="Draig walking, with a tail swish, a glance and a puff of smoke">
@@ -254,7 +262,8 @@
     <div class="seg" role="group" aria-label="Secondary action" data-target="stage" data-attr="sec">
       <button data-value="off" aria-pressed="false">Off</button><button data-value="subtle" aria-pressed="true">Subtle</button><button data-value="much" aria-pressed="false">Too much</button>
     </div>
-    <p class="small">The walk is the main action. The tail swish, the glance and the puff of smoke support it.</p>
+    <p class="small only-2d">The walk is the main action. The tail swish, the glance and the puff of smoke support it.</p>
+    <p class="small only-3d">The walk is the main action. A glance at us and a small wave support it.</p>
     <p class="small">Too much: watch where your eye goes. The walk gets lost.</p>
     <div class="explain">
       <h2>The principle</h2>

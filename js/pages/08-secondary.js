@@ -4,16 +4,28 @@
 import '../core/toggles.js';
 import { rotatePart, scalePart, posePart, movePart, mouth, placeDraig, groundShadow, rigClock, runRig, toScene, span, lerp } from '../core/draig.js';
 import { bindTimeline } from '../core/timeline.js';
+import { bindView, handOver } from '../three/view.js';
 
 const $ = id => document.getElementById(id);
 const stage = $('stage'), svg = $('svg'), pos = $('draigPos');
 const FRAMES = 100, LOOP = FRAMES * 40, S = .38, FLOOR = 340;
 const puffs = [...$('smoke').children];
 const clock = rigClock($('clock'), LOOP);
+let view3d = null;   // the 3D view while it's showing (08-secondary-3d.js)
 
-bindTimeline({
+const tl = bindTimeline({
   track: $('track'), head: $('head'), tc: $('tc'), play: $('play'),
-  getAnims: () => [clock], frames: FRAMES
+  getAnims: () => [view3d ? view3d.clock : clock], frames: FRAMES
+});
+
+// 2D / 3D: the timeline follows the clock of the view on screen
+bindView(() => import('./08-secondary-3d.js'), {
+  onSwitch(is3d, v) {
+    view3d = is3d ? v : null;
+    if (is3d) handOver([clock], [v.clock]); else if (v) handOver([v.clock], [clock]);
+    tl.setFrames(is3d ? v.frames : FRAMES);
+    tl.setKeys(is3d ? v.keys : [0, 25, 50, 75]);
+  }
 });
 
 // When the puffs of smoke start (frames), for each level
