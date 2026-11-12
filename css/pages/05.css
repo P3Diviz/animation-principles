@@ -1,51 +1,7 @@
-/* 05 Follow through and overlapping action. 50 frames (2 s); one frame = 2%.
-   The body moves and stops; the antenna and scarf carry on and settle.
-   --flex: how far the loose parts swing (0 = rigid, same as Off). Stiffness lowers it. */
-.scene{--ar:2;--flex:calc(1.5 - 1.3 * var(--stiff,.4))}
-main[data-follow="off"] .scene{--flex:0}
+/* 05 Follow through and overlapping action: Draig hops; tail, wings and crest settle late.
+   Posed from js/pages/05-follow.js. */
+.scene{--ar:2}
 .floor{stroke:rgba(255,255,255,.14)}
-.body{fill:#C9C9D3} .eye{fill:#0A0A15}
-.stalk{stroke:#B4B4C2;stroke-width:4;stroke-linecap:round}
-.tip{fill:#9999FF}
-.scarf{fill:#A9B6FF}
-
-/* Body: frame 5-18 slide right, hold, 30-43 slide back */
-.mover{transform:translate(160px,330px);animation:move 2s infinite both}
-@keyframes move{
-  0%,10%{transform:translate(160px,330px);animation-timing-function:cubic-bezier(.33,0,.67,1)}
-  36%,60%{transform:translate(560px,330px);animation-timing-function:cubic-bezier(.33,0,.67,1)}
-  86%,100%{transform:translate(160px,330px)}}
-
-/* Loose parts: lag while the body speeds up, overshoot when it stops, then settle.
-   One set of keyframes for every part; --a sets each part's swing, --d its delay. */
-.flop{transform:rotate(var(--rest,0deg));animation:flop 2s infinite both ease-in-out;animation-delay:var(--d,0s)}
-@keyframes flop{
-  0%,10%{transform:rotate(var(--rest,0deg))}
-  16%{transform:rotate(calc(var(--rest,0deg) - 32deg * var(--a)))}
-  30%{transform:rotate(calc(var(--rest,0deg) - 14deg * var(--a)))}
-  36%{transform:rotate(calc(var(--rest,0deg) - 10deg * var(--a)))}
-  40%{transform:rotate(calc(var(--rest,0deg) + 32deg * var(--a)))}
-  45%{transform:rotate(calc(var(--rest,0deg) - 18deg * var(--a)))}
-  50%{transform:rotate(calc(var(--rest,0deg) + 10deg * var(--a)))}
-  55%{transform:rotate(calc(var(--rest,0deg) - 4deg * var(--a)))}
-  60%,62%{transform:rotate(var(--rest,0deg))}
-  66%{transform:rotate(calc(var(--rest,0deg) + 32deg * var(--a)))}
-  80%{transform:rotate(calc(var(--rest,0deg) + 14deg * var(--a)))}
-  86%{transform:rotate(calc(var(--rest,0deg) + 10deg * var(--a)))}
-  90%{transform:rotate(calc(var(--rest,0deg) - 32deg * var(--a)))}
-  94%{transform:rotate(calc(var(--rest,0deg) + 16deg * var(--a)))}
-  97%{transform:rotate(calc(var(--rest,0deg) - 6deg * var(--a)))}
-  100%{transform:rotate(var(--rest,0deg))}}
-.ant{--a:var(--flex)}
-/* Scarf: each segment a little later than the one before (overlapping action) */
-.s1{--rest:-30deg;--a:calc(var(--flex) * -.6);--d:.04s}
-.s2{--rest:-6deg;--a:calc(var(--flex) * -.32);--d:.1s}
-.s3{--rest:-5deg;--a:calc(var(--flex) * -.32);--d:.16s}
-.s4{--rest:-4deg;--a:calc(var(--flex) * -.32);--d:.22s}
-.s5{--rest:-3deg;--a:calc(var(--flex) * -.32);--d:.28s}
-
-/* Drag it: the keyframes stop and spring physics (js/pages/05-follow.js) takes over */
-main[data-mode="drag"] .mover,main[data-mode="drag"] .flop{animation:none}
-main[data-mode="drag"] .stage{cursor:grab}
+main[data-mode="drag"] .stage{cursor:grab;touch-action:none}
 main[data-mode="drag"] .timeline{visibility:hidden}
 main:not([data-mode="drag"]) .drag-only{display:none}
