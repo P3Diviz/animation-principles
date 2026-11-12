@@ -17,7 +17,7 @@
 html,body{height:100%}
 body{background:var(--bg);padding:12px;gap:10px;isolation:isolate}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:var(--bg) url(STRANDS_URL) center/cover no-repeat}
+  background:var(--bg) url(../assets/svg/strands.svg) center/cover no-repeat}
 body.principle::before{opacity:var(--strands-dim)}  /* principle pages: dimmer so the demo reads first */
 
 /* Shared glass surface */
