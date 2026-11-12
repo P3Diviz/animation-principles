@@ -1,0 +1,86 @@
+/* Shared controls: pill, segmented control, slider, buttons, timeline, keyframe icons,
+   graph editor, light plot. Load after shell.css, before the page stylesheet and glass.css. */
+
+/* ===== Pill toggle: Key / Fill / Rim, Wide / Mid / Close, Silhouette test ===== */
+.pill{border:1px solid var(--hair);background:transparent;color:var(--text-2);font:500 12px var(--font);padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease)}
+.pill[aria-pressed="true"]{border-color:var(--accent-line);background:var(--accent-wash);color:var(--text)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ===== Segmented control: Off/On, 2D/3D, presets ===== */
+.seg{display:flex;background:rgba(255,255,255,.06);border-radius:8px;padding:3px;gap:2px}
+.seg button{flex:1;border:none;background:transparent;color:var(--text-2);font:500 12px var(--font);padding:7px 6px;border-radius:6px;cursor:pointer;transition:all .2s var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--accent-wash);color:var(--text)}
+.seg.compact{display:inline-flex}
+.seg.compact button{padding:5px 12px}
+.presets{flex-wrap:wrap}
+.presets button{flex:1 1 40%}
+
+/* ===== Buttons ===== */
+.btn{font:500 13px var(--font);padding:10px 18px;border-radius:999px;text-decoration:none;transition:all .22s var(--ease);cursor:pointer;border:none}
+.btn.primary{background:var(--accent);color:#0A0A15}
+.btn.secondary{border:1px solid var(--hair);color:var(--text);background:transparent}
+.btn:hover{transform:translateY(-1px)}
+.btn.small-btn{font-size:12px;padding:7px 14px}
+
+/* ===== Slider: custom range input with a mono value readout =====
+   JS (js/core/sliders.js) writes the value to a CSS custom property and sets --pct for the fill. */
+.slider{display:grid;gap:2px}
+.slider .row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--text-2)}
+.slider output{font-family:var(--mono);font-size:11.5px;color:var(--text)}
+.slider input{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;cursor:pointer;--pct:50%}
+.slider input::-webkit-slider-runnable-track{height:6px;border-radius:3px;border:1px solid var(--well-border,rgba(255,255,255,.06));
+  background:linear-gradient(90deg,var(--accent-line) var(--pct),rgba(0,0,0,.24) var(--pct))}
+.slider input::-moz-range-track{height:6px;border-radius:3px;border:1px solid var(--well-border,rgba(255,255,255,.06));
+  background:linear-gradient(90deg,var(--accent-line) var(--pct),rgba(0,0,0,.24) var(--pct))}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;background:var(--text);border:none;box-shadow:0 0 0 3px rgba(153,153,255,.35);transition:box-shadow .2s var(--ease)}
+.slider input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--text);border:none;box-shadow:0 0 0 3px rgba(153,153,255,.35)}
+.slider input:hover::-webkit-slider-thumb{box-shadow:0 0 0 5px rgba(153,153,255,.35)}
+.slider input:focus-visible{outline:none}
+.slider input:focus-visible::-webkit-slider-thumb{outline:2px solid var(--accent);outline-offset:2px}
+.slider input:focus-visible::-moz-range-thumb{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ===== Timeline: 25 fps, scrub, keyframe icons (js/core/timeline.js) ===== */
+.timeline{padding:10px 24px 14px;border-top:1px solid var(--hair);display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:14px;align-items:center}
+.timeline .play{background:none;border:none;color:var(--accent);cursor:pointer;width:24px;height:24px;display:grid;place-items:center}
+.timeline .tc{font-family:var(--mono);font-size:12px;color:var(--text-2);min-width:96px}
+.track{position:relative;height:34px;cursor:pointer;touch-action:none}
+.track .bar{position:absolute;left:0;right:0;top:14px;height:6px;border-radius:3px;background:rgba(255,255,255,.06)}
+.track .span{position:absolute;top:14px;height:6px;border-radius:3px;background:rgba(153,153,255,.3)}
+.track .ticks{position:absolute;left:0;right:0;bottom:0;height:5px;background-image:linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:calc(100% / var(--frames,30)) 100%}
+.track .key{position:absolute;top:10px;width:14px;height:14px;margin-left:-7px}
+.track .key path{fill:var(--accent)}
+.track .head{position:absolute;top:0;bottom:0;width:1px;background:var(--text);pointer-events:none}
+.track .head::before{content:"";position:absolute;top:-2px;left:-4px;width:9px;height:9px;border-radius:2px;background:var(--text)}
+
+/* ===== Graph editor and light plot ===== */
+.graph{width:100%;aspect-ratio:1;max-height:34vh;display:block;touch-action:none;background:rgba(255,255,255,.025);border-radius:10px}
+.graph .h{cursor:grab}
+.plot{width:100%;aspect-ratio:1;max-height:30vh;display:block;touch-action:none}
+.plot .lamp{cursor:grab}
+.readout{font-family:var(--mono);font-size:12px;color:var(--accent);word-break:break-all}
+.small{color:var(--text-2);font-size:12px;line-height:1.45}
+
+/* ===== 2D stage helpers =====
+   .scene keeps a fixed aspect ratio inside the stage and scales with it (container units). */
+.stage.has-scene{container-type:size}
+.scene{position:absolute;left:50%;top:50%;translate:-50% -50%;width:min(100cqw,calc(100cqh * var(--ar,2)));aspect-ratio:var(--ar,2);container-type:size}
+.scene > svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.stage-caption{position:absolute;left:24px;bottom:12px;color:var(--text-2);font-size:12px}
+
+/* Choice cards (Predict it, Guess the weight, Which is more appealing?) */
+.ask{display:grid;gap:6px}
+.ask[hidden]{display:none}
+.ask .q{font-size:12.5px;color:var(--text)}
+.ask .choices{display:grid;gap:4px}
+.ask .choices button{text-align:left;border:1px solid var(--hair);background:rgba(255,255,255,.04);color:var(--text);font:500 12px var(--font);padding:7px 10px;border-radius:8px;cursor:pointer;transition:all .2s var(--ease)}
+.ask .choices button:hover{border-color:var(--accent-line)}
+.ask .choices button[data-result="right"]{border-color:var(--accent-line);background:var(--accent-wash)}
+.ask .choices button[data-result="wrong"]{opacity:.5}
+.ask .answer{color:var(--text-2);font-size:12px;line-height:1.45;min-height:1.45em}
+
+/* ===== Present mode: controls about 125% for the projector ===== */
+html[data-present] .panel h2{font-size:14px}
+html[data-present] .pill{font-size:14px;padding:8px 14px}
+html[data-present] .slider .row,html[data-present] .slider output{font-size:14px}
+html[data-present] .small,html[data-present] .readout{font-size:14px}
+html[data-present] .ask .q,html[data-present] .ask .choices button,html[data-present] .ask .answer{font-size:14px}
