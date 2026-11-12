@@ -1,0 +1,40 @@
+/* Home: one screen. Header row, hero row. From docs/reference/home-approved.html. */
+body{grid-template-rows:auto minmax(0,1fr)}
+html[data-present] body{grid-template-rows:minmax(0,1fr)}
+.hero{display:grid;grid-template-rows:auto minmax(0,1fr) auto;justify-items:center;padding:clamp(20px,4vh,48px) 24px clamp(16px,3vh,32px);min-height:0}
+.hero h1{font-size:clamp(36px,4.6vw,60px);font-weight:600;letter-spacing:-.035em;line-height:1.04;text-align:center}
+.hero p{color:var(--text-2);font-size:clamp(14px,1.2vw,17px);max-width:46ch;text-align:center;margin:12px auto 0}
+
+/* ===== Paul's original ball, ported exactly =====
+   Source: docs/reference/original-bouncing-ball.html (800 x 480 container).
+   Every px value is converted to container units so the look is identical at any size:
+   160px = 20cqw, 30px = 3.75cqw, 385px top = 80.208cqh. Percentages and timing are unchanged.
+   transform-origin: the original said "centre bottom", which browsers ignore, so the squash
+   always happened from the CENTRE. The positions were tuned around that, so we use
+   "center center" (valid, identical look). Do NOT change it to "center bottom". */
+.stage{container-type:size;aspect-ratio:800/480;height:100%;max-height:480px;max-width:100%;position:relative;align-self:center;min-height:0}
+.ball{width:20cqw;height:20cqw;position:absolute;border-radius:50%;left:40%;
+  background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%); /* original: #fff9d9, #ffd93d, #b58d00 */
+  transform-origin:center center;animation:bounce .5s alternate infinite ease}
+@keyframes bounce{
+  0%{top:60%;transform:scale(1.7,.5)}
+  40%{height:20cqw;border-radius:50%;transform:scaleX(1)}
+  100%{top:0%}}
+.shadow{width:20cqw;height:3.75cqw;border-radius:50%;position:absolute;top:80.208cqh;left:40%;z-index:-1;transform-origin:bottom center;
+  background:rgba(153,153,255,.38); /* original hsl(0,0%,10%) is invisible on the dark navy page */
+  filter:blur(.75cqw);animation:shadow .5s alternate infinite ease}
+@keyframes shadow{0%{transform:scaleX(1.7)}40%{transform:scaleX(1);opacity:.8}100%{transform:scaleX(.2);opacity:.2}}
+/* Squash and stretch OFF: same timing, no scale. The squashed ball's lowest edge sits at
+   about 85% of the height (408px), so an unsquashed 160px ball touches that same floor at top 51.67%. */
+.stage[data-squash="off"] .ball{animation-name:bounce-flat}
+@keyframes bounce-flat{0%{top:51.67%}100%{top:0%}}
+.stage{z-index:0}
+
+/* Reduced motion: the ball waits, still on the floor */
+@media (prefers-reduced-motion: reduce){ .ball,.shadow{animation-play-state:paused} }
+
+.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+.seg{display:inline-flex;background:rgba(255,255,255,.06);border-radius:999px;padding:3px;gap:0}
+.seg button{flex:none;border:none;background:transparent;color:var(--text-2);font:500 12px var(--font);padding:7px 16px;border-radius:999px;cursor:pointer;transition:all .22s var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.label{color:var(--text-2);font-size:12px}

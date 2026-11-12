@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Principles of Animation</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages/home.css">
+<link rel="stylesheet" href="css/glass.css">
+<script type="module" src="js/core/menu.js"></script>
+<script type="module" src="js/core/present.js"></script>
+<script type="module" src="js/pages/home.js"></script>
+</head>
+<body>
+<header class="hdr"><a class="brand" href="index.html">Principles of Animation</a><nav><a href="index.html" aria-current="page">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="spot-it.html">Spot it</a><a href="playground.html">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="principles/01-squash-and-stretch.html"><span class="mono">01</span>Squash and stretch</a>
+    <a href="principles/07-arc.html"><span class="mono">07</span>Arc</a>
+    <a href="principles/02-anticipation.html"><span class="mono">02</span>Anticipation</a>
+    <a href="principles/08-secondary-action.html"><span class="mono">08</span>Secondary action</a>
+    <a href="principles/03-staging.html"><span class="mono">03</span>Staging</a>
+    <a href="principles/09-timing.html"><span class="mono">09</span>Timing</a>
+    <a href="principles/04-straight-ahead-pose-to-pose.html"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="principles/10-exaggeration.html"><span class="mono">10</span>Exaggeration</a>
+    <a href="principles/05-follow-through.html"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="principles/11-appeal.html"><span class="mono">11</span>Appeal</a>
+    <a href="principles/06-slow-in-slow-out.html"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="principles/12-solid-drawing.html"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="principles.html">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<main class="hero">
+  <div><h1>Twelve principles, every one switchable</h1>
+  <p>Turn each principle on and off, scrub it frame by frame, and see why good animation feels alive.</p></div>
+  <div class="stage" id="stage" data-squash="on"><div class="ball"></div><div class="shadow"></div></div>
+  <div class="controls">
+    <span class="label">Squash and stretch</span>
+    <div class="seg" role="group" aria-label="Squash and stretch" data-target="stage" data-attr="squash">
+      <button data-value="off" aria-pressed="false">Off</button><button data-value="on" aria-pressed="true">On</button></div>
+    <a class="btn primary" href="principles.html">Explore the principles</a>
+    <a class="btn secondary" href="spot-it.html">Spot it</a>
+  </div>
+</main>
+</body>
+</html>
