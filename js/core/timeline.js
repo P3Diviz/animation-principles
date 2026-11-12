@@ -103,10 +103,16 @@ export function bindTimeline({ track, head, tc, play, getAnims, frames, fps = 25
   // Reduced motion: the demo waits on frame 0 until the learner presses play
   if (reducedMotion) setFrame(0);
 
+  // Only touch the page when the frame changes: rewriting the timecode every screen refresh
+  // makes the browser redraw the frosted glass around it, which can flicker.
+  let shownFrame = -1, shownFrames = -1;
   (function loop() {
     const f = frameNow();
-    head.style.left = (f / frames * 100) + '%';
-    tc.textContent = '00:00:' + String(Math.floor(f / fps)).padStart(2, '0') + ':' + String(f % fps).padStart(2, '0');
+    if (f !== shownFrame || frames !== shownFrames) {
+      shownFrame = f; shownFrames = frames;
+      head.style.left = (f / frames * 100) + '%';
+      tc.textContent = '00:00:' + String(Math.floor(f / fps)).padStart(2, '0') + ':' + String(f % fps).padStart(2, '0');
+    }
     showPlayState();
     requestAnimationFrame(loop);
   })();

@@ -26,6 +26,10 @@ body.principle::before{opacity:var(--strands-dim)}  /* principle pages: dimmer s
   -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
   box-shadow:var(--glass-edge),var(--glass-shadow)}
 
+/* Each glass panel on its own compositor layer. Without this, Chrome can redraw the blur in patches
+   while the demo animates, so parts of a panel flicker more transparent. No visual change. */
+.hdr,.panel,.notes,.stage-area{will-change:transform}
+
 /* Header: floating pill */
 .hdr{height:52px;border-radius:999px;padding:0 8px 0 20px;border-bottom:1px solid var(--glass-border)}
 .hdr nav{gap:2px}
