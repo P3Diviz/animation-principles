@@ -27,13 +27,7 @@ main[data-path="straight"] .apex{display:none}
 
 /* ===== Head turn (right third) ===== */
 .turn{position:absolute;right:0;top:0;width:34%;height:100%}
-.turn svg{position:absolute;inset:0;width:100%;height:100%}
-.face{fill:#C9C9D3}
-.feature{fill:#0A0A15}
-.nose{fill:#9C9CB3}
-.hx{animation:hx 1s cubic-bezier(.33,0,.67,1) infinite alternate both}
-.hy{animation:hy .5s cubic-bezier(.333,.667,.667,1) infinite alternate both}
-@keyframes hx{from{transform:translateX(-36px)}to{transform:translateX(36px)}}
-@keyframes hy{from{transform:translateY(0)}to{transform:translateY(calc(var(--hh) * .45px))}}   /* the eyes dip as the head turns */
-.turn .head-path{fill:none;stroke:rgba(153,153,255,.55);stroke-width:1.5}
+.turn > svg{position:absolute;inset:0;width:100%;height:calc(100% - 8%);overflow:visible}
+/* Draig's face slides across his head as he turns (js/pages/07-arc.js) */
+.turn .head-path{fill:none;stroke:#F5F5F7;opacity:.85;stroke-width:5;stroke-dasharray:1 10;stroke-linecap:round}
 .cap{position:absolute;bottom:3%;color:var(--text-2);font-size:12px;translate:-50% 0;white-space:nowrap}
