@@ -1,0 +1,49 @@
+/* Header, Principles dropdown, principle page shell, notes strip, present mode.
+   Split out of docs/reference/*-approved.html. Values unchanged. */
+
+/* ===== Header (identical on every page) ===== */
+.hdr{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--hair)}
+.hdr .brand{font-weight:600;letter-spacing:-.2px;color:var(--text);text-decoration:none}
+.hdr nav{display:flex;align-items:center;gap:20px}
+.hdr nav a,.hdr nav button.link{color:var(--text-2);text-decoration:none;background:none;border:none;font:500 13px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px;transition:color var(--ease) .2s}
+.hdr nav a:hover,.hdr nav button.link:hover,.hdr nav [aria-current="page"]{color:var(--text)}
+
+/* ===== Principles dropdown =====
+   Right-aligned under the link. Hidden attribute toggled by JS; data-open drives the fade. */
+.menu{position:absolute;top:56px;right:120px;width:min(560px,calc(100vw - 48px));background:#15152A;border:1px solid var(--hair);border-radius:14px;padding:10px;z-index:50;box-shadow:0 24px 48px rgba(0,0,0,.45);opacity:0;transform:translateY(-6px);transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.menu[data-open]{opacity:1;transform:none}
+.menu-cols{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.menu a{display:flex;gap:12px;align-items:baseline;padding:9px 12px;border-radius:8px;color:var(--text);text-decoration:none;font-size:13px}
+.menu a:hover{background:rgba(255,255,255,.05)}
+.menu a .mono{color:var(--accent);font-size:11px;width:18px;flex:none}
+.menu a[aria-current="page"]{background:var(--accent-wash)}
+.menu .menu-all{border-top:1px solid var(--hair);border-radius:0 0 8px 8px;margin-top:6px;padding-top:12px;color:var(--text-2)}
+
+/* ===== Principle page shell ===== */
+.page{display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,22vw,320px);min-height:0}
+.stage-area{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;min-width:0}
+.stage-head{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 0}
+.stage-head h1{font-size:clamp(18px,1.6vw,24px);font-weight:600;letter-spacing:-.02em;display:flex;align-items:baseline;gap:12px}
+.stage-head h1 .mono{color:var(--accent);font-size:12px;font-weight:500}
+.stage{position:relative;min-height:0}
+.panel{background:var(--panel);border-left:1px solid var(--hair);padding:18px 18px;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
+.panel h2{color:var(--text-2);font-size:12px;font-weight:500;margin:10px 0 4px}
+.panel h2:first-child{margin-top:0}
+
+/* ===== Notes strip ===== */
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;border-top:1px solid var(--hair)}
+.notes section{padding:12px 24px;border-right:1px solid var(--hair)}
+.notes h3{font-size:12px;font-weight:500;margin-bottom:2px}
+.notes p{color:var(--text-2);font-size:12.5px;line-height:1.45}
+.notes .kbd{font-family:var(--mono);color:var(--text);font-size:11.5px}
+.prevnext{display:flex;align-items:center;gap:8px;padding:0 20px}
+.prevnext a{color:var(--text-2);text-decoration:none;font-size:12px;border:1px solid var(--hair);border-radius:999px;padding:6px 12px}
+.prevnext a:hover{color:var(--text);border-color:var(--hair-strong,rgba(255,255,255,.16))}
+
+/* ===== Present mode: press P. Header and notes hide; stage and controls fill the screen. ===== */
+html[data-present] .hdr,html[data-present] .notes{display:none}
+html[data-present] body{grid-template-rows:minmax(0,1fr)}
+html[data-present] .panel{font-size:15px}
+html[data-present] .seg button{font-size:14px;padding:10px 8px}
+.present-hint{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#15152A;border:1px solid var(--hair);border-radius:999px;padding:6px 14px;color:var(--text-2);font-size:12px;opacity:0;transition:opacity .3s var(--ease);pointer-events:none;z-index:60}
+.present-hint[data-show]{opacity:1}
