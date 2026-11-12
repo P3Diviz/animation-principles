@@ -1,0 +1,10 @@
+/* 06 Slow in and slow out. From docs/reference/06-slow-in-slow-out-approved.html. */
+.slide{position:absolute;left:8%;right:8%;top:50%;height:0}
+.slide .floor{position:absolute;left:0;right:0;top:0;height:1px;background:rgba(255,255,255,.14)}
+.ball{position:absolute;bottom:0;left:0;width:clamp(36px,4vw,56px);aspect-ratio:1;margin-left:calc(clamp(36px,4vw,56px) / -2);border-radius:50%;background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%)}
+.marks{position:absolute;left:0;right:0;top:14px;height:10px}
+.marks span{position:absolute;top:0;width:2px;height:10px;margin-left:-1px;border-radius:1px;background:var(--accent);opacity:.6}
+.stage-caption{position:absolute;left:8%;top:calc(50% + 34px);color:var(--text-2);font-size:12px}
+/* Keyboard: the handles take focus; arrow keys nudge them */
+.graph .h:focus{outline:none}
+.graph .h:focus-visible{stroke:#F5F5F7;stroke-width:2}

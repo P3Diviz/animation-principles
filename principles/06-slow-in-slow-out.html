@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>06 Slow in and slow out</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/shell.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages/06.css">
+<link rel="stylesheet" href="../css/glass.css">
+<script type="module" src="../js/core/menu.js"></script>
+<script type="module" src="../js/core/present.js"></script>
+<script type="module" src="../js/pages/06-slow.js"></script>
+</head>
+<body class="principle">
+<header class="hdr"><a class="brand" href="../index.html">Principles of Animation</a><nav><a href="../index.html">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="../spot-it.html">Spot it</a><a href="../playground.html">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="01-squash-and-stretch.html"><span class="mono">01</span>Squash and stretch</a>
+    <a href="07-arc.html"><span class="mono">07</span>Arc</a>
+    <a href="02-anticipation.html"><span class="mono">02</span>Anticipation</a>
+    <a href="08-secondary-action.html"><span class="mono">08</span>Secondary action</a>
+    <a href="03-staging.html"><span class="mono">03</span>Staging</a>
+    <a href="09-timing.html"><span class="mono">09</span>Timing</a>
+    <a href="04-straight-ahead-pose-to-pose.html"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="10-exaggeration.html"><span class="mono">10</span>Exaggeration</a>
+    <a href="05-follow-through.html"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="11-appeal.html"><span class="mono">11</span>Appeal</a>
+    <a href="06-slow-in-slow-out.html" aria-current="page"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="12-solid-drawing.html"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="../principles.html">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<main class="page" id="main" data-view="2d">
+  <section class="stage-area">
+    <div class="stage-head">
+      <h1><span class="mono">06</span>Slow in and slow out</h1>
+    </div>
+    <div class="stage" id="stage">
+      <div class="slide">
+        <div class="floor"></div>
+        <div class="ball" id="ball"></div>
+        <!-- 21 spacing marks: one per frame from frame 0 to 20. Written in HTML; JS only sets their left. -->
+        <div class="marks" id="marks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <p class="stage-caption">Spacing: one mark per frame</p>
+    </div>
+    <div class="timeline" id="timeline">
+      <button class="play" id="play" aria-label="Pause"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect class="i-pause" x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect class="i-pause" x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><path class="i-play" d="M3 1.5 12 7 3 12.5Z" fill="currentColor" style="display:none"/></svg></button>
+      <span class="tc" id="tc">00:00:00:00</span>
+      <div class="track" id="track" data-keys="0,20">
+        <div class="bar"></div><div class="span" style="left:0;width:66.667%"></div><div class="ticks"></div>
+        <svg class="key" id="k0" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" id="k1" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <div class="head" id="head"></div>
+      </div>
+    </div>
+  </section>
+  <aside class="panel">
+    <h2>Graph editor</h2>
+    <svg class="graph" id="graph" viewBox="0 0 200 200" aria-label="Value graph with two draggable handles">
+      <rect x="20" y="30" width="160" height="140" fill="none" stroke="rgba(255,255,255,.08)"/>
+      <line x1="20" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,.05)"/><line x1="100" y1="30" x2="100" y2="170" stroke="rgba(255,255,255,.05)"/>
+      <line id="l1" stroke="rgba(153,153,255,.5)"/><line id="l2" stroke="rgba(153,153,255,.5)"/>
+      <path id="curve" fill="none" stroke="#F5F5F7" stroke-width="2"/>
+      <circle cx="20" cy="170" r="3.5" fill="#F5F5F7"/><circle cx="180" cy="30" r="3.5" fill="#F5F5F7"/>
+      <circle class="h" id="h1" r="7" fill="#9999FF" tabindex="0" aria-label="Outgoing handle: arrow keys move it"/>
+      <circle class="h" id="h2" r="7" fill="#9999FF" tabindex="0" aria-label="Incoming handle: arrow keys move it"/>
+    </svg>
+    <h2>Presets</h2>
+    <div class="seg presets" id="presets" role="group" aria-label="Ease presets">
+      <button data-p=".333,.333,.667,.667" aria-pressed="false">Linear</button>
+      <button data-p=".33,0,.67,1" aria-pressed="true">Easy Ease</button>
+      <button data-p=".42,0,1,1" aria-pressed="false">Slow out only</button>
+      <button data-p="0,0,.58,1" aria-pressed="false">Slow in only</button>
+    </div>
+    <h2>CSS equivalent</h2>
+    <p class="readout" id="readout">cubic-bezier(0.33, 0, 0.67, 1)</p>
+    <p class="small">Careful: names are swapped. After Effects' Easy Ease In is CSS <span class="mono">ease-out</span>.</p>
+  </aside>
+</main>
+<footer class="notes">
+  <section><h3>What to notice</h3><p>Marks bunch up where it's slow and spread out where it's fast.</p></section>
+  <section><h3>In After Effects</h3><p>Select keys, <span class="kbd">F9</span> for Easy Ease. <span class="kbd">Shift+F3</span> opens the Graph Editor.</p></section>
+  <section><h3>Try this</h3><p>Drag a handle above the box to make it overshoot and settle back.</p></section>
+  <div class="prevnext"><a href="05-follow-through.html" aria-label="Previous: 05 Follow through">‹ 05</a><a href="07-arc.html" aria-label="Next: 07 Arc">07 ›</a></div>
+</footer>
+</body>
+</html>
