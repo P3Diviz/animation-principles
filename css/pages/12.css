@@ -1,0 +1,28 @@
+/* 12 Solid drawing: one figure, drawn four ways. JS places every shape from one set of joints. */
+.scene{--ar:2}
+.sk,.cons,.vol-s,.vol-l,.contour,.formline,.shadow{display:none}
+
+/* 1 Stick figure */
+.sk{stroke:#C9C9D3;stroke-width:3;stroke-linecap:round;fill:none}
+.stage[data-step="1"] .sk{display:inline}
+
+/* 2 Construction shapes: spheres, ovals and centre lines over a faint stick figure */
+.cons{fill:none;stroke:#9C9CB3;stroke-width:1.5}
+.formline{fill:none;stroke:var(--accent);stroke-width:1.5}
+.stage[data-step="2"] .sk{display:inline;opacity:.35}
+.stage[data-step="2"] .cons,.stage[data-step="2"] .formline{display:inline}
+
+/* 3 Volume: solid forms, with lines that wrap round them */
+.vol-s{fill:#C9C9D3}
+.vol-l{stroke:#C9C9D3;stroke-linecap:round;fill:none}
+.contour{fill:none;stroke:rgba(10,10,21,.4);stroke-width:1.5}
+.stage[data-step="3"] .vol-s,.stage[data-step="3"] .vol-l,.stage[data-step="3"] .contour{display:inline}
+.stage[data-step="3"] .formline{display:inline;stroke:rgba(10,10,21,.45)}
+
+/* 4 Shaded: light from the upper left, a cast shadow on the floor */
+.stage[data-step="4"] .vol-s,.stage[data-step="4"] .vol-l,.stage[data-step="4"] .shadow{display:inline}
+.stage[data-step="4"] .vol-s{fill:url(#gBall)}
+.stage[data-step="4"] .vol-l{stroke:url(#gLimb)}
+.shadow{fill:rgba(0,0,0,.4)}
+.floor{stroke:rgba(255,255,255,.12)}
+.leg{stroke-width:24} .arm{stroke-width:18} .neck{stroke-width:16}

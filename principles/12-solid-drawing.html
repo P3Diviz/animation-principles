@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>12 Solid drawing</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/shell.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages/12.css">
+<link rel="stylesheet" href="../css/glass.css">
+<script type="module" src="../js/core/menu.js"></script>
+<script type="module" src="../js/core/present.js"></script>
+<script type="module" src="../js/pages/12-solid.js"></script>
+</head>
+<body class="principle">
+<header class="hdr"><a class="brand" href="../index.html">Principles of Animation</a><nav><a href="../index.html">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="../spot-it.html">Spot it</a><a href="../playground.html">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="01-squash-and-stretch.html"><span class="mono">01</span>Squash and stretch</a>
+    <a href="07-arc.html"><span class="mono">07</span>Arc</a>
+    <a href="02-anticipation.html"><span class="mono">02</span>Anticipation</a>
+    <a href="08-secondary-action.html"><span class="mono">08</span>Secondary action</a>
+    <a href="03-staging.html"><span class="mono">03</span>Staging</a>
+    <a href="09-timing.html"><span class="mono">09</span>Timing</a>
+    <a href="04-straight-ahead-pose-to-pose.html"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="10-exaggeration.html"><span class="mono">10</span>Exaggeration</a>
+    <a href="05-follow-through.html"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="11-appeal.html"><span class="mono">11</span>Appeal</a>
+    <a href="06-slow-in-slow-out.html"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="12-solid-drawing.html" aria-current="page"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="../principles.html">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<main class="page" id="main" data-view="2d">
+  <section class="stage-area">
+    <div class="stage-head">
+      <h1><span class="mono">12</span>Solid drawing</h1>
+    </div>
+    <div class="stage has-scene" id="stage" data-step="2" data-twin="off">
+      <div class="scene">
+        <svg viewBox="0 0 800 400" aria-label="A standing figure drawn as a stick figure, construction shapes, volume, or shaded">
+          <defs>
+            <radialGradient id="gBall" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#F0F0F6"/><stop offset=".55" stop-color="#A9A9BC"/><stop offset="1" stop-color="#4E4E62"/></radialGradient>
+            <linearGradient id="gLimb" gradientUnits="userSpaceOnUse" x1="330" y1="0" x2="490" y2="0"><stop offset="0" stop-color="#E4E4EC"/><stop offset="1" stop-color="#5A5A6E"/></linearGradient>
+          </defs>
+          <!-- Shapes carry the joints they join (data-a, data-b) or sit on (data-at, data-g).
+               js/pages/12-solid.js places them all from one table of joints. -->
+          <line class="floor" x1="200" y1="372" x2="600" y2="372"/>
+          <ellipse class="shadow" cx="430" cy="374" rx="90" ry="8"/>
+
+          <line class="vol-l leg" data-a="hipL" data-b="knL"/><line class="vol-l leg" data-a="knL" data-b="ftL"/>
+          <line class="vol-l leg" data-a="hipR" data-b="knR"/><line class="vol-l leg" data-a="knR" data-b="ftR"/>
+          <g data-g="pelvis" data-tilt="hipL,hipR">
+            <ellipse class="vol-s" rx="34" ry="24"/><ellipse class="cons" rx="34" ry="24"/>
+            <path class="formline" d="M-34 0 A34 9 0 0 0 34 0"/>
+          </g>
+          <line class="vol-l neck" data-a="neck" data-b="head"/>
+          <g data-g="chest" data-tilt="shL,shR">
+            <ellipse class="vol-s" rx="38" ry="48"/><ellipse class="cons" rx="38" ry="48"/>
+            <path class="formline" id="chestCentre"/>
+            <path class="formline" d="M-38 4 A38 10 0 0 0 38 4"/>
+          </g>
+          <g data-g="head">
+            <circle class="vol-s" r="30"/><circle class="cons" r="30"/>
+            <path class="formline" id="headCentre"/>
+            <path class="formline" id="headEyes"/>
+          </g>
+          <line class="vol-l arm" data-a="shL" data-b="elL"/><line class="vol-l arm" data-a="elL" data-b="haL"/>
+          <line class="vol-l arm" data-a="shR" data-b="elR"/><line class="vol-l arm" data-a="elR" data-b="haR"/>
+
+          <!-- Lines that wrap round each limb, halfway along -->
+          <path class="contour" data-a="hipL" data-b="knL" data-w="12"/><path class="contour" data-a="knL" data-b="ftL" data-w="12"/>
+          <path class="contour" data-a="hipR" data-b="knR" data-w="12"/><path class="contour" data-a="knR" data-b="ftR" data-w="12"/>
+          <path class="contour" data-a="shL" data-b="elL" data-w="9"/><path class="contour" data-a="elL" data-b="haL" data-w="9"/>
+          <path class="contour" data-a="shR" data-b="elR" data-w="9"/><path class="contour" data-a="elR" data-b="haR" data-w="9"/>
+
+          <!-- Stick figure -->
+          <line class="sk" data-a="neck" data-b="pelvis"/><line class="sk" data-a="shL" data-b="shR"/><line class="sk" data-a="hipL" data-b="hipR"/>
+          <line class="sk" data-a="shL" data-b="elL"/><line class="sk" data-a="elL" data-b="haL"/><line class="sk" data-a="shR" data-b="elR"/><line class="sk" data-a="elR" data-b="haR"/>
+          <line class="sk" data-a="hipL" data-b="knL"/><line class="sk" data-a="knL" data-b="ftL"/><line class="sk" data-a="hipR" data-b="knR"/><line class="sk" data-a="knR" data-b="ftR"/>
+          <line class="sk" data-a="neck" data-b="head"/><circle class="sk" data-at="head" r="30"/>
+
+          <!-- Construction joints -->
+          <circle class="cons" data-at="shL" r="7"/><circle class="cons" data-at="shR" r="7"/><circle class="cons" data-at="elL" r="6"/><circle class="cons" data-at="elR" r="6"/>
+          <circle class="cons" data-at="haL" r="6"/><circle class="cons" data-at="haR" r="6"/><circle class="cons" data-at="hipL" r="8"/><circle class="cons" data-at="hipR" r="8"/>
+          <circle class="cons" data-at="knL" r="7"/><circle class="cons" data-at="knR" r="7"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+  <aside class="panel">
+    <h2>Drawing</h2>
+    <div class="seg" role="group" aria-label="Drawing" data-target="stage" data-attr="step">
+      <button data-value="1" aria-pressed="false">Stick</button><button data-value="2" aria-pressed="true">Shapes</button><button data-value="3" aria-pressed="false">Volume</button><button data-value="4" aria-pressed="false">Shaded</button>
+    </div>
+    <p class="small">Stick figure, then construction shapes, then volume, then light and shadow.</p>
+    <h2>Turn</h2>
+    <label class="slider"><span class="row"><span>Turn the head</span><output>30°</output></span>
+      <input type="range" id="turn" min="-60" max="60" step="5" value="30" data-unit="°"></label>
+    <p class="small">The centre lines wrap round the form, so a flat drawing reads as solid.</p>
+    <h2>Pose</h2>
+    <div class="pills"><button class="pill" data-target="stage" data-attr="twin" aria-pressed="false">Twinning</button></div>
+    <p class="small">Twinning: both sides doing the same thing at once.</p>
+  </aside>
+</main>
+<footer class="notes">
+  <section><h3>What to notice</h3><p>Things have weight, volume and a back as well as a front.</p></section>
+  <section><h3>In After Effects</h3><p>3D layers and the camera show form from new angles.</p></section>
+  <section><h3>Try this</h3><p>Turn twinning on. Why does the pose look flat?</p></section>
+  <div class="prevnext"><a href="11-appeal.html" aria-label="Previous: 11 Appeal">‹ 11</a><a href="01-squash-and-stretch.html" aria-label="Next: 01 Squash and stretch">01 ›</a></div>
+</footer>
+</body>
+</html>
