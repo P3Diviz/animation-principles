@@ -2,6 +2,8 @@
 
 For Claude Code, working in Paul's VS Code workspace and GitHub repo. Read this whole file before writing any code. Last updated 12 November 2026.
 
+> **Status: Tier 1 is complete and checked by Paul. Next job: Tier 2 (3D).** Section 17 records what was built, every decision Paul made during Tier 1 (these override the earlier sections where they differ), how the 2D pages work, and what Tier 2 must plug into. Read it before starting.
+
 ## 0. Start here
 
 **Deadline: the site must be fully working in class on Monday.** Build in the order in section 14 so the site is usable at the end of every phase. Paul has very little time for back-and-forth: decisions are made in this file, and the reference files in `docs/reference/` are the visual source of truth. Don't redesign; match them.
@@ -72,7 +74,7 @@ The look: After Effects' navy and violet, built to the standard of an Apple or A
 
 ### Header (identical on every page)
 
-The wordmark "Principles of Animation" (links home) sits on the left. Everything else is grouped on the right: Home, **Principles ▾** (dropdown), Spot it, Playground, then a **Present** button showing the key hint `P`. No other text in the header.
+The wordmark "Principles of Animation" (links home) sits on the left. Everything else is grouped on the right: Home, **Principles ▾** (dropdown), Spot it, Playground. No other text in the header. *(Changed in Tier 1: the **Present** button moved out of the header into the notes strip, under the previous/next links; Spot it and Playground are greyed out until built. See section 17.)*
 
 The Principles dropdown is a two-column panel listing all 12 in poster order (01–06 left, 07–12 right), each with its number in the accent colour. The menu opens right-aligned under the Principles link. The current page has `aria-current="page"` and a violet wash. It opens on click (not hover, which is unreliable on projector touch screens), closes on Esc, outside click, or choosing a link. It's a real `<nav>` of `<a>` links, written in HTML on every page. Clicking the word "Principles" itself toggles the menu; the menu's footer link "See all twelve" goes to `principles.html`.
 
@@ -112,7 +114,7 @@ Because the header is duplicated across 17 files, keep it byte-identical apart f
 - **No backdrop blur behind a live 3D canvas.** A 3D stage area gets the class `is-3d`, which turns the blur off and uses a near-solid panel instead. Blurring behind a canvas that redraws every frame is slow on college PCs.
 - **Inside a glass panel, divide with hairlines**, not more boxes.
 - **Type:** Inter for everything; JetBrains Mono only where After Effects itself shows numbers: timecodes (`00:00:00:12`), values, the principle number, CSS readouts, key hints. Self-host both (OFL licence) as woff2 in `assets/fonts/` so the site doesn't depend on Google Fonts loading on the college network.
-- **Type scale:** 11 / 12 / 13 / 15 / 17 / 22 / 36, home headline `clamp(40px, 5vw, 64px)`. Weights 400, 500, 600 only. Headlines tight (letter-spacing about -0.02em).
+- **Type scale:** 11 / 12 / 13 / 15 / 17 / 22 / 36, home headline `clamp(40px, 5vw, 64px)`. Weights 400, 500, 600 only. Headlines tight (letter-spacing about -0.02em). **Reading text is 14px minimum** (Paul's decision in Tier 1): principle explanations, notes strip, panel notes (`.small`), quiz text. Control labels, buttons, timecode and key hints stay 11–13px.
 - **Copy:** sentence case, short, plain verbs. No ALL-CAPS labels, no tracked-out eyebrows, no middle-dot strings ("2D · 3D"), no single word coloured in a headline, no "→" on buttons. These were in early mockups and have been removed on purpose.
 - **Motion obeys the principles.** Every UI transition uses `var(--ease)`. Camera moves ease, never cut. Nothing animates on its own except the demo itself and the home ball. The boxes on `principles.html` are static images.
 - **Accessibility:** visible focus rings (`outline: 2px solid var(--accent); outline-offset: 2px`), `aria-pressed` on toggle buttons, `aria-expanded` on the dropdown, real `<button>` and `<a>` elements, contrast at least 4.5:1 for text. `prefers-reduced-motion`: demos stay paused until the learner presses play.
@@ -130,7 +132,7 @@ Because the header is duplicated across 17 files, keep it byte-identical apart f
 
 ```
 ┌ header (44–52px) ─────────────────────────────────────────────┐
-│ Principles of Animation   Home  Principles ▾  Spot it  Playground      Present P │
+│ Principles of Animation              Home  Principles ▾  Spot it  Playground │
 ├ stage ──────────────────────────────────────┬ controls panel ─┤
 │ 03 Staging                        [2D][3D]  │  (≈260–300px)    │
 │                                             │  sliders, pills, │
@@ -139,7 +141,9 @@ Because the header is duplicated across 17 files, keep it byte-identical apart f
 │ [timeline, on pages that use it]            │                  │
 ├ notes strip ────────────────────────────────┴──────────────────┤
 │ What to notice │ In After Effects │ Try this      ‹ 02   04 › │
+│                │                  │               [Present P]  │
 └────────────────────────────────────────────────────────────────┘
+(The controls panel also ends with a "The principle" explanation, pinned to its foot. See section 17.)
 ```
 
 - `body` is a grid: `grid-template-rows: auto minmax(0,1fr) auto; height: 100dvh`.
@@ -208,7 +212,7 @@ Each entry lists the 2D demo, the 3D demo, the controls, and the notes strip cop
 ### 02 Anticipation
 - **2D:** simple block character (SVG, a few rounded shapes) jumping onto a box; also a throw.
 - **3D:** Y Bot `Jump` clip. **Off** starts the clip after the crouch (per-clip constant `ANTICIPATION_END` in seconds), so learners see the identical jump with and without it.
-- **Controls:** Off/On · Wind-up slider (none → huge) · **Predict it**: freezes on the wind-up pose and offers three choices of what happens next, then plays · Timeline.
+- **Controls:** Off/On · Wind-up slider (none → huge) · Jump / Throw · Timeline. *(Predict it was built, then removed at Paul's request: too easy. The principle explanation fills the space.)*
 - **Notes:** *Notice* The small move the opposite way first. *In After Effects* An extra keyframe just before the main move, pulling back. *Try this* Make the wind-up so big it becomes funny.
 
 ### 03 Staging
@@ -232,8 +236,8 @@ Each entry lists the 2D demo, the 3D demo, the controls, and the notes strip cop
 ### 06 Slow in and slow out
 - **2D:** ball sliding across a track with **spacing marks**, one per frame (21 marks written in HTML, positions set by JS).
 - **3D:** clay block or simple car shape pulling away and stopping, same curve.
-- **Controls:** **Graph Editor** (value graph, SVG) with two draggable Bézier handles · Presets: Linear, Easy Ease, Slow out only, Slow in only · Keyframe icons that change shape with the curve (diamond / hourglass halves) · CSS readout `cubic-bezier(…)` in mono · Timeline.
-- **Teaching gotcha to show:** After Effects and CSS name easing the opposite way round. AE's Easy Ease In (slowing *into* a keyframe) is CSS `ease-out`. One short line under the readout.
+- **Controls:** **Graph Editor** (value graph, SVG) with two draggable Bézier handles · Presets: Linear, Easy Ease, Slow out only, Slow in only · Keyframe icons that change shape with the curve (diamond / hourglass halves) · Timeline.
+- *(The CSS `cubic-bezier(…)` readout and the "AE and CSS name easing the opposite way" note were removed at Paul's request: learners on this site aren't learning code. The move is now 30 frames (1.2 s) plus a 15-frame hold, with 31 spacing marks, because 20 frames was too fast to follow.)*
 - **Notes:** *Notice* Marks bunch up where it's slow and spread out where it's fast. *In After Effects* Select keys, F9 for Easy Ease; Shift+F3 for the Graph Editor. *Try this* Make a curve that overshoots and settles back.
 
 ### 07 Arc
@@ -279,7 +283,7 @@ One ball, with controls for squash amount, anticipation, timing frames, ease cur
 
 ## 10. Home page
 
-One screen, no scroll. Header; headline "Twelve principles, every one switchable" (final copy is Paul's call; no single coloured word); one supporting line; the violet ball bouncing on a hairline floor with its blurred shadow; the Squash and stretch Off/On segmented control under it; a small "25 fps, Easy Ease" readout in mono at the side; two buttons: "Explore the principles" (`principles.html`) and "Spot it".
+One screen, no scroll. Header; headline "Twelve principles, every one switchable" (final copy is Paul's call; no single coloured word); one supporting line; the violet ball bouncing on a hairline floor with its blurred shadow; the Squash and stretch Off/On segmented control under it; two buttons: "Explore the principles" (`principles.html`) and "Spot it" (greyed out until Spot it is built). *(The "25 fps, Easy Ease" readout is deliberately left off: it isn't on the approved reference and the ball uses `ease`, not Easy Ease. Paul agreed.)*
 
 ## 11. 3D models (Mixamo, no Blender)
 
@@ -399,6 +403,8 @@ If time runs out, a principle page without its 3D version hides the 2D/3D switch
 
 **Paul's ball.** The original CSS said `transform-origin: centre bottom`. Browsers ignore that line because of the British spelling, so the squash has always happened from the ball's centre, and the positions (`top: 60%`, shadow at 385px) were tuned around that. Changing it to `center bottom` pushes the squashed ball about 40px below its shadow. The reference uses `center center`: valid code, identical look. The port keeps every value and converts px to container units (`container-type: size`, 160px = 20cqw, 30px = 3.75cqw, 385px top = 80.208cqh) so it scales without changing. Colours changed to violet, and the shadow became a soft violet because the original dark shadow is invisible on navy. The Off state uses the same timing with no scale and lands at `top: 51.67%`, so the unsquashed ball touches the same floor.
 
+*Tier 1 addition, at Paul's request:* a small **stretch at speed** on the home page and on 01. Two keyframes were added (10% holds the shape his ball already has there, so it never dips below the floor; 30% is the stretch, about 0.9 × 1.15). His 0%, 40% and 100% values and `transform-origin` are unchanged. On 01 the stretch scales with the Amount slider (`--amount`), and the contact `top` is worked out so the squashed ball always lands on the same floor at any amount (see the comment in `css/pages/01.css`).
+
 **Timeline.** `bindTimeline()` in the 06 reference works with any Web Animation, including CSS `@keyframes` (via `el.getAnimations()`), at 25 fps. Use it on every 2D page.
 
 **Graph Editor.** Handle x is clamped to 0–1 so the curve stays solvable by bisection; y can go from -0.25 to 1.25 for overshoot. The keyframe icons switch halves (diamond for linear, hourglass for eased) from the handle positions.
@@ -408,3 +414,60 @@ If time runs out, a principle page without its 3D version hides the 2D/3D switch
 **Dropdown.** Uses the `hidden` attribute plus a `data-open` fade; closes on Esc and outside click; right-aligned under the link. In the glass layer it's deliberately more opaque than the other panels, so the list stays readable over the page.
 
 **Glass layer.** Checked at 1280×720, 1366×768 and 1920×1080 on all four reference pages, including the open dropdown. Body padding (12px) and grid gaps (10px) are part of the layout, and nothing scrolls. The background is a CSS background on `body::before` (fixed), so it costs nothing per frame.
+
+**Glass flicker (Tier 1).** In Firefox the live `backdrop-filter` flickers while demos animate. Paul develops in Firefox but **presents in Chrome**, and wants the live blur kept: a pre-blurred background was tried and reverted at his request. Don't replace the live blur. Two Chrome-safe mitigations are in place: the timeline only writes to the page when the frame changes, and `.hdr, .panel, .notes, .stage-area` have `will-change: transform` (in `glass.css`). If Chrome on the presentation PC flickers, raise it with Paul before changing the glass.
+
+---
+
+## 17. Tier 1 record and Tier 2 handover
+
+### 17.1 What's built (Tier 1, complete)
+
+- Shared files: `css/tokens.css`, `base.css`, `shell.css`, `components.css`, `glass.css`; `js/core/menu.js`, `present.js`, `toggles.js`, `sliders.js` (added), `timeline.js`, `bezier.js`, `draig.js` (added); self-hosted Inter and JetBrains Mono in `assets/fonts/` (with OFL licences); README.
+- `index.html` (home) and `principles.html`, matching their references.
+- All 12 principle pages, **2D only**. Every page passes: no scroll at 1280×720, 1366×768 and 1920×1080 in normal and present mode; no JS errors; no `innerHTML`; header identical on all 14 pages (apart from `aria-current` and paths); unique ids.
+- **Draig** (`assets/svg/characters/draig.svg`, rig guide `docs/Draig_Character_Guide.md`) is the 2D character on 02, 03, 04, 05, 07 (head turn), 08, 10, 11 and 12. The 2D ball stays on 01, 06, 07 (thrown ball) and 09.
+- Not built: Spot it, Playground (Tier 3), and every 3D view (Tier 2).
+
+### 17.2 Decisions Paul made during Tier 1 (these override the sections above)
+
+1. **Present button**: removed from the header; it sits full width under the previous/next links in the notes strip on the 12 principle pages. Home and Principles have no button; the `P` key works everywhere.
+2. **Spot it and Playground**: greyed out (`<a aria-disabled="true">`, no `href`, 40% opacity, not clickable) in the header and on the home button. When a page is built, give its links an `href` again on all 14 pages.
+3. **"The principle"**: every principle page's controls panel ends with a short explanation of the principle (`.explain`, pinned to the foot of the panel with `margin-top: auto`). Keep it when adding 3D controls.
+4. **Reading text 14px minimum** (section 4). If a panel then overflows at 1280×720, trim duplicate wording rather than shrinking text.
+5. **No code on the site**: learners aren't learning code. No CSS readouts or CSS terminology (06's was removed).
+6. **02 Anticipation**: Predict it removed. Jump and Throw both use Draig.
+7. **04 Pose to pose**: Draig's jump is built from key poses, each with its own outgoing easing (in / out / inout) so he doesn't stall in mid-air at take-off; the keyframe icons show each key's easing. Onion skin shows ghosts two frames either side; Make your own drags three keys.
+8. **06**: 30-frame move (1.2 s) + 15-frame hold, 31 spacing marks.
+9. **07 Arc**: Draig does the head turn (his face slides across his head and dips through the arc); the thrown ball stays a ball.
+10. **10 Exaggeration**: the reference demo's take, as it is, plus one change: the mouth opens a little (a small "o") even at the realistic setting.
+11. **12 Solid drawing**: four stages: Stick, Construction (Draig drawn *only* as simple forms, every part, no render behind), Flat, Full. Plus Turn the head and Twinning.
+12. **03 Staging (2D)**: Draig is the subject. The 2D light plot (from the 3D reference) is in the panel: lamps fade to 25% when their light is off, and the camera wedge eases with Wide / Mid / Close. On Draig, every light follows his whole silhouette (masked by `#rig`): key strongest, warm, from the front-left; fill weaker, cool, from the right, lifting only the shadow side; rim cut from his outline (SVG filter), so it lights outer right edges (tail, ear, horn, wing, arm) and never draws across the front of his arm. Key off leaves only fill and rim. The crate and ball follow the same rules.
+13. **Home and Principles**: the "In the order of the classroom posters" line is removed from the Principles page.
+14. **Copy changed from section 8**: 05 Try this says "tail" (not "scarf"); 06 Try this follows the approved reference. The principle explanations are new copy, as are some panel notes. Paul may still edit.
+
+### 17.3 How the 2D pages work (follow this when adding 3D)
+
+- **Stylesheet order** on every page: `tokens, base, shell, components, pages/NN.css, glass`. Page CSS comes *before* `glass.css` on purpose, to reproduce the references' cascade. Page rules that must beat glass need higher specificity.
+- **State in data attributes.** `toggles.js` wires any `.seg[data-target][data-attr]` (buttons with `data-value`) and `.pill[data-target][data-attr]` (`on`/`off`), then fires a `statechange` event on the target (`detail: { attr, value }`). `keepTime()` keeps CSS animations on the same frame when an `animation-name` swap would restart them. `setControl()` sets a state from code.
+- **Sliders**: `.slider` with `<output>` readout; `sliders.js` writes `data-var` (times `data-scale`) to `data-target`; `setSlider()` from code.
+- **Timeline** (`bindTimeline`): returns `{ setFrames, setKeys, setFrame, frameNow, isPlaying, play, pause }`. Positions use `frame / frames` (playhead, keys and tick marks line up), timecode `00:00:SS:FF` at 25 fps, keys from `data-keys` on the track, icons via `setKeyIcon(svg, in, out)` with `linear | eased | hold`. Under reduced motion it parks on frame 0. It only writes to the page when the frame changes.
+- **Draig pages** pose him from JavaScript. A hidden `<span id="clock">` carries a dummy Web Animation (`rigClock`), so the shared timeline scrubs, pauses and steps Draig like any CSS animation; `runRig(clock, ms, pose)` calls `pose(t)` only when the time changes. Draig is pasted inline as a nested `<svg class="draig">` inside the page's scene SVG, inside a wrapper `<g>` positioned with `placeDraig()`; `groundShadow()` keeps his shadow on the floor. Second and third copies (11) suffix every id (`-b`, `-c`).
+- **05 Follow through** precomputes its springs over the loop (so scrubbing is exact) and runs the same springs live in Drag it. **09 Timing** builds its drop per frame from physics through the Web Animations API.
+- **The 2D/3D switch is not on any page yet**, following section 14 ("a page without its 3D version hides the 2D/3D switch entirely"). Each `<main class="page">` already has `data-view="2d"`.
+
+### 17.4 Tier 2: what to plug into
+
+- **The models are already in place**: `assets/models/` has YBot, XBot, Idle, Jump, Walking, Throw and RunToStop (`.fbx`). Paul doesn't need to download anything.
+- **Per page**: add the reference's `<div class="seg compact" role="group" aria-label="View">` (2D / 3D) to the `.stage-head`, driving `data-view` on `<main>` (for example `data-target="main" data-attr="view"`). Add a 3D stage (canvas) that CSS shows only for `data-view="3d"`, with the stage area getting `is-3d` in that view (no blur behind a live canvas). Stop the render loop when 2D is showing or the tab is hidden; dispose cleanly.
+- **Panels are tight at 1280×720.** Where the 3D view needs different controls, show the 2D or 3D set by view (hide the other) rather than stacking both. Keep "The principle" at the foot. Re-run the no-scroll check at all three sizes, in normal and present mode, after every page.
+- **03 Staging 3D**: the 2D page already has the light plot in the panel. In the 3D view it becomes draggable and drives the lights (the reference's `lights.js` code), plus the Y Bot / X Bot subject switch from section 11.
+- **3D timeline**: section 7 says the timeline works with any Web Animation. For mixer-driven 3D, use the same clock pattern as Draig (`rigClock`), so one timeline drives 2D and 3D; set the mixer time from the clock.
+- **Split the Staging reference** into `js/three/stage.js`, `rig.js`, `lights.js`, `cameras.js`, `silhouette.js`, `clips.js` as section 7 describes, keeping its tuned light values, fog and floor colour.
+
+### 17.5 Working notes
+
+- **git** isn't on PATH on Paul's PC. Use GitHub Desktop's copy, for example `%LOCALAPPDATA%\GitHubDesktop\app-3.6.10\resources\app\git\cmd\git.exe` (the version folder changes when Desktop updates). Commits work from Claude Code; **pushing doesn't** (the GitHub login lives in GitHub Desktop), so commit per page and ask Paul to press **Push origin** in GitHub Desktop.
+- **Checking pages**: Node 24 and Chrome are installed. Headless Chrome via the DevTools protocol works for screenshots and for measuring scroll and clipped panels; Firefox is also installed. These checks were scratch scripts, not part of the repo.
+- **Browsers**: Paul develops in Firefox (for its inspector) and presents in **Chrome**. Judge the look in Chrome.
+- **Performance to confirm on a college PC**: the Draig plush filter (`dg-plush`) re-renders while he animates. If a page stutters, remove `filter="url(#dg-plush)"` from that page's copy (Draig guide, Performance).
