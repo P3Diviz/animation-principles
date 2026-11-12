@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- The site background, pre-blurred: what you see through the frosted glass panels.
+       Same drawing as strands.svg inside one blur and saturate filter, matching the old
+       backdrop-filter: blur(22px) saturate(140%). Generated from strands.svg; keep them in step. -->
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="40%" r="62%">
+      <stop offset="0" stop-color="#4646B4" stop-opacity=".55"/>
+      <stop offset=".55" stop-color="#18184A" stop-opacity=".4"/>
+      <stop offset="1" stop-color="#07071A" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="violetTeal" x1="0" x2="1">
+      <stop offset="0" stop-color="#9999FF" stop-opacity="0"/>
+      <stop offset=".25" stop-color="#B9B9FF"/>
+      <stop offset=".6" stop-color="#7FD6E6"/>
+      <stop offset="1" stop-color="#9999FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lilac" x1="0" x2="1">
+      <stop offset="0" stop-color="#C9A0FF" stop-opacity="0"/>
+      <stop offset=".45" stop-color="#C9A0FF"/>
+      <stop offset="1" stop-color="#9999FF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="far" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="20"/></filter>
+    <filter id="mid" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="glowLine" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="frost" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="22"/>
+      <feColorMatrix type="saturate" values="1.4"/>
+    </filter>
+  </defs>
+  <g filter="url(#frost)">
+
+  <rect width="1600" height="900" fill="#07071A"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+
+  <!-- Far plane -->
+  <g filter="url(#far)" opacity=".5" fill="none" stroke-linecap="round">
+    <path d="M-120 360 C 260 190, 660 470, 1080 300 S 1580 220, 1740 320" stroke="url(#lilac)" stroke-width="44"/>
+    <path d="M-120 660 C 340 530, 740 760, 1180 600 S 1600 540, 1740 630" stroke="url(#violetTeal)" stroke-width="32"/>
+  </g>
+
+  <!-- Mid plane -->
+  <g filter="url(#mid)" opacity=".55" fill="none" stroke-linecap="round">
+    <path d="M-80 520 C 300 370, 690 620, 1090 470 S 1530 400, 1700 470" stroke="url(#violetTeal)" stroke-width="6"/>
+    <path d="M-80 250 C 380 150, 780 370, 1180 250 S 1530 200, 1700 260" stroke="url(#violetTeal)" stroke-width="4"/>
+    <path d="M-80 566 C 330 440, 720 670, 1120 520 S 1530 460, 1700 530" stroke="url(#lilac)" stroke-width="3" stroke-dasharray="0 64"/>
+  </g>
+
+  <!-- Near plane: sharp strands, with evenly spaced keyframe dots on alternate strands -->
+  <g filter="url(#glowLine)" fill="none" stroke-linecap="round">
+    <path d="M-60 500 C 320 360, 700 600, 1100 450 S 1530 380, 1680 450" stroke="url(#violetTeal)" stroke-width=".9" opacity=".8"/>
+    <path d="M-60 516 C 330 380, 710 616, 1110 466 S 1530 400, 1680 468" stroke="url(#violetTeal)" stroke-width="1.6"/>
+    <path d="M-60 516 C 330 380, 710 616, 1110 466 S 1530 400, 1680 468" stroke="url(#violetTeal)" stroke-width="6.5" stroke-dasharray="0 48"/>
+    <path d="M-60 538 C 345 410, 725 636, 1125 488 S 1530 428, 1680 492" stroke="url(#lilac)" stroke-width="1.1"/>
+    <path d="M-60 560 C 360 440, 740 656, 1140 510 S 1530 456, 1680 516" stroke="url(#lilac)" stroke-width="1"/>
+    <path d="M-60 560 C 360 440, 740 656, 1140 510 S 1530 456, 1680 516" stroke="url(#lilac)" stroke-width="5" stroke-dasharray="0 72"/>
+    <path d="M-60 586 C 380 476, 760 680, 1160 536 S 1530 486, 1680 544" stroke="url(#violetTeal)" stroke-width=".7" opacity=".7"/>
+  </g>
+  </g>
+</svg>
