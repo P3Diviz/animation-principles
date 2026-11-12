@@ -20,15 +20,19 @@ const tl = bindTimeline({
 // ----- The key poses of the jump -----
 // lift: height off the floor; sx, sy: squash and stretch; arms, wings: degrees; eye: eye height; brow: brows down
 const STAND = { lift: 0, sx: 1, sy: 1, armL: 0, armR: 0, wingL: 0, wingR: 0, eye: 1, brow: 0, mouth: 0 };
+// out: how each key eases into the next. Easy Ease on every key would make him stop dead at
+// take-off, in mid-air. A jump speeds up into take-off (in), slows only as it reaches the top
+// (out, like gravity), and speeds up again as it falls (in).
 const KEYS = [
-  { f: 0,  ...STAND },
-  { f: 10, lift: 0,   sx: 1.16, sy: .76, armL: -18, armR: 18,   wingL: 12,  wingR: -12, eye: .6,   brow: 7,  mouth: 0 },   // crouch
-  { f: 16, lift: 14,  sx: .88,  sy: 1.2, armL: 110, armR: -110, wingL: -25, wingR: 25,  eye: 1.12, brow: -6, mouth: 1 },   // take-off
-  { f: 24, lift: 150, sx: 1,    sy: 1,   armL: 70,  armR: -70,  wingL: -40, wingR: 40,  eye: 1.05, brow: -4, mouth: 1 },   // top of the jump
-  { f: 32, lift: 0,   sx: 1.2,  sy: .78, armL: 15,  armR: -15,  wingL: 10,  wingR: -10, eye: .75,  brow: 4,  mouth: 0 },   // land
-  { f: 40, ...STAND },
-  { f: 50, ...STAND },
+  { f: 0,  ...STAND, out: 'inout' },
+  { f: 10, lift: 0,   sx: 1.16, sy: .76, armL: -18, armR: 18,   wingL: 12,  wingR: -12, eye: .6,   brow: 7,  mouth: 0, out: 'in' },    // crouch
+  { f: 16, lift: 22,  sx: .88,  sy: 1.2, armL: 110, armR: -110, wingL: -25, wingR: 25,  eye: 1.12, brow: -6, mouth: 1, out: 'out' },   // take-off
+  { f: 24, lift: 150, sx: 1,    sy: 1,   armL: 70,  armR: -70,  wingL: -40, wingR: 40,  eye: 1.05, brow: -4, mouth: 1, out: 'in' },    // top of the jump
+  { f: 32, lift: 0,   sx: 1.2,  sy: .78, armL: 15,  armR: -15,  wingL: 10,  wingR: -10, eye: .75,  brow: 4,  mouth: 0, out: 'inout' }, // land
+  { f: 40, ...STAND, out: 'inout' },
+  { f: 50, ...STAND, out: 'inout' },
 ];
+const EASES = { inout: ease, in: t => t * t, out: t => 1 - (1 - t) * (1 - t) };
 const holdKeys = () => stage.dataset.mode === 'keys';
 
 // The pose at frame f: the last key (keys only), or eased towards the next key (in-betweens)
@@ -37,8 +41,8 @@ function poseAt(f) {
   while (i > 0 && KEYS[i].f > f) i--;
   const a = KEYS[i], b = KEYS[i + 1];
   if (holdKeys()) return a;
-  const t = ease((f - a.f) / (b.f - a.f)), p = {};
-  for (const k in a) p[k] = lerp(a[k], b[k], t);
+  const t = EASES[a.out]((f - a.f) / (b.f - a.f)), p = {};
+  for (const k in a) if (k !== 'out') p[k] = lerp(a[k], b[k], t);
   p.mouth = t < .5 ? a.mouth : b.mouth;
   return p;
 }
@@ -90,9 +94,16 @@ function pose(ms) {
 const redraw = runRig(clock, LOOP, pose);
 
 // Keyframe icons: half squares for hold keys, hourglass halves for eased in-betweens
+// (for Draig's jump each key shows its own easing: eased where the motion slows into or out of it)
 function showKeyIcons() {
-  const shape = holdKeys() ? 'hold' : 'eased';
-  document.querySelectorAll('#track .key').forEach(k => setKeyIcon(k, shape, shape));
+  document.querySelectorAll('#track .key').forEach((k, i) => {
+    if (holdKeys()) return setKeyIcon(k, 'hold', 'hold');
+    if (own()) return setKeyIcon(k, 'eased', 'eased');
+    const prev = KEYS[i - 1], key = KEYS[i];
+    const slowsIn = !prev || prev.out !== 'in';          // arriving slowly
+    const slowsOut = key.out !== 'out';                   // leaving slowly
+    setKeyIcon(k, slowsIn ? 'eased' : 'linear', slowsOut ? 'eased' : 'linear');
+  });
 }
 
 stage.addEventListener('statechange', e => {
