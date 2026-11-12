@@ -3,6 +3,7 @@
 import '../core/toggles.js';
 import { showSlider } from '../core/sliders.js';
 import { rotatePart, posePart, movePart } from '../core/draig.js';
+import { bindView } from '../three/view.js';
 
 const $ = id => document.getElementById(id);
 const stage = $('stage'), turn = $('turn');
@@ -60,6 +61,9 @@ function draw() {
   $('c-tail').setAttribute('transform', `rotate(${P.tail} 290 340)`);
   $('c-centre').setAttribute('d', centreLine(200, 96, 380, 132, t));
 }
+
+// 2D / 3D: the 3D view (12-solid-3d.js) has no timeline; it orbits instead
+bindView(() => import('./12-solid-3d.js'));
 
 turn.addEventListener('input', () => { showSlider(turn); draw(); });
 stage.addEventListener('statechange', draw);

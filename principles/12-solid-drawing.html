@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/12.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/12-solid.js"></script>
@@ -35,11 +40,14 @@
   <a class="menu-all" href="../principles.html">See all twelve</a>
 </nav>
 <div class="present-hint">Present mode. Press P or Esc to exit</div>
-<main class="page" id="main" data-view="2d">
+<main class="page" id="main" data-view="2d" data-display="lit" data-bot="xbot">
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">12</span>Solid drawing</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/12-solid-3d.js). Drag to orbit. -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas" tabindex="0" aria-label="The figure in 3D. Drag, or use the arrow keys, to walk round it"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage" data-step="cons" data-twin="off">
       <div class="scene">
         <svg viewBox="0 0 800 400" aria-label="Draig drawn as a stick figure, construction shapes, flat colour, or fully rendered">
@@ -270,14 +278,23 @@
     </div>
   </section>
   <aside class="panel">
-    <h2>Drawing</h2>
-    <div class="seg" role="group" aria-label="Drawing" data-target="stage" data-attr="step">
+    <h2 class="only-2d">Drawing</h2>
+    <div class="seg only-2d" role="group" aria-label="Drawing" data-target="stage" data-attr="step">
       <button data-value="stick" aria-pressed="false">Stick</button><button data-value="cons" aria-pressed="true">Construction</button><button data-value="flat" aria-pressed="false">Flat</button><button data-value="full" aria-pressed="false">Full</button>
     </div>
-    <p class="small">Stick figure, then simple solids, then flat colour, then light, shade and texture.</p>
-    <h2>Turn</h2>
-    <label class="slider"><span class="row"><span>Turn the head</span><output>30°</output></span>
+    <p class="small only-2d">Stick figure, then simple solids, then flat colour, then light, shade and texture.</p>
+    <h2 class="only-2d">Turn</h2>
+    <label class="slider only-2d"><span class="row"><span>Turn the head</span><output>30°</output></span>
       <input type="range" id="turn" min="-60" max="60" step="5" value="30" data-unit="°"></label>
+    <h2 class="only-3d top">Display</h2>
+    <div class="seg only-3d" role="group" aria-label="Display" data-target="main" data-attr="display">
+      <button data-value="wire" aria-pressed="false">Wireframe</button><button data-value="clay" aria-pressed="false">Clay</button><button data-value="normals" aria-pressed="false">Normals</button><button data-value="lit" aria-pressed="true">Lit</button>
+    </div>
+    <p class="small only-3d">Drag the stage, or use the arrow keys, to walk round.</p>
+    <h2 class="only-3d">Figure</h2>
+    <div class="seg only-3d" role="group" aria-label="Figure" data-target="main" data-attr="bot">
+      <button data-value="ybot" aria-pressed="false">Y Bot</button><button data-value="xbot" aria-pressed="true">X Bot</button>
+    </div>
     <h2>Pose</h2>
     <div class="pills"><button class="pill" data-target="stage" data-attr="twin" aria-pressed="false">Twinning</button></div>
     <div class="explain">
