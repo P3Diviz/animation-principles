@@ -1,0 +1,39 @@
+/* 07 Arc. 50 frames (2 s): the ball flies right in 25 frames, then back.
+   Across is linear; up and down use cubic-bezier(.333,.667,.667,1), which is exactly
+   a parabola (y = 2t - t²), so the path is a true arc. --hh is the arc height (0 = straight). */
+.scene{--ar:2;--hh:var(--h,39)}
+main[data-path="straight"] .scene{--hh:0}
+
+/* ===== Thrown ball (left two thirds) ===== */
+.throw{position:absolute;left:0;top:0;width:66%;height:100%;container-type:size}
+.floor{position:absolute;left:6cqw;right:6cqw;top:calc(82cqh + 4.5cqh);height:1px;background:rgba(255,255,255,.14)}
+.tx{position:absolute;left:0;top:0;animation:tx 1s linear infinite alternate both}
+.ty{animation:ty .5s cubic-bezier(.333,.667,.667,1) infinite alternate both}
+@keyframes tx{from{transform:translate(10cqw,82cqh)}to{transform:translate(90cqw,82cqh)}}
+@keyframes ty{from{transform:translateY(0)}to{transform:translateY(calc(var(--hh) * -1cqh))}}
+.ball{width:9cqh;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%)}
+
+/* Motion path, as in the After Effects Composition panel: the path plus one dot per frame */
+.path-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.path-svg path{fill:none;stroke:rgba(153,153,255,.55);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.dots span{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--accent);opacity:.75}
+.mp{display:none}
+main[data-motionpath="on"] .mp{display:block}
+
+/* Arc height handle: drag it up and down */
+.apex{position:absolute;left:50cqw;top:calc(82cqh - var(--hh) * 1cqh);width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--text);cursor:ns-resize;touch-action:none;z-index:2}
+main[data-path="straight"] .apex{display:none}
+
+/* ===== Head turn (right third) ===== */
+.turn{position:absolute;right:0;top:0;width:34%;height:100%}
+.turn svg{position:absolute;inset:0;width:100%;height:100%}
+.face{fill:#C9C9D3}
+.feature{fill:#0A0A15}
+.nose{fill:#9C9CB3}
+.hx{animation:hx 1s cubic-bezier(.33,0,.67,1) infinite alternate both}
+.hy{animation:hy .5s cubic-bezier(.333,.667,.667,1) infinite alternate both}
+@keyframes hx{from{transform:translateX(-36px)}to{transform:translateX(36px)}}
+@keyframes hy{from{transform:translateY(0)}to{transform:translateY(calc(var(--hh) * .45px))}}   /* the eyes dip as the head turns */
+.turn .head-path{fill:none;stroke:rgba(153,153,255,.55);stroke-width:1.5}
+.cap{position:absolute;bottom:3%;color:var(--text-2);font-size:12px;translate:-50% 0;white-space:nowrap}
