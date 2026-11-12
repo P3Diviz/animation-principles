@@ -26,7 +26,7 @@ materials.forEach(b => b.addEventListener('click', () => {
   materials.forEach(x => x.setAttribute('aria-pressed', x === b));
   setSlider(amount, b.dataset.amount);
   const frames = setDuration(+b.dataset.dur);
-  note.textContent = `${b.textContent}: ${b.dataset.amount}% squash, ${frames} frames up and down.`;
+  note.textContent = `${b.textContent}: ${b.dataset.amount}% squash, ${frames} frames.`;
 }));
 
 // Moving the slider by hand leaves the presets

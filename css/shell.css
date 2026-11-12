@@ -34,8 +34,8 @@
 .notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;border-top:1px solid var(--hair)}
 .notes section{padding:12px 24px;border-right:1px solid var(--hair)}
 .notes h3{font-size:12px;font-weight:500;margin-bottom:2px}
-.notes p{color:var(--text-2);font-size:12.5px;line-height:1.45}
-.notes .kbd{font-family:var(--mono);color:var(--text);font-size:11.5px}
+.notes p{color:var(--text-2);font-size:14px;line-height:1.4}   /* reading text: 14px minimum */
+.notes .kbd{font-family:var(--mono);color:var(--text);font-size:13px}
 .prevnext{display:flex;flex-direction:column;justify-content:center;gap:6px;padding:0 20px}
 .prevnext .pn-links{display:flex;gap:8px}
 .prevnext .pn-links a{flex:1;text-align:center;white-space:nowrap}

@@ -43,7 +43,7 @@
 
 /* Light plot (in the panel, after the stage area): off lights fade, the camera wedge follows the shot */
 .plotrow{display:flex;gap:10px;align-items:center;flex:none}
-.plot{flex:none;height:min(16vh,180px);width:auto}
+.plot{flex:none;height:min(14vh,180px);width:auto}
 .plotrow .lights{display:grid;gap:6px;min-width:0}
 .plotrow .pills{flex-direction:column;align-items:flex-start}
 .plot .lamp{transition:opacity .3s var(--ease)}
