@@ -1,73 +1,7 @@
-/* 02 Anticipation. 50 frames (2 s) per loop: one frame = 2%.
-   --wind scales the wind-up: 0 = none (same as Off), 1 = normal, 2 = huge.
-   With no wind-up the jump itself is identical, it just starts from standing. */
-.scene{--ar:2;--wind:var(--wind-set,1)}
-.stage[data-anticipation="off"] .scene{--wind:0}
-
+/* 02 Anticipation: Draig jumps onto a box, or throws a ball. 50 frames (2 s).
+   Posed from js/pages/02-anticipation.js. */
+.scene{--ar:2}
 .floor{stroke:rgba(255,255,255,.14);stroke-width:1}
 .box{fill:#24243A;stroke:rgba(255,255,255,.16)}
-.body{fill:#C9C9D3}
-.eye{fill:#0A0A15}
-.arm rect{fill:#B4B4C2}
 .ball{fill:#9999FF}
-
-/* Show the set for the chosen action */
 .stage[data-action="jump"] .throw-only,.stage[data-action="throw"] .jump-only{display:none}
-
-/* ===== Jump onto the box ===== */
-.mx{transform:translate(200px,0);animation:jump-x 2s infinite linear}
-.my{transform:translate(0,330px);animation:jump-y 2s infinite linear}
-.squash{animation:jump-squash 2s infinite linear}
-.who{animation:loop-fade 2s infinite linear}
-
-/* Frame 8-18 wind-up (crouch and lean back), 20 take-off, 26 top, 32 land on the box */
-@keyframes jump-x{
-  0%,16%{transform:translate(200px,0);animation-timing-function:cubic-bezier(.33,0,.67,1)}
-  36%,40%{transform:translate(calc(200px - 18px * var(--wind)),0)}
-  64%,94%{transform:translate(540px,0)}
-  95%,100%{transform:translate(200px,0)}}
-@keyframes jump-y{
-  0%,40%{transform:translate(0,330px);animation-timing-function:cubic-bezier(.33,.67,.67,1)}   /* rising: slows to the top */
-  52%{transform:translate(0,150px);animation-timing-function:cubic-bezier(.33,0,.67,.33)}     /* falling: speeds up */
-  64%,94%{transform:translate(0,250px)}
-  95%,100%{transform:translate(0,330px)}}
-@keyframes jump-squash{
-  0%,16%{transform:none;animation-timing-function:cubic-bezier(.33,0,.67,1)}
-  36%{transform:scale(calc(1 + .2 * var(--wind)),calc(1 - .3 * var(--wind)))}
-  40%{transform:scale(calc(1 - .06 * var(--wind)),calc(1 + .1 * var(--wind)))}
-  48%{transform:none}
-  64%{transform:scale(1.18,.8)}
-  70%,100%{transform:none}}
-@keyframes loop-fade{0%,88%{opacity:1}92%,96%{opacity:0}100%{opacity:1}}
-
-/* ===== Throw ===== */
-.stage[data-action="throw"] .mx{animation:none;transform:translate(230px,0)}
-.stage[data-action="throw"] .my{animation:none;transform:translate(0,330px)}
-.stage[data-action="throw"] .squash{animation-name:throw-lean}
-.stage[data-action="throw"] .who{animation:none}
-.stage[data-action="throw"] .arm{animation:throw-arm 2s infinite linear}
-.stage[data-action="throw"] .held{animation:held 2s infinite linear}
-.thrown-x{animation:thrown-x 2s infinite linear}
-.thrown-y{animation:thrown-y 2s infinite linear}
-.thrown{animation:thrown 2s infinite linear}
-
-/* Frame 8-20 wind-up (arm swings back, body leans back), 24 release, then follow through */
-@keyframes throw-arm{
-  0%,16%{transform:rotate(10deg);animation-timing-function:cubic-bezier(.33,0,.67,1)}
-  40%{transform:rotate(calc(10deg + 85deg * var(--wind)));animation-timing-function:cubic-bezier(.5,0,1,1)}
-  48%{transform:rotate(-120deg);animation-timing-function:cubic-bezier(0,0,.4,1)}
-  60%{transform:rotate(-30deg);animation-timing-function:cubic-bezier(.33,0,.67,1)}
-  80%,100%{transform:rotate(10deg)}}
-@keyframes throw-lean{
-  0%,16%{transform:none;animation-timing-function:cubic-bezier(.33,0,.67,1)}
-  40%{transform:rotate(calc(-9deg * var(--wind))) scale(1,calc(1 - .06 * var(--wind)))}
-  50%{transform:rotate(10deg)}
-  70%,100%{transform:none}}
-@keyframes held{0%,47.9%{opacity:1}48%,95.9%{opacity:0}96%,100%{opacity:1}}
-/* Released at the hand (269, 265), lands at the far right */
-@keyframes thrown-x{0%,48%{transform:translate(269px,0)}80%,100%{transform:translate(760px,0)}}
-@keyframes thrown-y{
-  0%,48%{transform:translate(0,265px);animation-timing-function:cubic-bezier(.33,.67,.67,1)}
-  60%{transform:translate(0,200px);animation-timing-function:cubic-bezier(.33,0,.67,.33)}
-  80%,100%{transform:translate(0,321px)}}
-@keyframes thrown{0%,47.9%{opacity:0}48%,84%{opacity:1}90%,100%{opacity:0}}

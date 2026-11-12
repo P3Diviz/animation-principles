@@ -30,6 +30,7 @@ export function placeDraig(wrapper, x, y, s) {
 // Keep the ground shadow on the floor while Draig is lifted by `lift` scene units:
 // push it back down, and shrink it the higher he goes.
 export function groundShadow(id, lift, s) {
+  lift = Math.max(0, lift);
   const k = Math.max(.35, 1 - lift / 260);
   part(id).setAttribute('transform', `translate(0 ${lift / s}) translate(200 396) scale(${k} ${k}) translate(-200 -396)`);
 }
