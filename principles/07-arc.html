@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/07.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/07-arc.js"></script>
@@ -35,11 +40,14 @@
   <a class="menu-all" href="../principles.html">See all twelve</a>
 </nav>
 <div class="present-hint">Present mode. Press P or Esc to exit</div>
-<main class="page" id="main" data-view="2d" data-path="arc" data-motionpath="on">
+<main class="page" id="main" data-view="2d" data-path="arc" data-motionpath="on" data-clip="throw" data-bone="hand">
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">07</span>Arc</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/07-arc-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage">
       <div class="scene">
         <div class="throw" id="throw">
@@ -258,17 +266,25 @@
     </div>
   </section>
   <aside class="panel">
-    <h2>Path</h2>
+    <h2 class="only-3d">Action</h2>
+    <div class="seg only-3d" role="group" aria-label="Action" data-target="main" data-attr="clip">
+      <button data-value="throw" aria-pressed="true">Throw</button><button data-value="walk" aria-pressed="false">Walk</button>
+    </div>
+    <h2 class="only-3d">Trail</h2>
+    <div class="seg only-3d" role="group" aria-label="Trail" data-target="main" data-attr="bone">
+      <button data-value="hand" aria-pressed="true">Hand</button><button data-value="head" aria-pressed="false">Head</button><button data-value="foot" aria-pressed="false">Foot</button>
+    </div>
+    <h2 class="top-2d">Path<span class="only-3d"> of the ball</span></h2>
     <div class="seg" role="group" aria-label="Path" data-target="main" data-attr="path">
       <button data-value="straight" aria-pressed="false">Straight</button><button data-value="arc" aria-pressed="true">Arc</button>
     </div>
-    <h2>Arc height</h2>
+    <h2 class="only-2d">Arc height</h2>
     <label class="slider"><span class="row"><span>Low to high</span><output>60%</output></span>
       <input type="range" id="height" min="0" max="100" step="1" value="60" data-target="main" data-var="--h" data-scale="0.65" data-unit="%"></label>
-    <p class="small">Or drag the handle at the top of the arc.</p>
-    <h2>View</h2>
+    <p class="small only-2d">Or drag the handle at the top of the arc.</p>
+    <h2 class="only-2d">View</h2>
     <div class="pills"><button class="pill" data-target="main" data-attr="motionpath" aria-pressed="true">Show motion path</button></div>
-    <p class="small">One dot per frame. They sit closer at the top, where the ball slows.</p>
+    <p class="small only-2d">One dot per frame. They sit closer at the top, where the ball slows.</p>
     <div class="explain">
       <h2>The principle</h2>
       <p>Most natural movement follows an arc, not a straight line: a thrown ball, a swinging arm, a turning head. Straight paths look mechanical. Checking the motion path for smooth arcs is one of the quickest ways to improve a shot.</p>

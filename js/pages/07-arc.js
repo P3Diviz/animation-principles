@@ -4,6 +4,7 @@ import '../core/toggles.js';
 import { setSlider } from '../core/sliders.js';
 import { bindTimeline } from '../core/timeline.js';
 import { posePart, movePart, rigClock, runRig, ease, lerp } from '../core/draig.js';
+import { bindView, handOver } from '../three/view.js';
 
 const $ = id => document.getElementById(id);
 const main = $('main'), stage = $('stage'), height = $('height'), area = $('throw');
@@ -11,10 +12,24 @@ const dots = [...$('dots').children];
 const FLIGHT = 25;   // frames from one side to the other
 const LOOP = 2000;
 const clock = rigClock($('clock'), LOOP);
+let view3d = null;   // the 3D view while it's showing (07-arc-3d.js)
 
-bindTimeline({
+const tl = bindTimeline({
   track: $('track'), head: $('head'), tc: $('tc'), play: $('play'),
-  getAnims: () => stage.getAnimations({ subtree: true }), frames: 50
+  getAnims: () => view3d ? [view3d.clock] : stage.getAnimations({ subtree: true }), frames: 50
+});
+const KEYS_2D = [0, 12.5, 25, 37.5];
+
+// 2D / 3D: the timeline follows the clock of the view on screen
+bindView(() => import('./07-arc-3d.js'), {
+  onSwitch(is3d, v) {
+    view3d = is3d ? v : null;
+    if (is3d) handOver(stage.getAnimations({ subtree: true }), [v.clock]);
+    else if (v) handOver([v.clock], stage.getAnimations({ subtree: true }));
+    if (v) v.onTiming = () => { if (view3d) { tl.setFrames(v.frames); tl.setKeys(v.keys); } };
+    tl.setFrames(is3d ? v.frames : 50);
+    tl.setKeys(is3d ? v.keys : KEYS_2D);
+  }
 });
 
 // Arc height in % of the throw area (matches --hh in the CSS)
