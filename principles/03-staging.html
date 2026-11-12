@@ -110,23 +110,37 @@
     <div class="seg" role="group" aria-label="Drawing level" data-target="stageArea" data-attr="level">
       <button data-value="line" aria-pressed="false">Line</button><button data-value="flat" aria-pressed="false">Flat colour</button><button data-value="rendered" aria-pressed="true">Rendered</button>
     </div>
-    <h2>Lights</h2>
-    <div class="pills">
-      <button class="pill key" data-target="stageArea" data-attr="key" aria-pressed="true">Key</button>
-      <button class="pill fill" data-target="stageArea" data-attr="fill" aria-pressed="true">Fill</button>
-      <button class="pill" data-target="stageArea" data-attr="rim" aria-pressed="true">Rim</button>
+    <h2>Light plot, from above</h2>
+    <!-- Top-down plan of the set: the figure in the middle, crate and ball, the camera at the bottom.
+         The camera wedge narrows with the shot; a light that's off fades to 25%. -->
+    <div class="plotrow">
+    <svg class="plot" id="plot" viewBox="-100 -100 200 200" aria-label="Top-down plan of the set showing the lights and the camera">
+      <circle r="72" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="3 4"/>
+      <path class="wedge" d="M0 1 L-28 0 L28 0 Z" fill="rgba(245,245,247,.05)" stroke="rgba(245,245,247,.25)" vector-effect="non-scaling-stroke"/>
+      <rect x="30" y="-12" width="16" height="16" rx="2" fill="#4A4A66"/>
+      <circle cx="-36" cy="10" r="5" fill="#9999FF" opacity=".7"/>
+      <circle r="7" fill="#C9C9D3"/>
+      <g class="lamp" id="lamp-key"><line x1="-48" y1="54" x2="0" y2="0" stroke="#FFD9A8" stroke-width="1.2" opacity=".6"/><circle cx="-48" cy="54" r="8" fill="#FFD9A8"/></g>
+      <g class="lamp" id="lamp-fill"><line x1="55" y1="46" x2="0" y2="0" stroke="#A9B6FF" stroke-width="1.2" opacity=".6"/><circle cx="55" cy="46" r="8" fill="#A9B6FF"/></g>
+      <g class="lamp" id="lamp-rim"><line x1="63" y1="-35" x2="0" y2="0" stroke="#9999FF" stroke-width="1.2" opacity=".6"/><circle cx="63" cy="-35" r="8" fill="#9999FF"/></g>
+    </svg>
+    <div class="lights">
+      <div class="pills">
+        <button class="pill key" data-target="stageArea" data-attr="key" aria-pressed="true">Key</button>
+        <button class="pill fill" data-target="stageArea" data-attr="fill" aria-pressed="true">Fill</button>
+        <button class="pill" data-target="stageArea" data-attr="rim" aria-pressed="true">Rim</button>
+      </div>
+      <p class="small">Lights show in the rendered drawing.</p>
     </div>
-    <p class="small">Lights show in the rendered drawing.</p>
+    </div>
     <h2>Camera</h2>
     <div class="seg" role="group" aria-label="Camera" data-target="stageArea" data-attr="shot">
       <button data-value="wide" aria-pressed="true">Wide</button><button data-value="mid" aria-pressed="false">Mid</button><button data-value="close" aria-pressed="false">Close</button>
     </div>
-    <h2>Readability</h2>
-    <div class="pills">
+    <div class="pills" style="margin-top:8px">
       <button class="pill" data-target="stageArea" data-attr="silhouette" aria-pressed="false">Silhouette test</button>
       <button class="pill" data-target="stageArea" data-attr="clutter" aria-pressed="false">Clutter</button>
     </div>
-    <p class="small">Turn the clutter on. Where does your eye go first?</p>
     <div class="explain">
       <h2>The principle</h2>
       <p>Staging is presenting one idea so clearly it can't be missed. Light, framing and a readable silhouette lead the eye to what matters. Anything that competes with it is clutter.</p>

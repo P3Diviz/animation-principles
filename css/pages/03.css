@@ -41,5 +41,18 @@
 .stage-area[data-silhouette="on"] .lt,.stage-area[data-silhouette="on"] .crate-lines,.stage-area[data-silhouette="on"] .horizon{display:none}
 .stage-area[data-silhouette="on"] .stage-head h1{color:#0A0A15}
 
+/* Light plot (in the panel, after the stage area): off lights fade, the camera wedge follows the shot */
+.plotrow{display:flex;gap:10px;align-items:center;flex:none}
+.plot{flex:none;height:min(16vh,180px);width:auto}
+.plotrow .lights{display:grid;gap:6px;min-width:0}
+.plotrow .pills{flex-direction:column;align-items:flex-start}
+.plot .lamp{transition:opacity .3s var(--ease)}
+.stage-area[data-key="off"] ~ .panel #lamp-key,
+.stage-area[data-fill="off"] ~ .panel #lamp-fill,
+.stage-area[data-rim="off"] ~ .panel #lamp-rim{opacity:.25}
+.plot .wedge{transform:scaleY(90);transition:transform .9s var(--ease)}
+.stage-area[data-shot="mid"] ~ .panel .wedge{transform:scaleY(58)}
+.stage-area[data-shot="close"] ~ .panel .wedge{transform:scaleY(36)}
+
 .pill.key[aria-pressed="true"]{border-color:#FFD9A8;background:rgba(255,217,168,.12)}
 .pill.fill[aria-pressed="true"]{border-color:#A9B6FF;background:rgba(169,182,255,.12)}
