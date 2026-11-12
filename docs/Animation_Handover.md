@@ -2,7 +2,7 @@
 
 For Claude Code, working in Paul's VS Code workspace and GitHub repo. Read this whole file before writing any code. Last updated 12 November 2026.
 
-> **Status: Tier 1 is complete and checked by Paul. Tier 2 (3D) has started: shared 3D modules and 03 Staging 3D are done (section 17.4a); next is step 5 in section 14.** Section 17 records what was built, every decision Paul made during Tier 1 (these override the earlier sections where they differ), how the 2D pages work, and what Tier 2 must plug into. Read it before starting.
+> **Status: Tier 1 is complete and checked by Paul. Tier 2 (3D) is under way: shared 3D modules, 03 Staging and every Mixamo bot page (02, 04, 05, 07, 08, 09, 10, 12) are done (section 17.4a); still to do is the procedural 3D for 01, 06 and 11.** Section 17 records what was built, every decision Paul made during Tier 1 (these override the earlier sections where they differ), how the 2D pages work, and what Tier 2 must plug into. Read it before starting.
 
 ## 0. Start here
 
@@ -473,6 +473,18 @@ If time runs out, a principle page without its 3D version hides the 2D/3D switch
 - **Changed from the reference:** Wide, Mid and Close were framed for the taller stand-in mannequin, so they are reframed for the 1.8-unit bots (the plot wedge lengths 90/58/36 are kept). Light values, fog and floor are unchanged.
 - **For Paul to decide:** the 3D lights keep the reference's layout (key front right, fill front left, rim back left). The 2D plot is its mirror (key front left), so lamps swap sides when switching view. Mirroring the 3D angles would make them match.
 - Checked in headless Chrome: no scroll or clipped panel at 1280×720, 1366×768, 1920×1080, normal and present; drag, arrow keys, every toggle, Subject, back to 2D; missing XBot and missing YBot; reduced motion. No console errors.
+
+**Done: every Mixamo bot page (02, 04, 05, 07, 08, 09, 10, 12).** Still to do: procedural 3D for 01, 06, 11 (step 5).
+- **Shared additions:** `js/three/view.js` (`bindView(load, { onSwitch })` does the 2D/3D switch, `is-3d` and the lazy load for every page; `clock3d` / `clockSeconds` / `handOver` let one timeline drive both views: in 3D the timeline's `getAnims` returns the 3D view's clock, a do-nothing Web Animation on the canvas with `id: 'clock3d'`, which `keepTime()` in toggles.js leaves alone). `js/three/studio.js` (stage + lights + camera; `addBot` with the status line). `js/three/poses.js` (`capturePose`, `scalePose` scales every joint's turn from a reference pose, `turnBone` turns a bone about a world axis, `feetHeight`). `rig.js` gained `bones` and `bone(name)` (from the skin's skeleton: the cloned FBX has a second, unused copy of every bone), `scale`, `play(name, { inPlace })`, `inPlaceClip`, `clipTravel`. `js/core/drop.js` holds 09's drop physics for both views. The 2D/3D CSS (`.stage-3d`, `only-2d` / `only-3d`, `top-2d`) is in `components.css`.
+- **Clip constants** (`clips.js`) were read off the clips in the browser: Jump crouch 0.15–0.7 s (deepest 0.55), take-off 0.75, top 1.0, landing 1.3; Throw (right hand) wind-up from 0.3, release 1.68; Walking 1.03 s per cycle, travelling 1.72 m; RunToStop stops by 1.0 s. Walking and RunToStop are not "in place" files, so walks use `inPlace` and move the figure at the clip's own speed.
+- **02 Anticipation:** Y Bot, Jump only (the Action switch is 2D only: Throw's wind-up includes a big step forward, so cutting it out would jump the figure). Wind-up sets the crouch's length and depth; Off cuts from standing to `anticipationEnd`. Keys and the wind-up highlight follow the slider.
+- **04:** X Bot. Keys only = `stepped(JUMP_KEYS)`; onion skin = two see-through copies two frames either side. Make your own is 2D only.
+- **05:** Y Bot RunToStop with an 8-point verlet tail on the hips; Stiffness and Off/On shared; Drag it (pointer or arrow keys) with Idle. Live physics, so the timeline is 2D only.
+- **07:** X Bot, Throw or Walk, trail on Hand / Head / Foot (fading half second), Show motion path adds the whole path with a dot per frame; the thrown ball follows Straight / Arc and the height slider.
+- **08:** Y Bot walks across (three cycles). Subtle: a glance at the camera and a small wave; Too much: head, arms and spine never settle.
+- **09:** Drop (balloon, football, bowling ball side by side, same drop code as 2D) or Walk (X Bot, one cycle in 40 / 26 / 16 frames). Linear / Gravity and On twos are shared. Weights, Frames, ghosts and Guess the weight are 2D only.
+- **10:** Y Bot Jump; k = 1 + amount × 0.6 (Realistic is the capture as it is). Feet are held on the floor while they touch it. Own 3D note under the presets.
+- **12:** X Bot (Y Bot / X Bot switch), OrbitControls plus arrow keys on the focused stage; Wireframe / Clay / Normals / Lit (the key circles slowly in Lit); Twinning = the bind pose with both arms lowered the same amount.
 
 ### 17.5 Working notes
 
