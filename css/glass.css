@@ -20,21 +20,15 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:var(--bg) url(../assets/svg/strands.svg) center/cover no-repeat}
 body.principle::before{opacity:var(--strands-dim)}  /* principle pages: dimmer so the demo reads first */
 
-/* Shared glass surface.
-   The background behind the panels never moves, so the frost is painted, not computed live:
-   each panel shows a pre-blurred copy of the strands (strands-glass.svg), fixed to the window so it
-   lines up exactly with the real background. It looks the same as backdrop-filter but costs nothing
-   per frame, and it stops the flicker Firefox (and sometimes Chrome) showed while demos animate. */
-:root{
-  --frost:url(../assets/svg/strands-glass.svg) center/cover no-repeat fixed;
-  --frost-dim:linear-gradient(rgba(7,7,26,.45),rgba(7,7,26,.45)) fixed;   /* matches the 55% strands on principle pages */
-}
+/* Shared glass surface */
 .glass,.hdr,.panel,.notes,.stage-area,.card,.menu,.controls{
-  background:var(--glass),var(--frost),var(--bg);border:1px solid var(--glass-border);
+  background:var(--glass);border:1px solid var(--glass-border);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
   box-shadow:var(--glass-edge),var(--glass-shadow)}
-body.principle :is(.glass,.hdr,.panel,.notes,.stage-area,.controls){background:var(--glass),var(--frost-dim),var(--frost),var(--bg)}
-/* The dropdown floats over other panels, so it keeps a live blur (it's only open briefly) */
-.menu{-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+
+/* Each glass panel on its own compositor layer. Without this, Chrome can redraw the blur in patches
+   while the demo animates, so parts of a panel flicker more transparent. No visual change. */
+.hdr,.panel,.notes,.stage-area{will-change:transform}
 
 /* Header: floating pill */
 .hdr{height:52px;border-radius:999px;padding:0 8px 0 20px;border-bottom:1px solid var(--glass-border)}
@@ -59,12 +53,12 @@ body.principle :is(.glass,.hdr,.panel,.notes,.stage-area,.controls){background:v
 .pill{background:rgba(255,255,255,.04)}
 
 /* 3D stages: NO backdrop blur behind a live WebGL canvas (expensive on college PCs) */
-.stage-area.is-3d{background:rgba(10,10,21,.9)}
+.stage-area.is-3d{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(10,10,21,.9)}
 
 /* Principles index boxes */
 .card{border-radius:16px;transition:border-color .25s var(--ease),box-shadow .25s var(--ease),transform .25s var(--ease)}
 .card:hover,.card:focus-visible{border-color:rgba(153,153,255,.6);transform:translateY(-2px);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px rgba(153,153,255,.25),0 12px 36px rgba(153,153,255,.18);background:var(--glass),var(--frost),var(--bg)}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 1px rgba(153,153,255,.25),0 12px 36px rgba(153,153,255,.18);background:var(--glass)}
 
 /* Home: controls sit in a glass dock */
 .controls{border-radius:999px;padding:6px 6px 6px 18px}
