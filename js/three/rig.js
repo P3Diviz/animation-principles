@@ -39,6 +39,29 @@ export function loadClip(name) {
   return clips[name];
 }
 
+// A copy of a clip with the hips held over the same spot (their height still moves).
+const inPlaceCache = new Map();
+export function inPlaceClip(clip) {
+  if (inPlaceCache.has(clip)) return inPlaceCache.get(clip);
+  const copy = clip.clone();
+  copy.name = clip.name + ' in place';
+  const track = copy.tracks.find(t => /Hips\.position$/.test(t.name));
+  if (track) {
+    const v = track.values, x0 = v[0], z0 = v[2];
+    for (let i = 0; i < v.length; i += 3) { v[i] = x0; v[i + 2] = z0; }
+  }
+  inPlaceCache.set(clip, copy);
+  return copy;
+}
+
+// How far a clip's hips travel forward from start to end, in Mixamo centimetres.
+export function clipTravel(clip) {
+  const track = clip.tracks.find(t => /Hips\.position$/.test(t.name));
+  if (!track) return 0;
+  const v = track.values;
+  return v[v.length - 1] - v[2];
+}
+
 // Load a bot, scale it to 1.8 units tall (Mixamo exports in centimetres) and dress it in clay.
 export async function loadBot(name) {
   const model = cloneSkinned(await loadFile(name));    // a copy, so the same file can be used twice
@@ -89,15 +112,26 @@ export async function createRig(name) {
   const mixer = new THREE.AnimationMixer(model);
   let action = null, time = 0, scale = 1, keys = null;
 
+  // The bones that move the skin. (Take them from the skeleton: the cloned FBX has a second,
+  // unused copy of every bone with the same name.)
+  let skeleton = null;
+  model.traverse(o => { if (o.isSkinnedMesh && !skeleton) skeleton = o.skeleton; });
+  const bones = skeleton ? skeleton.bones : [];
+  const byName = new Map(bones.map(b => [b.name.replace(/^mixamorig:?/, ''), b]));
+
   const rig = {
-    model, mixer, note,
+    model, mixer, note, bones,
+    bone: name => byName.get(name) || null,              // 'Hips', 'Head', 'RightHand' ...
+    scale: model.children[0].scale.x,                    // scene units per Mixamo centimetre
     get duration() { return action ? action.getClip().duration : 0; },
 
     // Start a clip. Resolves false (and the model stands still) if the file is missing.
-    async play(clipName, { offset = 0 } = {}) {
+    // inPlace: drop the clip's forward travel, so a walk stays on the spot.
+    async play(clipName, { offset = 0, inPlace = false } = {}) {
       if (torso) return false;                          // the mannequin has no skeleton
       try {
-        const clip = await loadClip(clipName);
+        let clip = await loadClip(clipName);
+        if (inPlace) clip = inPlaceClip(clip);
         action?.stop();
         action = mixer.clipAction(clip);
         action.play();

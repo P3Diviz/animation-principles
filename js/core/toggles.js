@@ -13,7 +13,8 @@
 // After a change the target fires a 'statechange' event: { detail: { attr, value } }.
 
 const isTransition = a => typeof CSSTransition !== 'undefined' && a instanceof CSSTransition;
-const demoAnims = root => root.getAnimations({ subtree: true }).filter(a => !isTransition(a));
+// The 3D view's clock (js/three/view.js) keeps its own time, so it's left out.
+const demoAnims = root => root.getAnimations({ subtree: true }).filter(a => !isTransition(a) && a.id !== 'clock3d');
 
 // Run change() without losing the animation's place. Swapping animation-name (or showing
 // a hidden element) restarts a CSS animation at 0; this puts every animation in root back

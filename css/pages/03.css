@@ -89,15 +89,8 @@
 .pill.key[aria-pressed="true"]{border-color:#FFD9A8;background:rgba(255,217,168,.12)}
 .pill.fill[aria-pressed="true"]{border-color:#A9B6FF;background:rgba(169,182,255,.12)}
 
-/* ===== 2D / 3D switch: data-view on <main> shows one stage and its own controls ===== */
+/* The 2D / 3D switch itself is in components.css */
 .stage-head .seg{pointer-events:auto}
-.stage-3d{display:none}
-.page[data-view="3d"] .stage-3d{display:block}
-.page[data-view="3d"] #stage{display:none}
-.page[data-view="2d"] .only-3d,.page[data-view="3d"] .only-2d{display:none}
-.panel h2.top{margin-top:0}
-.stage-3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.loading{position:absolute;left:24px;bottom:16px;color:var(--text-2);font-size:12px;font-family:var(--mono)}
 
 /* Light plot in 3D: the plan shows both figures; lamps are dragged round the subject.
    The camera wedge is drawn from the 3D camera, so the 2D scale transform is switched off. */

@@ -59,7 +59,8 @@ const shapes = {
   ball: ([r]) => new THREE.SphereGeometry(r, 24, 16)
 };
 
-export function create({ area, stageEl, canvas, plot, status }) {
+export function create({ stageEl, canvas, status }) {
+  const area = document.getElementById('stageArea'), plot = document.getElementById('plot');
   const stage = createStage(stageEl, canvas);
   const { scene, add } = stage;
 
