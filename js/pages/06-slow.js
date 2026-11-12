@@ -1,5 +1,5 @@
 // 06 Slow in and slow out: Graph Editor, presets, spacing marks and keyframe icons.
-import { evaluate, toCSS } from '../core/bezier.js';
+import { evaluate } from '../core/bezier.js';
 import { bindTimeline, setKeyIcon } from '../core/timeline.js';
 
 const FPS = 25, FRAMES = 45, MOVE = 30, MS = 1000 / FPS;   // 30-frame move (1.2 s), 15-frame hold
@@ -37,7 +37,6 @@ function update() {
   const outEased = P[1] < P[0] * .6, inEased = P[3] > 1 - (1 - P[2]) * .6;
   setKeyIcon($('k0'), 'linear', outEased ? 'eased' : 'linear');
   setKeyIcon($('k1'), inEased ? 'eased' : 'linear', 'linear');
-  $('readout').textContent = toCSS(P);
   buildAnimation();
 }
 
