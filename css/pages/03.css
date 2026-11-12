@@ -1,0 +1,45 @@
+/* 03 Staging (2D). The set fills the whole stage area; the title sits on top, as in the 3D view. */
+.stage-area{position:relative;grid-template-rows:minmax(0,1fr)}
+.stage-area .stage-head{position:absolute;top:0;left:0;right:0;z-index:2;pointer-events:none}
+.stage-head h1{transition:color .4s var(--ease)}
+.scene{--ar:16/9}
+
+/* Camera: eased moves, never cuts */
+.cam{transform-origin:0 0;transition:transform .9s var(--ease)}
+.stage-area[data-shot="mid"] .cam{transform:translate(-284px,-345px) scale(1.9)}     /* frames the figure from the knees up */
+.stage-area[data-shot="close"] .cam{transform:translate(-896px,-610px) scale(3.6)}  /* frames the head */
+
+/* ===== Drawing level: colours per level ===== */
+.stage-area{--wall:#17172B;--floor:#202036;--fig:#C9C9D3;--crate:#4A4A66;--ball:#9999FF;--clutter:#5C5C78;--clutter-2:#45456A;--line:none}
+.wall{fill:var(--wall)} .floor-plane{fill:var(--floor)}
+.fig-b{fill:var(--fig)} .crate-b{fill:var(--crate)} .ball-b{fill:var(--ball)}
+.cl{fill:var(--clutter)} .cl2{fill:var(--clutter-2)}
+.base,.cl,.cl2{stroke:var(--line);stroke-width:1.5}
+.crate-lines{stroke:rgba(0,0,0,.35);stroke-width:2;fill:none}
+.horizon{stroke:rgba(255,255,255,.1);stroke-width:1}
+
+.stage-area[data-level="line"]{--wall:transparent;--floor:transparent;--fig:none;--crate:none;--ball:none;--clutter:none;--clutter-2:none;--line:#C9C9D3}
+.stage-area[data-level="line"] .crate-lines{stroke:#C9C9D3;stroke-width:1}
+.stage-area[data-level="line"] .horizon{stroke:rgba(255,255,255,.35)}
+
+/* Rendered: light and shadow. The fill light lifts the shadow side. */
+.stage-area[data-level="rendered"]{--wall:url(#gWall);--floor:url(#gFloor);--fig:#7E7E92;--crate:#33334C;--ball:#6262C4;--clutter:#4A4A62;--clutter-2:#38385A}
+.stage-area[data-level="rendered"][data-fill="off"]{--fig:#3E3E50;--crate:#1E1E30;--ball:#33337A;--clutter:#2A2A3C;--clutter-2:#22223A}
+
+/* Light layers only exist in the rendered drawing */
+.lt{display:none}
+.stage-area[data-level="rendered"] .lt{display:inline}
+.stage-area[data-key="off"] .key-l{display:none}
+.stage-area[data-rim="off"] .rim-l{display:none}
+
+/* Clutter: a busy background that competes with the figure */
+.clutter{display:none}
+.stage-area[data-clutter="on"] .clutter{display:inline}
+
+/* Silhouette test: black shapes on a pale ground. The title flips to dark so it stays readable. */
+.stage-area[data-silhouette="on"]{--wall:#E9E9F2;--floor:#E9E9F2;--fig:#05050A;--crate:#05050A;--ball:#05050A;--clutter:#05050A;--clutter-2:#05050A;--line:none}
+.stage-area[data-silhouette="on"] .lt,.stage-area[data-silhouette="on"] .crate-lines,.stage-area[data-silhouette="on"] .horizon{display:none}
+.stage-area[data-silhouette="on"] .stage-head h1{color:#0A0A15}
+
+.pill.key[aria-pressed="true"]{border-color:#FFD9A8;background:rgba(255,217,168,.12)}
+.pill.fill[aria-pressed="true"]{border-color:#A9B6FF;background:rgba(169,182,255,.12)}
