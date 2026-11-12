@@ -1,0 +1,21 @@
+/* Design tokens (handover section 4). Every other stylesheet reads these. */
+:root {
+  --bg: #0A0A15;            /* 3D scene background and solid fallbacks; the page itself uses #07071A from glass.css */
+  --panel: #10101D;         /* side panels */
+  --card: #12122A;          /* boxes on principles.html, dropdown */
+  --card-hover: #17173A;
+  --hair: rgba(255,255,255,.08);   /* all dividers: 1px */
+  --hair-strong: rgba(255,255,255,.16);
+  --text: #F5F5F7;
+  --text-2: #9C9CB3;
+  --accent: #9999FF;        /* After Effects violet: interactive things and keyframes ONLY */
+  --accent-wash: rgba(153,153,255,.14);
+  --accent-line: rgba(153,153,255,.55);
+  --light-key: #FFD9A8;  --light-fill: #A9B6FF;  --light-rim: #9999FF;
+  --clay: #C9C9D3;          /* 3D models */
+  --ease: cubic-bezier(.33,0,.67,1);   /* After Effects Easy Ease */
+  --dur: 220ms;
+  --r-card: 12px; --r-control: 8px; --r-pill: 999px;
+  --font: "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
