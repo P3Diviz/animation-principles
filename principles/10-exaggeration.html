@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>10 Exaggeration</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/shell.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages/10.css">
+<link rel="stylesheet" href="../css/glass.css">
+<script type="module" src="../js/core/menu.js"></script>
+<script type="module" src="../js/core/present.js"></script>
+<script type="module" src="../js/pages/10-exaggeration.js"></script>
+</head>
+<body class="principle">
+<header class="hdr"><a class="brand" href="../index.html">Principles of Animation</a><nav><a href="../index.html">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="../spot-it.html">Spot it</a><a href="../playground.html">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="01-squash-and-stretch.html"><span class="mono">01</span>Squash and stretch</a>
+    <a href="07-arc.html"><span class="mono">07</span>Arc</a>
+    <a href="02-anticipation.html"><span class="mono">02</span>Anticipation</a>
+    <a href="08-secondary-action.html"><span class="mono">08</span>Secondary action</a>
+    <a href="03-staging.html"><span class="mono">03</span>Staging</a>
+    <a href="09-timing.html"><span class="mono">09</span>Timing</a>
+    <a href="04-straight-ahead-pose-to-pose.html"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="10-exaggeration.html" aria-current="page"><span class="mono">10</span>Exaggeration</a>
+    <a href="05-follow-through.html"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="11-appeal.html"><span class="mono">11</span>Appeal</a>
+    <a href="06-slow-in-slow-out.html"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="12-solid-drawing.html"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="../principles.html">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<main class="page" id="main" data-view="2d">
+  <section class="stage-area">
+    <div class="stage-head">
+      <h1><span class="mono">10</span>Exaggeration</h1>
+    </div>
+    <div class="stage has-scene" id="stage">
+      <div class="scene">
+        <svg viewBox="0 0 800 400" aria-label="A ball hits a wall and a face reacts">
+          <line class="floor" x1="40" y1="340" x2="720" y2="340"/>
+          <rect class="wall" x="690" y="50" width="34" height="290" rx="3"/>
+          <g class="burst-g">
+            <line class="burst" x1="680" y1="160" x2="664" y2="140"/><line class="burst" x1="676" y1="200" x2="652" y2="200"/><line class="burst" x1="680" y1="240" x2="664" y2="260"/>
+          </g>
+          <!-- The face watching, bottom left -->
+          <g class="headr">
+            <rect class="skin" x="70" y="190" width="120" height="150" rx="56"/>
+            <g class="brows"><line class="brow" x1="104" y1="222" x2="124" y2="218"/><line class="brow" x1="140" y1="218" x2="160" y2="222"/></g>
+            <g class="eyes"><circle class="ink" cx="116" cy="246" r="7"/><circle class="ink" cx="150" cy="246" r="7"/></g>
+            <ellipse class="ink mouth" cx="134" cy="290" rx="13" ry="12"/>
+          </g>
+          <!-- The ball -->
+          <g class="bfade"><g class="bx"><g class="by"><g class="bs"><circle class="ballc" cx="0" cy="0" r="22"/></g></g></g></g>
+        </svg>
+      </div>
+    </div>
+    <div class="timeline">
+      <button class="play" id="play" aria-label="Pause"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect class="i-pause" x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect class="i-pause" x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><path class="i-play" d="M3 1.5 12 7 3 12.5Z" fill="currentColor" style="display:none"/></svg></button>
+      <span class="tc" id="tc">00:00:00:00</span>
+      <div class="track" id="track" data-keys="0,12,15,25,31">
+        <div class="bar"></div><div class="span" style="left:24%;width:20%"></div><div class="ticks"></div>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <div class="head" id="head"></div>
+      </div>
+    </div>
+  </section>
+  <aside class="panel">
+    <h2>Exaggeration</h2>
+    <label class="slider"><span class="row"><span>Realism to cartoon</span><output>100%</output></span>
+      <input type="range" id="k" min="0" max="150" step="5" value="100" data-target="stage" data-var="--k-set" data-scale="0.01" data-unit="%"></label>
+    <h2>Presets</h2>
+    <div class="seg presets" id="presets" role="group" aria-label="Exaggeration presets">
+      <button data-k="10" aria-pressed="false">Realistic</button><button data-k="100" aria-pressed="true">Cartoon</button><button data-k="150" aria-pressed="false">Too far</button>
+    </div>
+    <p class="small">One slider pushes the squash, the rebound and the reaction together.</p>
+  </aside>
+</main>
+<footer class="notes">
+  <section><h3>What to notice</h3><p>Push it, but keep it believable.</p></section>
+  <section><h3>In After Effects</h3><p>Bigger value changes, overshoot keys.</p></section>
+  <section><h3>Try this</h3><p>Find the point where it stops being believable.</p></section>
+  <div class="prevnext"><a href="09-timing.html" aria-label="Previous: 09 Timing">‹ 09</a><a href="11-appeal.html" aria-label="Next: 11 Appeal">11 ›</a></div>
+</footer>
+</body>
+</html>
