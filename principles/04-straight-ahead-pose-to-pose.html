@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/04.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/04-straight-ahead.js"></script>
@@ -39,7 +44,10 @@
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">04</span>Straight ahead and pose to pose</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/04-straight-ahead-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage" data-mode="inbetweens" data-onion="off" data-own="off">
       <div class="scene">
         <svg viewBox="0 0 800 400" id="svg" aria-label="Left: a flame drawn frame by frame. Right: Draig jumping, posed at the keys.">
@@ -294,9 +302,10 @@
     <p class="small">Keys only holds each pose, like blocking.</p>
     <h2>View</h2>
     <div class="pills"><button class="pill" data-target="stage" data-attr="onion" aria-pressed="false">Onion skin</button></div>
-    <h2>Make your own</h2>
-    <div class="pills"><button class="pill" data-target="stage" data-attr="own" aria-pressed="false">Make your own</button></div>
-    <p class="small">Drag keys 1, 2 and 3 into three poses, then play. Switch to keys only to see your blocking.</p>
+    <h2 class="only-2d">Make your own</h2>
+    <div class="pills only-2d"><button class="pill" data-target="stage" data-attr="own" aria-pressed="false">Make your own</button></div>
+    <p class="small only-2d">Drag keys 1, 2 and 3 into three poses, then play. Switch to keys only to see your blocking.</p>
+    <p class="small only-3d">In 3D you block the same way: keys held on their poses, then splined.</p>
     <div class="explain">
       <h2>The principle</h2>
       <p>Straight ahead means drawing every frame in order, which suits fire, water and wild motion. Pose to pose means planning the key poses first, then filling in the in-betweens, which suits acting and timing. Most animation mixes both.</p>

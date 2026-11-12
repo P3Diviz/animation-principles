@@ -4,6 +4,7 @@
 import '../core/toggles.js';
 import { bindTimeline, setKeyIcon } from '../core/timeline.js';
 import { scalePart, rotatePart, posePart, mouth, placeDraig, groundShadow, rigClock, runRig, ease, lerp } from '../core/draig.js';
+import { bindView, handOver } from '../three/view.js';
 
 const $ = id => document.getElementById(id);
 const stage = $('stage'), svg = $('svg'), pos = $('draigPos');
@@ -11,10 +12,11 @@ const FRAMES = 50, LOOP = FRAMES * 40, S = .34, X = 620, FLOOR = 380;
 const FIG_KEYS = [0, 10, 16, 24, 32, 40];
 const OWN_KEYS = [0, FRAMES / 3, FRAMES * 2 / 3];
 const clock = rigClock($('clock'), LOOP);
+let view3d = null;   // the 3D view while it's showing (04-straight-ahead-3d.js)
 
 const tl = bindTimeline({
   track: $('track'), head: $('head'), tc: $('tc'), play: $('play'),
-  getAnims: () => stage.getAnimations({ subtree: true }), frames: FRAMES
+  getAnims: () => view3d ? [view3d.clock] : stage.getAnimations({ subtree: true }), frames: FRAMES
 });
 
 // ----- The key poses of the jump -----
@@ -98,7 +100,7 @@ const redraw = runRig(clock, LOOP, pose);
 function showKeyIcons() {
   document.querySelectorAll('#track .key').forEach((k, i) => {
     if (holdKeys()) return setKeyIcon(k, 'hold', 'hold');
-    if (own()) return setKeyIcon(k, 'eased', 'eased');
+    if (own() || view3d) return setKeyIcon(k, 'eased', 'eased');   // the Mixamo clip is splined
     const prev = KEYS[i - 1], key = KEYS[i];
     const slowsIn = !prev || prev.out !== 'in';          // arriving slowly
     const slowsOut = key.out !== 'out';                   // leaving slowly
@@ -106,9 +108,22 @@ function showKeyIcons() {
   });
 }
 
+const keyList = () => view3d ? view3d.keys : own() ? OWN_KEYS : FIG_KEYS;
 stage.addEventListener('statechange', e => {
-  if (e.detail.attr === 'own') { if (own()) drawHandles(); tl.setKeys(own() ? OWN_KEYS : FIG_KEYS); }
+  if (e.detail.attr === 'own') { if (own()) drawHandles(); tl.setKeys(keyList()); }
   showKeyIcons(); redraw();
+});
+
+// 2D / 3D: the timeline follows the clock of the view on screen
+bindView(() => import('./04-straight-ahead-3d.js'), {
+  onSwitch(is3d, v) {
+    const anims2d = stage.getAnimations({ subtree: true });
+    view3d = is3d ? v : null;
+    if (is3d) handOver(anims2d, [v.clock]); else if (v) handOver([v.clock], stage.getAnimations({ subtree: true }));
+    tl.setFrames(is3d ? v.frames : FRAMES);
+    tl.setKeys(keyList());
+    showKeyIcons();
+  }
 });
 
 // Dragging: screen position to SVG units
