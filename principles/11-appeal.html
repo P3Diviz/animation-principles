@@ -42,62 +42,572 @@
     </div>
     <div class="stage has-scene" id="stage">
       <div class="scene">
-        <svg viewBox="0 0 800 400" aria-label="A character made of simple shapes">
-          <!-- Build: one character to change -->
-          <g transform="translate(400 0)"><g class="char" id="build" data-shape="circle" data-pose="stiff">
-            <g class="poser">
-              <g transform="translate(-22 328)"><rect class="limb leg-l" x="-9" y="0" width="18" height="34" rx="9"/></g>
-              <g transform="translate(22 328)"><rect class="limb leg-r" x="-9" y="0" width="18" height="34" rx="9"/></g>
-              <g class="armw-l"><rect class="limb arm-l" x="-9" y="-6" width="18" height="74" rx="9"/></g>
-              <g class="armw-r"><rect class="limb arm-r" x="-9" y="-6" width="18" height="74" rx="9"/></g>
-              <circle class="body b-circle" cx="0" cy="275" r="72"/>
-              <rect class="body b-square" x="-68" y="205" width="136" height="140" rx="20"/>
-              <path class="body b-tri" d="M0 210 L72 338 L-72 338Z"/>
-              <g class="headg"><circle class="skin" cx="0" cy="150" r="48"/>
-                <g class="eye-l"><circle class="eye-white" cx="-17" cy="146" r="11"/><circle class="pupil" cx="-15" cy="148" r="5.5"/></g>
-                <g class="eye-r"><circle class="eye-white" cx="17" cy="146" r="11"/><circle class="pupil" cx="19" cy="148" r="5.5"/></g>
-                <path class="mouth" d="M-11 172 Q0 181 11 172"/>
+        <svg viewBox="0 0 800 400" aria-label="Draig, built from simple shapes">
+          <line class="floor" x1="60" y1="372" x2="740" y2="372"/>
+          <!-- Build: one Draig to change -->
+          <g id="build" class="who" data-shape="round" data-pose="stiff" transform="translate(244 75.6) scale(.78)">
+            <!--DRAIG-->
+            <svg viewBox="0 0 400 420" class="draig" width="400" height="420" overflow="visible" id="dragon" role="img" aria-label="A small red Welsh dragon with green eyes">
+            <!-- Draig: original character for the Principles of Animation site (no licence restrictions).
+                 Every animatable part is a named <g>. Pivot points are in data-pivot="x y" (viewBox units).
+                 Full rig notes: docs/Draig_Character_Guide.md
+                 Body shapes for the Appeal page: set the SAME d on #body-shape and #body-clip-shape:
+                   round:   M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z
+                   square:  M118 104 H282 Q 330 104 332 152 V 336 Q 332 380 288 380 H112 Q 68 380 68 336 V152 Q 70 104 118 104Z
+                   pointed: M200 92 C 250 120 300 170 322 236 C 344 302 330 380 200 380 C 70 380 56 302 78 236 C 100 170 150 120 200 92Z -->
+            <defs>
+              <radialGradient id="dg-red" cx="38%" cy="28%" r="80%">
+                <stop offset="0" stop-color="#FF6B6B"/><stop offset=".45" stop-color="#E0283F"/><stop offset="1" stop-color="#8C1230"/>
+              </radialGradient>
+              <radialGradient id="dg-red-dark" cx="40%" cy="30%" r="80%">
+                <stop offset="0" stop-color="#E0283F"/><stop offset="1" stop-color="#7A0F28"/>
+              </radialGradient>
+              <radialGradient id="dg-belly" cx="45%" cy="30%" r="75%">
+                <stop offset="0" stop-color="#FFF4DD"/><stop offset=".6" stop-color="#FBE0B4"/><stop offset="1" stop-color="#E9BE85"/>
+              </radialGradient>
+              <radialGradient id="dg-muzzle" cx="45%" cy="30%" r="80%">
+                <stop offset="0" stop-color="#FF8E8E"/><stop offset="1" stop-color="#E23A4E"/>
+              </radialGradient>
+              <linearGradient id="dg-horn" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0" stop-color="#C99A55"/><stop offset=".6" stop-color="#F3DDAE"/><stop offset="1" stop-color="#FFF6E2"/>
+              </linearGradient>
+              <linearGradient id="dg-wing" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#C01F3A"/><stop offset="1" stop-color="#6E0C24"/>
+              </linearGradient>
+              <linearGradient id="dg-membrane" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#F2546A"/><stop offset="1" stop-color="#A3163A"/>
+              </linearGradient>
+              <radialGradient id="dg-sclera" cx="45%" cy="35%" r="70%">
+                <stop offset="0" stop-color="#FFFFFF"/><stop offset=".75" stop-color="#F1F2F8"/><stop offset="1" stop-color="#C9CCDA"/>
+              </radialGradient>
+              <radialGradient id="dg-iris" cx="50%" cy="55%" r="60%">
+                <stop offset="0" stop-color="#7BE3A2"/><stop offset=".55" stop-color="#22A35A"/><stop offset="1" stop-color="#0B5C30"/>
+              </radialGradient>
+              <radialGradient id="dg-shadow" cx="50%" cy="50%" r="50%">
+                <stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+              </radialGradient>
+              <!-- Plush texture: soft fuzzy edge plus fine felt grain -->
+              <filter id="dg-plush" x="-5%" y="-5%" width="110%" height="110%">
+                <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/>
+                <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 -.18" result="grain"/>
+                <feComposite in="grain" in2="d" operator="in" result="g2"/>
+                <feBlend in="g2" in2="d" mode="soft-light"/>
+              </filter>
+              <filter id="dg-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+              <filter id="dg-softer" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter>
+              <clipPath id="dg-body-clip"><path id="body-clip-shape" d="M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z"/></clipPath>
+            </defs>
+            
+            <ellipse id="shadow" cx="200" cy="396" rx="130" ry="16" fill="url(#dg-shadow)"/>
+            
+            <g id="rig" data-pivot="200 380">
+            <!-- Behind the body -->
+            <g id="tail" data-pivot="290 340">
+              <path d="M280 342 C 334 356 376 338 380 298 C 383 272 370 256 356 250" fill="none" stroke="url(#dg-red-dark)" stroke-width="26" stroke-linecap="round"/>
+              <path d="M296 334 C 336 340 364 324 368 296" fill="none" stroke="#FF6B6B" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+              <path d="M356 258 C 330 254 320 232 330 214 L 352 178 L 382 210 C 392 232 380 252 356 258Z" fill="url(#dg-red-dark)"/>
+              <path d="M352 246 C 338 240 334 226 340 216 L 352 194" fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+            </g>
+            
+            <g id="wing-left" data-pivot="100 205">
+              <path d="M104 214 C 70 190 40 150 22 110 C 46 118 62 112 70 98 C 78 124 94 132 108 128 C 104 150 108 176 118 196 Z" fill="url(#dg-membrane)"/>
+              <path d="M104 214 C 70 190 40 150 22 110 C 46 118 62 112 70 98 C 78 124 94 132 108 128" fill="none" stroke="url(#dg-wing)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M100 206 C 80 176 72 140 70 100 M100 206 C 92 180 96 150 108 128" fill="none" stroke="#8C1230" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+            </g>
+            <g id="wing-right" data-pivot="300 205">
+              <path d="M296 214 C 330 190 360 150 378 110 C 354 118 338 112 330 98 C 322 124 306 132 292 128 C 296 150 292 176 282 196 Z" fill="url(#dg-membrane)"/>
+              <path d="M296 214 C 330 190 360 150 378 110 C 354 118 338 112 330 98 C 322 124 306 132 292 128" fill="none" stroke="url(#dg-wing)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M300 206 C 320 176 328 140 330 100 M300 206 C 308 180 304 150 292 128" fill="none" stroke="#8C1230" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+            </g>
+            
+            <g id="horns" data-pivot="200 110">
+              <path d="M154 120 C 140 98 128 78 112 60 C 140 66 160 86 172 110 Z" fill="url(#dg-horn)"/>
+              <path d="M246 120 C 260 98 272 78 288 60 C 260 66 240 86 228 110 Z" fill="url(#dg-horn)"/>
+            </g>
+            <g id="crest" data-pivot="200 100">
+              <path d="M184 104 Q 188 80 200 70 Q 212 80 216 104 Z" fill="url(#dg-horn)"/>
+              <path d="M170 110 Q 170 94 178 86 Q 186 96 188 108 Z" fill="url(#dg-horn)"/>
+              <path d="M230 110 Q 230 94 222 86 Q 214 96 212 108 Z" fill="url(#dg-horn)"/>
+            </g>
+            
+            <g id="feet" data-pivot="200 380">
+              <ellipse cx="152" cy="378" rx="36" ry="19" fill="url(#dg-red-dark)"/>
+              <ellipse cx="248" cy="378" rx="36" ry="19" fill="url(#dg-red-dark)"/>
+              <g fill="#F3DDAE"><ellipse cx="132" cy="388" rx="6" ry="5"/><ellipse cx="148" cy="391" rx="6" ry="5"/><ellipse cx="164" cy="389" rx="6" ry="5"/>
+              <ellipse cx="236" cy="389" rx="6" ry="5"/><ellipse cx="252" cy="391" rx="6" ry="5"/><ellipse cx="268" cy="388" rx="6" ry="5"/></g>
+            </g>
+            
+            <!-- Body and head are one plush shape -->
+            <g id="body" data-pivot="200 380">
+              <g filter="url(#dg-plush)">
+                <path id="body-shape" d="M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z" fill="url(#dg-red)"/>
+                <g clip-path="url(#dg-body-clip)">
+                  <ellipse cx="200" cy="318" rx="80" ry="74" fill="url(#dg-belly)"/>
+                  <path d="M140 300 Q 200 314 260 300 M136 326 Q 200 342 264 326 M142 352 Q 200 368 258 352" fill="none" stroke="#E2B47A" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+                  <!-- rim light on the right, soft shade on the left -->
+                  <path d="M320 200 C 336 250 330 320 286 362" fill="none" stroke="#FF9AA2" stroke-width="10" filter="url(#dg-softer)" opacity=".6"/>
+                  <ellipse cx="150" cy="150" rx="60" ry="40" fill="#fff" opacity=".18" filter="url(#dg-soft)"/>
+                </g>
               </g>
             </g>
-            <path class="loa" d="M-34 362 C30 300 46 210 -16 96"/>
-          </g></g>
-
+            
+            <g id="arm-left" data-pivot="98 262">
+              <g transform="rotate(22 98 262)">
+                <rect x="80" y="252" width="34" height="68" rx="17" fill="url(#dg-red-dark)"/>
+                <rect x="86" y="258" width="12" height="40" rx="6" fill="#FF6B6B" opacity=".25" filter="url(#dg-softer)"/>
+                <g fill="#F3DDAE"><ellipse cx="88" cy="318" rx="5" ry="4.5"/><ellipse cx="98" cy="321" rx="5" ry="4.5"/><ellipse cx="108" cy="318" rx="5" ry="4.5"/></g>
+              </g>
+            </g>
+            <g id="arm-right" data-pivot="302 262">
+              <g transform="rotate(-22 302 262)">
+                <rect x="286" y="252" width="34" height="68" rx="17" fill="url(#dg-red-dark)"/>
+                <rect x="302" y="258" width="12" height="40" rx="6" fill="#FF6B6B" opacity=".25" filter="url(#dg-softer)"/>
+                <g fill="#F3DDAE"><ellipse cx="292" cy="318" rx="5" ry="4.5"/><ellipse cx="302" cy="321" rx="5" ry="4.5"/><ellipse cx="312" cy="318" rx="5" ry="4.5"/></g>
+              </g>
+            </g>
+            
+            <g id="face" data-pivot="200 220">
+              <ellipse cx="128" cy="236" rx="16" ry="10" fill="#FF7A8A" opacity=".55" filter="url(#dg-softer)"/>
+              <ellipse cx="272" cy="236" rx="16" ry="10" fill="#FF7A8A" opacity=".55" filter="url(#dg-softer)"/>
+            
+              <g id="muzzle">
+                <ellipse cx="200" cy="252" rx="70" ry="40" fill="url(#dg-muzzle)"/>
+                <ellipse cx="185" cy="232" rx="5.5" ry="3.8" fill="#8C1230"/>
+                <ellipse cx="215" cy="232" rx="5.5" ry="3.8" fill="#8C1230"/>
+              </g>
+            
+              <g id="mouth" data-pivot="200 262">
+                <g id="mouth-smile">
+                  <path d="M150 248 Q 200 312 250 248 Q 200 262 150 248Z" fill="#3E0716"/>
+                  <clipPath id="dg-grin-clip"><path d="M150 248 Q 200 312 250 248 Q 200 262 150 248Z"/></clipPath>
+                  <g clip-path="url(#dg-grin-clip)">
+                    <ellipse cx="200" cy="292" rx="34" ry="16" fill="#FF6F8E"/>
+                    <g fill="#FFFDF7"><rect x="160" y="246" width="12" height="13" rx="4"/><rect x="174" y="250" width="12" height="13" rx="4"/><rect x="188" y="252" width="12" height="13" rx="4"/><rect x="202" y="252" width="12" height="13" rx="4"/><rect x="216" y="250" width="12" height="13" rx="4"/><rect x="230" y="246" width="12" height="13" rx="4"/></g>
+                    <g fill="#FFFDF7"><path d="M164 252 L 172 272 L 178 252 Z"/><path d="M236 252 L 228 272 L 222 252 Z"/></g>
+                  </g>
+                  <path d="M150 248 Q 200 262 250 248" fill="none" stroke="#B3173A" stroke-width="3" stroke-linecap="round"/>
+                </g>
+                <g id="mouth-open" opacity="0">
+                  <ellipse cx="200" cy="274" rx="32" ry="30" fill="#3E0716"/>
+                  <ellipse cx="200" cy="292" rx="20" ry="11" fill="#FF6F8E"/>
+                  <g fill="#FFFDF7"><path d="M176 254 L 184 270 L 190 250 Z"/><path d="M224 254 L 216 270 L 210 250 Z"/></g>
+                </g>
+              </g>
+            
+              <g id="eye-left" data-pivot="160 186">
+                <clipPath id="dg-eye-left-clip"><ellipse cx="160" cy="186" rx="40" ry="44"/></clipPath>
+                <ellipse cx="160" cy="186" rx="40" ry="44" fill="url(#dg-sclera)"/>
+                <g id="pupil-left" data-pivot="163 192">
+                  <circle cx="163" cy="192" r="25" fill="url(#dg-iris)"/>
+                  <circle cx="163" cy="192" r="25" fill="none" stroke="#0B5C30" stroke-width="2"/>
+                  <circle cx="163" cy="194" r="12.5" fill="#06140C"/>
+                  <circle cx="173" cy="181" r="7.5" fill="#fff"/>
+                  <circle cx="155" cy="203" r="3.2" fill="#fff" opacity=".85"/>
+                </g>
+                <g clip-path="url(#dg-eye-left-clip)"><ellipse cx="160" cy="146" rx="46" ry="18" fill="#9C2A44" opacity=".22" filter="url(#dg-softer)"/></g>
+                <ellipse cx="160" cy="186" rx="40" ry="44" fill="none" stroke="#8C1230" stroke-width="2.5" opacity=".35"/>
+              </g>
+              <g id="eye-right" data-pivot="240 186">
+                <clipPath id="dg-eye-right-clip"><ellipse cx="240" cy="186" rx="40" ry="44"/></clipPath>
+                <ellipse cx="240" cy="186" rx="40" ry="44" fill="url(#dg-sclera)"/>
+                <g id="pupil-right" data-pivot="237 192">
+                  <circle cx="237" cy="192" r="25" fill="url(#dg-iris)"/>
+                  <circle cx="237" cy="192" r="25" fill="none" stroke="#0B5C30" stroke-width="2"/>
+                  <circle cx="237" cy="194" r="12.5" fill="#06140C"/>
+                  <circle cx="247" cy="181" r="7.5" fill="#fff"/>
+                  <circle cx="229" cy="203" r="3.2" fill="#fff" opacity=".85"/>
+                </g>
+                <g clip-path="url(#dg-eye-right-clip)"><ellipse cx="240" cy="146" rx="46" ry="18" fill="#9C2A44" opacity=".22" filter="url(#dg-softer)"/></g>
+                <ellipse cx="240" cy="186" rx="40" ry="44" fill="none" stroke="#8C1230" stroke-width="2.5" opacity=".35"/>
+              </g>
+            
+              <g id="brows" data-pivot="200 132">
+                <path d="M134 136 Q 158 122 182 132" fill="none" stroke="#7A0F28" stroke-width="7" stroke-linecap="round"/>
+                <path d="M218 132 Q 242 122 266 136" fill="none" stroke="#7A0F28" stroke-width="7" stroke-linecap="round"/>
+              </g>
+            </g>
+            </g>
+            </svg>
+            <!--/DRAIG-->
+            <path class="loa" d="M150 400 C 236 330 262 220 196 62"/>
+          </g>
           <!-- Compare: the same parts, put together two ways -->
           <g id="compare">
-            <g transform="translate(230 14) scale(.92)"><g class="char" data-shape="square" data-pose="stiff" style="--head-set:.78;--eye-set:.5">
-              <g class="poser">
-                <g transform="translate(-22 328)"><rect class="limb leg-l" x="-9" y="0" width="18" height="34" rx="9"/></g>
-                <g transform="translate(22 328)"><rect class="limb leg-r" x="-9" y="0" width="18" height="34" rx="9"/></g>
-                <g class="armw-l"><rect class="limb arm-l" x="-9" y="-6" width="18" height="74" rx="9"/></g>
-                <g class="armw-r"><rect class="limb arm-r" x="-9" y="-6" width="18" height="74" rx="9"/></g>
-                <circle class="body b-circle" cx="0" cy="275" r="72"/>
-                <rect class="body b-square" x="-68" y="205" width="136" height="140" rx="20"/>
-                <path class="body b-tri" d="M0 210 L72 338 L-72 338Z"/>
-                <g class="headg"><circle class="skin" cx="0" cy="150" r="48"/>
-                  <g class="eye-l"><circle class="eye-white" cx="-17" cy="146" r="11"/><circle class="pupil" cx="-15" cy="148" r="5.5"/></g>
-                  <g class="eye-r"><circle class="eye-white" cx="17" cy="146" r="11"/><circle class="pupil" cx="19" cy="148" r="5.5"/></g>
-                  <path class="mouth" d="M-9 176 L9 176"/>
+            <g class="who" data-pose="stiff" transform="translate(106 136.4) scale(.62)">
+              <!--DRAIG:-b-->
+              <svg viewBox="0 0 400 420" class="draig" width="400" height="420" overflow="visible" id="dragon-b" role="img" aria-label="A small red Welsh dragon with green eyes">
+              <!-- Draig: original character for the Principles of Animation site (no licence restrictions).
+                   Every animatable part is a named <g>. Pivot points are in data-pivot="x y" (viewBox units).
+                   Full rig notes: docs/Draig_Character_Guide.md
+                   Body shapes for the Appeal page: set the SAME d on #body-shape and #body-clip-shape:
+                     round:   M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z
+                     square:  M118 104 H282 Q 330 104 332 152 V 336 Q 332 380 288 380 H112 Q 68 380 68 336 V152 Q 70 104 118 104Z
+                     pointed: M200 92 C 250 120 300 170 322 236 C 344 302 330 380 200 380 C 70 380 56 302 78 236 C 100 170 150 120 200 92Z -->
+              <defs>
+                <radialGradient id="dg-red-b" cx="38%" cy="28%" r="80%">
+                  <stop offset="0" stop-color="#FF6B6B"/><stop offset=".45" stop-color="#E0283F"/><stop offset="1" stop-color="#8C1230"/>
+                </radialGradient>
+                <radialGradient id="dg-red-dark-b" cx="40%" cy="30%" r="80%">
+                  <stop offset="0" stop-color="#E0283F"/><stop offset="1" stop-color="#7A0F28"/>
+                </radialGradient>
+                <radialGradient id="dg-belly-b" cx="45%" cy="30%" r="75%">
+                  <stop offset="0" stop-color="#FFF4DD"/><stop offset=".6" stop-color="#FBE0B4"/><stop offset="1" stop-color="#E9BE85"/>
+                </radialGradient>
+                <radialGradient id="dg-muzzle-b" cx="45%" cy="30%" r="80%">
+                  <stop offset="0" stop-color="#FF8E8E"/><stop offset="1" stop-color="#E23A4E"/>
+                </radialGradient>
+                <linearGradient id="dg-horn-b" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0" stop-color="#C99A55"/><stop offset=".6" stop-color="#F3DDAE"/><stop offset="1" stop-color="#FFF6E2"/>
+                </linearGradient>
+                <linearGradient id="dg-wing-b" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#C01F3A"/><stop offset="1" stop-color="#6E0C24"/>
+                </linearGradient>
+                <linearGradient id="dg-membrane-b" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#F2546A"/><stop offset="1" stop-color="#A3163A"/>
+                </linearGradient>
+                <radialGradient id="dg-sclera-b" cx="45%" cy="35%" r="70%">
+                  <stop offset="0" stop-color="#FFFFFF"/><stop offset=".75" stop-color="#F1F2F8"/><stop offset="1" stop-color="#C9CCDA"/>
+                </radialGradient>
+                <radialGradient id="dg-iris-b" cx="50%" cy="55%" r="60%">
+                  <stop offset="0" stop-color="#7BE3A2"/><stop offset=".55" stop-color="#22A35A"/><stop offset="1" stop-color="#0B5C30"/>
+                </radialGradient>
+                <radialGradient id="dg-shadow-b" cx="50%" cy="50%" r="50%">
+                  <stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+                </radialGradient>
+                <!-- Plush texture: soft fuzzy edge plus fine felt grain -->
+                <filter id="dg-plush-b" x="-5%" y="-5%" width="110%" height="110%">
+                  <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" result="n"/>
+                  <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/>
+                  <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 -.18" result="grain"/>
+                  <feComposite in="grain" in2="d" operator="in" result="g2"/>
+                  <feBlend in="g2" in2="d" mode="soft-light"/>
+                </filter>
+                <filter id="dg-soft-b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+                <filter id="dg-softer-b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter>
+                <clipPath id="dg-body-clip-b"><path id="body-clip-shape-b" d="M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z"/></clipPath>
+              </defs>
+              
+              <ellipse id="shadow-b" cx="200" cy="396" rx="130" ry="16" fill="url(#dg-shadow-b)"/>
+              
+              <g id="rig-b" data-pivot="200 380">
+              <!-- Behind the body -->
+              <g id="tail-b" data-pivot="290 340">
+                <path d="M280 342 C 334 356 376 338 380 298 C 383 272 370 256 356 250" fill="none" stroke="url(#dg-red-dark-b)" stroke-width="26" stroke-linecap="round"/>
+                <path d="M296 334 C 336 340 364 324 368 296" fill="none" stroke="#FF6B6B" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+                <path d="M356 258 C 330 254 320 232 330 214 L 352 178 L 382 210 C 392 232 380 252 356 258Z" fill="url(#dg-red-dark-b)"/>
+                <path d="M352 246 C 338 240 334 226 340 216 L 352 194" fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+              </g>
+              
+              <g id="wing-left-b" data-pivot="100 205">
+                <path d="M104 214 C 70 190 40 150 22 110 C 46 118 62 112 70 98 C 78 124 94 132 108 128 C 104 150 108 176 118 196 Z" fill="url(#dg-membrane-b)"/>
+                <path d="M104 214 C 70 190 40 150 22 110 C 46 118 62 112 70 98 C 78 124 94 132 108 128" fill="none" stroke="url(#dg-wing-b)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M100 206 C 80 176 72 140 70 100 M100 206 C 92 180 96 150 108 128" fill="none" stroke="#8C1230" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+              </g>
+              <g id="wing-right-b" data-pivot="300 205">
+                <path d="M296 214 C 330 190 360 150 378 110 C 354 118 338 112 330 98 C 322 124 306 132 292 128 C 296 150 292 176 282 196 Z" fill="url(#dg-membrane-b)"/>
+                <path d="M296 214 C 330 190 360 150 378 110 C 354 118 338 112 330 98 C 322 124 306 132 292 128" fill="none" stroke="url(#dg-wing-b)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M300 206 C 320 176 328 140 330 100 M300 206 C 308 180 304 150 292 128" fill="none" stroke="#8C1230" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+              </g>
+              
+              <g id="horns-b" data-pivot="200 110">
+                <path d="M154 120 C 140 98 128 78 112 60 C 140 66 160 86 172 110 Z" fill="url(#dg-horn-b)"/>
+                <path d="M246 120 C 260 98 272 78 288 60 C 260 66 240 86 228 110 Z" fill="url(#dg-horn-b)"/>
+              </g>
+              <g id="crest-b" data-pivot="200 100">
+                <path d="M184 104 Q 188 80 200 70 Q 212 80 216 104 Z" fill="url(#dg-horn-b)"/>
+                <path d="M170 110 Q 170 94 178 86 Q 186 96 188 108 Z" fill="url(#dg-horn-b)"/>
+                <path d="M230 110 Q 230 94 222 86 Q 214 96 212 108 Z" fill="url(#dg-horn-b)"/>
+              </g>
+              
+              <g id="feet-b" data-pivot="200 380">
+                <ellipse cx="152" cy="378" rx="36" ry="19" fill="url(#dg-red-dark-b)"/>
+                <ellipse cx="248" cy="378" rx="36" ry="19" fill="url(#dg-red-dark-b)"/>
+                <g fill="#F3DDAE"><ellipse cx="132" cy="388" rx="6" ry="5"/><ellipse cx="148" cy="391" rx="6" ry="5"/><ellipse cx="164" cy="389" rx="6" ry="5"/>
+                <ellipse cx="236" cy="389" rx="6" ry="5"/><ellipse cx="252" cy="391" rx="6" ry="5"/><ellipse cx="268" cy="388" rx="6" ry="5"/></g>
+              </g>
+              
+              <!-- Body and head are one plush shape -->
+              <g id="body-b" data-pivot="200 380">
+                <g filter="url(#dg-plush-b)">
+                  <path id="body-shape-b" d="M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z" fill="url(#dg-red-b)"/>
+                  <g clip-path="url(#dg-body-clip-b)">
+                    <ellipse cx="200" cy="318" rx="80" ry="74" fill="url(#dg-belly-b)"/>
+                    <path d="M140 300 Q 200 314 260 300 M136 326 Q 200 342 264 326 M142 352 Q 200 368 258 352" fill="none" stroke="#E2B47A" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+                    <!-- rim light on the right, soft shade on the left -->
+                    <path d="M320 200 C 336 250 330 320 286 362" fill="none" stroke="#FF9AA2" stroke-width="10" filter="url(#dg-softer-b)" opacity=".6"/>
+                    <ellipse cx="150" cy="150" rx="60" ry="40" fill="#fff" opacity=".18" filter="url(#dg-soft-b)"/>
+                  </g>
                 </g>
               </g>
-              <path class="loa" d="M-34 362 C30 300 46 210 -16 96"/>
-            </g></g>
-            <g transform="translate(570 14) scale(.92)"><g class="char" data-shape="circle" data-pose="strong" style="--head-set:1.18;--eye-set:1.4">
-              <g class="poser">
-                <g transform="translate(-22 328)"><rect class="limb leg-l" x="-9" y="0" width="18" height="34" rx="9"/></g>
-                <g transform="translate(22 328)"><rect class="limb leg-r" x="-9" y="0" width="18" height="34" rx="9"/></g>
-                <g class="armw-l"><rect class="limb arm-l" x="-9" y="-6" width="18" height="74" rx="9"/></g>
-                <g class="armw-r"><rect class="limb arm-r" x="-9" y="-6" width="18" height="74" rx="9"/></g>
-                <circle class="body b-circle" cx="0" cy="275" r="72"/>
-                <rect class="body b-square" x="-68" y="205" width="136" height="140" rx="20"/>
-                <path class="body b-tri" d="M0 210 L72 338 L-72 338Z"/>
-                <g class="headg"><circle class="skin" cx="0" cy="150" r="48"/>
-                  <g class="eye-l"><circle class="eye-white" cx="-17" cy="146" r="11"/><circle class="pupil" cx="-15" cy="148" r="5.5"/></g>
-                  <g class="eye-r"><circle class="eye-white" cx="17" cy="146" r="11"/><circle class="pupil" cx="19" cy="148" r="5.5"/></g>
-                  <path class="mouth" d="M-11 172 Q0 181 11 172"/>
+              
+              <g id="arm-left-b" data-pivot="98 262">
+                <g transform="rotate(22 98 262)">
+                  <rect x="80" y="252" width="34" height="68" rx="17" fill="url(#dg-red-dark-b)"/>
+                  <rect x="86" y="258" width="12" height="40" rx="6" fill="#FF6B6B" opacity=".25" filter="url(#dg-softer-b)"/>
+                  <g fill="#F3DDAE"><ellipse cx="88" cy="318" rx="5" ry="4.5"/><ellipse cx="98" cy="321" rx="5" ry="4.5"/><ellipse cx="108" cy="318" rx="5" ry="4.5"/></g>
                 </g>
               </g>
-              <path class="loa" d="M-34 362 C30 300 46 210 -16 96"/>
-            </g></g>
+              <g id="arm-right-b" data-pivot="302 262">
+                <g transform="rotate(-22 302 262)">
+                  <rect x="286" y="252" width="34" height="68" rx="17" fill="url(#dg-red-dark-b)"/>
+                  <rect x="302" y="258" width="12" height="40" rx="6" fill="#FF6B6B" opacity=".25" filter="url(#dg-softer-b)"/>
+                  <g fill="#F3DDAE"><ellipse cx="292" cy="318" rx="5" ry="4.5"/><ellipse cx="302" cy="321" rx="5" ry="4.5"/><ellipse cx="312" cy="318" rx="5" ry="4.5"/></g>
+                </g>
+              </g>
+              
+              <g id="face-b" data-pivot="200 220">
+                <ellipse cx="128" cy="236" rx="16" ry="10" fill="#FF7A8A" opacity=".55" filter="url(#dg-softer-b)"/>
+                <ellipse cx="272" cy="236" rx="16" ry="10" fill="#FF7A8A" opacity=".55" filter="url(#dg-softer-b)"/>
+              
+                <g id="muzzle-b">
+                  <ellipse cx="200" cy="252" rx="70" ry="40" fill="url(#dg-muzzle-b)"/>
+                  <ellipse cx="185" cy="232" rx="5.5" ry="3.8" fill="#8C1230"/>
+                  <ellipse cx="215" cy="232" rx="5.5" ry="3.8" fill="#8C1230"/>
+                </g>
+              
+                <g id="mouth-b" data-pivot="200 262">
+                  <g id="mouth-smile-b">
+                    <path d="M150 248 Q 200 312 250 248 Q 200 262 150 248Z" fill="#3E0716"/>
+                    <clipPath id="dg-grin-clip-b"><path d="M150 248 Q 200 312 250 248 Q 200 262 150 248Z"/></clipPath>
+                    <g clip-path="url(#dg-grin-clip-b)">
+                      <ellipse cx="200" cy="292" rx="34" ry="16" fill="#FF6F8E"/>
+                      <g fill="#FFFDF7"><rect x="160" y="246" width="12" height="13" rx="4"/><rect x="174" y="250" width="12" height="13" rx="4"/><rect x="188" y="252" width="12" height="13" rx="4"/><rect x="202" y="252" width="12" height="13" rx="4"/><rect x="216" y="250" width="12" height="13" rx="4"/><rect x="230" y="246" width="12" height="13" rx="4"/></g>
+                      <g fill="#FFFDF7"><path d="M164 252 L 172 272 L 178 252 Z"/><path d="M236 252 L 228 272 L 222 252 Z"/></g>
+                    </g>
+                    <path d="M150 248 Q 200 262 250 248" fill="none" stroke="#B3173A" stroke-width="3" stroke-linecap="round"/>
+                  </g>
+                  <g id="mouth-open-b" opacity="0">
+                    <ellipse cx="200" cy="274" rx="32" ry="30" fill="#3E0716"/>
+                    <ellipse cx="200" cy="292" rx="20" ry="11" fill="#FF6F8E"/>
+                    <g fill="#FFFDF7"><path d="M176 254 L 184 270 L 190 250 Z"/><path d="M224 254 L 216 270 L 210 250 Z"/></g>
+                  </g>
+                </g>
+              
+                <g id="eye-left-b" data-pivot="160 186">
+                  <clipPath id="dg-eye-left-clip-b"><ellipse cx="160" cy="186" rx="40" ry="44"/></clipPath>
+                  <ellipse cx="160" cy="186" rx="40" ry="44" fill="url(#dg-sclera-b)"/>
+                  <g id="pupil-left-b" data-pivot="163 192">
+                    <circle cx="163" cy="192" r="25" fill="url(#dg-iris-b)"/>
+                    <circle cx="163" cy="192" r="25" fill="none" stroke="#0B5C30" stroke-width="2"/>
+                    <circle cx="163" cy="194" r="12.5" fill="#06140C"/>
+                    <circle cx="173" cy="181" r="7.5" fill="#fff"/>
+                    <circle cx="155" cy="203" r="3.2" fill="#fff" opacity=".85"/>
+                  </g>
+                  <g clip-path="url(#dg-eye-left-clip-b)"><ellipse cx="160" cy="146" rx="46" ry="18" fill="#9C2A44" opacity=".22" filter="url(#dg-softer-b)"/></g>
+                  <ellipse cx="160" cy="186" rx="40" ry="44" fill="none" stroke="#8C1230" stroke-width="2.5" opacity=".35"/>
+                </g>
+                <g id="eye-right-b" data-pivot="240 186">
+                  <clipPath id="dg-eye-right-clip-b"><ellipse cx="240" cy="186" rx="40" ry="44"/></clipPath>
+                  <ellipse cx="240" cy="186" rx="40" ry="44" fill="url(#dg-sclera-b)"/>
+                  <g id="pupil-right-b" data-pivot="237 192">
+                    <circle cx="237" cy="192" r="25" fill="url(#dg-iris-b)"/>
+                    <circle cx="237" cy="192" r="25" fill="none" stroke="#0B5C30" stroke-width="2"/>
+                    <circle cx="237" cy="194" r="12.5" fill="#06140C"/>
+                    <circle cx="247" cy="181" r="7.5" fill="#fff"/>
+                    <circle cx="229" cy="203" r="3.2" fill="#fff" opacity=".85"/>
+                  </g>
+                  <g clip-path="url(#dg-eye-right-clip-b)"><ellipse cx="240" cy="146" rx="46" ry="18" fill="#9C2A44" opacity=".22" filter="url(#dg-softer-b)"/></g>
+                  <ellipse cx="240" cy="186" rx="40" ry="44" fill="none" stroke="#8C1230" stroke-width="2.5" opacity=".35"/>
+                </g>
+              
+                <g id="brows-b" data-pivot="200 132">
+                  <path d="M134 136 Q 158 122 182 132" fill="none" stroke="#7A0F28" stroke-width="7" stroke-linecap="round"/>
+                  <path d="M218 132 Q 242 122 266 136" fill="none" stroke="#7A0F28" stroke-width="7" stroke-linecap="round"/>
+                </g>
+              </g>
+              </g>
+              </svg>
+              <!--/DRAIG-->
+              <path class="loa" d="M150 400 C 236 330 262 220 196 62"/>
+            </g>
+            <g class="who" data-pose="strong" transform="translate(446 136.4) scale(.62)">
+              <!--DRAIG:-c-->
+              <svg viewBox="0 0 400 420" class="draig" width="400" height="420" overflow="visible" id="dragon-c" role="img" aria-label="A small red Welsh dragon with green eyes">
+              <!-- Draig: original character for the Principles of Animation site (no licence restrictions).
+                   Every animatable part is a named <g>. Pivot points are in data-pivot="x y" (viewBox units).
+                   Full rig notes: docs/Draig_Character_Guide.md
+                   Body shapes for the Appeal page: set the SAME d on #body-shape and #body-clip-shape:
+                     round:   M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z
+                     square:  M118 104 H282 Q 330 104 332 152 V 336 Q 332 380 288 380 H112 Q 68 380 68 336 V152 Q 70 104 118 104Z
+                     pointed: M200 92 C 250 120 300 170 322 236 C 344 302 330 380 200 380 C 70 380 56 302 78 236 C 100 170 150 120 200 92Z -->
+              <defs>
+                <radialGradient id="dg-red-c" cx="38%" cy="28%" r="80%">
+                  <stop offset="0" stop-color="#FF6B6B"/><stop offset=".45" stop-color="#E0283F"/><stop offset="1" stop-color="#8C1230"/>
+                </radialGradient>
+                <radialGradient id="dg-red-dark-c" cx="40%" cy="30%" r="80%">
+                  <stop offset="0" stop-color="#E0283F"/><stop offset="1" stop-color="#7A0F28"/>
+                </radialGradient>
+                <radialGradient id="dg-belly-c" cx="45%" cy="30%" r="75%">
+                  <stop offset="0" stop-color="#FFF4DD"/><stop offset=".6" stop-color="#FBE0B4"/><stop offset="1" stop-color="#E9BE85"/>
+                </radialGradient>
+                <radialGradient id="dg-muzzle-c" cx="45%" cy="30%" r="80%">
+                  <stop offset="0" stop-color="#FF8E8E"/><stop offset="1" stop-color="#E23A4E"/>
+                </radialGradient>
+                <linearGradient id="dg-horn-c" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0" stop-color="#C99A55"/><stop offset=".6" stop-color="#F3DDAE"/><stop offset="1" stop-color="#FFF6E2"/>
+                </linearGradient>
+                <linearGradient id="dg-wing-c" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#C01F3A"/><stop offset="1" stop-color="#6E0C24"/>
+                </linearGradient>
+                <linearGradient id="dg-membrane-c" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#F2546A"/><stop offset="1" stop-color="#A3163A"/>
+                </linearGradient>
+                <radialGradient id="dg-sclera-c" cx="45%" cy="35%" r="70%">
+                  <stop offset="0" stop-color="#FFFFFF"/><stop offset=".75" stop-color="#F1F2F8"/><stop offset="1" stop-color="#C9CCDA"/>
+                </radialGradient>
+                <radialGradient id="dg-iris-c" cx="50%" cy="55%" r="60%">
+                  <stop offset="0" stop-color="#7BE3A2"/><stop offset=".55" stop-color="#22A35A"/><stop offset="1" stop-color="#0B5C30"/>
+                </radialGradient>
+                <radialGradient id="dg-shadow-c" cx="50%" cy="50%" r="50%">
+                  <stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+                </radialGradient>
+                <!-- Plush texture: soft fuzzy edge plus fine felt grain -->
+                <filter id="dg-plush-c" x="-5%" y="-5%" width="110%" height="110%">
+                  <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" result="n"/>
+                  <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/>
+                  <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 -.18" result="grain"/>
+                  <feComposite in="grain" in2="d" operator="in" result="g2"/>
+                  <feBlend in="g2" in2="d" mode="soft-light"/>
+                </filter>
+                <filter id="dg-soft-c" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+                <filter id="dg-softer-c" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter>
+                <clipPath id="dg-body-clip-c"><path id="body-clip-shape-c" d="M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z"/></clipPath>
+              </defs>
+              
+              <ellipse id="shadow-c" cx="200" cy="396" rx="130" ry="16" fill="url(#dg-shadow-c)"/>
+              
+              <g id="rig-c" data-pivot="200 380">
+              <!-- Behind the body -->
+              <g id="tail-c" data-pivot="290 340">
+                <path d="M280 342 C 334 356 376 338 380 298 C 383 272 370 256 356 250" fill="none" stroke="url(#dg-red-dark-c)" stroke-width="26" stroke-linecap="round"/>
+                <path d="M296 334 C 336 340 364 324 368 296" fill="none" stroke="#FF6B6B" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+                <path d="M356 258 C 330 254 320 232 330 214 L 352 178 L 382 210 C 392 232 380 252 356 258Z" fill="url(#dg-red-dark-c)"/>
+                <path d="M352 246 C 338 240 334 226 340 216 L 352 194" fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+              </g>
+              
+              <g id="wing-left-c" data-pivot="100 205">
+                <path d="M104 214 C 70 190 40 150 22 110 C 46 118 62 112 70 98 C 78 124 94 132 108 128 C 104 150 108 176 118 196 Z" fill="url(#dg-membrane-c)"/>
+                <path d="M104 214 C 70 190 40 150 22 110 C 46 118 62 112 70 98 C 78 124 94 132 108 128" fill="none" stroke="url(#dg-wing-c)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M100 206 C 80 176 72 140 70 100 M100 206 C 92 180 96 150 108 128" fill="none" stroke="#8C1230" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+              </g>
+              <g id="wing-right-c" data-pivot="300 205">
+                <path d="M296 214 C 330 190 360 150 378 110 C 354 118 338 112 330 98 C 322 124 306 132 292 128 C 296 150 292 176 282 196 Z" fill="url(#dg-membrane-c)"/>
+                <path d="M296 214 C 330 190 360 150 378 110 C 354 118 338 112 330 98 C 322 124 306 132 292 128" fill="none" stroke="url(#dg-wing-c)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M300 206 C 320 176 328 140 330 100 M300 206 C 308 180 304 150 292 128" fill="none" stroke="#8C1230" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+              </g>
+              
+              <g id="horns-c" data-pivot="200 110">
+                <path d="M154 120 C 140 98 128 78 112 60 C 140 66 160 86 172 110 Z" fill="url(#dg-horn-c)"/>
+                <path d="M246 120 C 260 98 272 78 288 60 C 260 66 240 86 228 110 Z" fill="url(#dg-horn-c)"/>
+              </g>
+              <g id="crest-c" data-pivot="200 100">
+                <path d="M184 104 Q 188 80 200 70 Q 212 80 216 104 Z" fill="url(#dg-horn-c)"/>
+                <path d="M170 110 Q 170 94 178 86 Q 186 96 188 108 Z" fill="url(#dg-horn-c)"/>
+                <path d="M230 110 Q 230 94 222 86 Q 214 96 212 108 Z" fill="url(#dg-horn-c)"/>
+              </g>
+              
+              <g id="feet-c" data-pivot="200 380">
+                <ellipse cx="152" cy="378" rx="36" ry="19" fill="url(#dg-red-dark-c)"/>
+                <ellipse cx="248" cy="378" rx="36" ry="19" fill="url(#dg-red-dark-c)"/>
+                <g fill="#F3DDAE"><ellipse cx="132" cy="388" rx="6" ry="5"/><ellipse cx="148" cy="391" rx="6" ry="5"/><ellipse cx="164" cy="389" rx="6" ry="5"/>
+                <ellipse cx="236" cy="389" rx="6" ry="5"/><ellipse cx="252" cy="391" rx="6" ry="5"/><ellipse cx="268" cy="388" rx="6" ry="5"/></g>
+              </g>
+              
+              <!-- Body and head are one plush shape -->
+              <g id="body-c" data-pivot="200 380">
+                <g filter="url(#dg-plush-c)">
+                  <path id="body-shape-c" d="M200 96 C 292 96 332 172 332 252 C 332 334 282 380 200 380 C 118 380 68 334 68 252 C 68 172 108 96 200 96Z" fill="url(#dg-red-c)"/>
+                  <g clip-path="url(#dg-body-clip-c)">
+                    <ellipse cx="200" cy="318" rx="80" ry="74" fill="url(#dg-belly-c)"/>
+                    <path d="M140 300 Q 200 314 260 300 M136 326 Q 200 342 264 326 M142 352 Q 200 368 258 352" fill="none" stroke="#E2B47A" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+                    <!-- rim light on the right, soft shade on the left -->
+                    <path d="M320 200 C 336 250 330 320 286 362" fill="none" stroke="#FF9AA2" stroke-width="10" filter="url(#dg-softer-c)" opacity=".6"/>
+                    <ellipse cx="150" cy="150" rx="60" ry="40" fill="#fff" opacity=".18" filter="url(#dg-soft-c)"/>
+                  </g>
+                </g>
+              </g>
+              
+              <g id="arm-left-c" data-pivot="98 262">
+                <g transform="rotate(22 98 262)">
+                  <rect x="80" y="252" width="34" height="68" rx="17" fill="url(#dg-red-dark-c)"/>
+                  <rect x="86" y="258" width="12" height="40" rx="6" fill="#FF6B6B" opacity=".25" filter="url(#dg-softer-c)"/>
+                  <g fill="#F3DDAE"><ellipse cx="88" cy="318" rx="5" ry="4.5"/><ellipse cx="98" cy="321" rx="5" ry="4.5"/><ellipse cx="108" cy="318" rx="5" ry="4.5"/></g>
+                </g>
+              </g>
+              <g id="arm-right-c" data-pivot="302 262">
+                <g transform="rotate(-22 302 262)">
+                  <rect x="286" y="252" width="34" height="68" rx="17" fill="url(#dg-red-dark-c)"/>
+                  <rect x="302" y="258" width="12" height="40" rx="6" fill="#FF6B6B" opacity=".25" filter="url(#dg-softer-c)"/>
+                  <g fill="#F3DDAE"><ellipse cx="292" cy="318" rx="5" ry="4.5"/><ellipse cx="302" cy="321" rx="5" ry="4.5"/><ellipse cx="312" cy="318" rx="5" ry="4.5"/></g>
+                </g>
+              </g>
+              
+              <g id="face-c" data-pivot="200 220">
+                <ellipse cx="128" cy="236" rx="16" ry="10" fill="#FF7A8A" opacity=".55" filter="url(#dg-softer-c)"/>
+                <ellipse cx="272" cy="236" rx="16" ry="10" fill="#FF7A8A" opacity=".55" filter="url(#dg-softer-c)"/>
+              
+                <g id="muzzle-c">
+                  <ellipse cx="200" cy="252" rx="70" ry="40" fill="url(#dg-muzzle-c)"/>
+                  <ellipse cx="185" cy="232" rx="5.5" ry="3.8" fill="#8C1230"/>
+                  <ellipse cx="215" cy="232" rx="5.5" ry="3.8" fill="#8C1230"/>
+                </g>
+              
+                <g id="mouth-c" data-pivot="200 262">
+                  <g id="mouth-smile-c">
+                    <path d="M150 248 Q 200 312 250 248 Q 200 262 150 248Z" fill="#3E0716"/>
+                    <clipPath id="dg-grin-clip-c"><path d="M150 248 Q 200 312 250 248 Q 200 262 150 248Z"/></clipPath>
+                    <g clip-path="url(#dg-grin-clip-c)">
+                      <ellipse cx="200" cy="292" rx="34" ry="16" fill="#FF6F8E"/>
+                      <g fill="#FFFDF7"><rect x="160" y="246" width="12" height="13" rx="4"/><rect x="174" y="250" width="12" height="13" rx="4"/><rect x="188" y="252" width="12" height="13" rx="4"/><rect x="202" y="252" width="12" height="13" rx="4"/><rect x="216" y="250" width="12" height="13" rx="4"/><rect x="230" y="246" width="12" height="13" rx="4"/></g>
+                      <g fill="#FFFDF7"><path d="M164 252 L 172 272 L 178 252 Z"/><path d="M236 252 L 228 272 L 222 252 Z"/></g>
+                    </g>
+                    <path d="M150 248 Q 200 262 250 248" fill="none" stroke="#B3173A" stroke-width="3" stroke-linecap="round"/>
+                  </g>
+                  <g id="mouth-open-c" opacity="0">
+                    <ellipse cx="200" cy="274" rx="32" ry="30" fill="#3E0716"/>
+                    <ellipse cx="200" cy="292" rx="20" ry="11" fill="#FF6F8E"/>
+                    <g fill="#FFFDF7"><path d="M176 254 L 184 270 L 190 250 Z"/><path d="M224 254 L 216 270 L 210 250 Z"/></g>
+                  </g>
+                </g>
+              
+                <g id="eye-left-c" data-pivot="160 186">
+                  <clipPath id="dg-eye-left-clip-c"><ellipse cx="160" cy="186" rx="40" ry="44"/></clipPath>
+                  <ellipse cx="160" cy="186" rx="40" ry="44" fill="url(#dg-sclera-c)"/>
+                  <g id="pupil-left-c" data-pivot="163 192">
+                    <circle cx="163" cy="192" r="25" fill="url(#dg-iris-c)"/>
+                    <circle cx="163" cy="192" r="25" fill="none" stroke="#0B5C30" stroke-width="2"/>
+                    <circle cx="163" cy="194" r="12.5" fill="#06140C"/>
+                    <circle cx="173" cy="181" r="7.5" fill="#fff"/>
+                    <circle cx="155" cy="203" r="3.2" fill="#fff" opacity=".85"/>
+                  </g>
+                  <g clip-path="url(#dg-eye-left-clip-c)"><ellipse cx="160" cy="146" rx="46" ry="18" fill="#9C2A44" opacity=".22" filter="url(#dg-softer-c)"/></g>
+                  <ellipse cx="160" cy="186" rx="40" ry="44" fill="none" stroke="#8C1230" stroke-width="2.5" opacity=".35"/>
+                </g>
+                <g id="eye-right-c" data-pivot="240 186">
+                  <clipPath id="dg-eye-right-clip-c"><ellipse cx="240" cy="186" rx="40" ry="44"/></clipPath>
+                  <ellipse cx="240" cy="186" rx="40" ry="44" fill="url(#dg-sclera-c)"/>
+                  <g id="pupil-right-c" data-pivot="237 192">
+                    <circle cx="237" cy="192" r="25" fill="url(#dg-iris-c)"/>
+                    <circle cx="237" cy="192" r="25" fill="none" stroke="#0B5C30" stroke-width="2"/>
+                    <circle cx="237" cy="194" r="12.5" fill="#06140C"/>
+                    <circle cx="247" cy="181" r="7.5" fill="#fff"/>
+                    <circle cx="229" cy="203" r="3.2" fill="#fff" opacity=".85"/>
+                  </g>
+                  <g clip-path="url(#dg-eye-right-clip-c)"><ellipse cx="240" cy="146" rx="46" ry="18" fill="#9C2A44" opacity=".22" filter="url(#dg-softer-c)"/></g>
+                  <ellipse cx="240" cy="186" rx="40" ry="44" fill="none" stroke="#8C1230" stroke-width="2.5" opacity=".35"/>
+                </g>
+              
+                <g id="brows-c" data-pivot="200 132">
+                  <path d="M134 136 Q 158 122 182 132" fill="none" stroke="#7A0F28" stroke-width="7" stroke-linecap="round"/>
+                  <path d="M218 132 Q 242 122 266 136" fill="none" stroke="#7A0F28" stroke-width="7" stroke-linecap="round"/>
+                </g>
+              </g>
+              </g>
+              </svg>
+              <!--/DRAIG-->
+              <path class="loa" d="M150 400 C 236 330 262 220 196 62"/>
+            </g>
             <text class="cap" x="230" y="396">Left</text><text class="cap" x="570" y="396">Right</text>
           </g>
         </svg>
@@ -111,20 +621,21 @@
     </div>
     <h2 class="build-only">Shape language</h2>
     <div class="seg build-only" role="group" aria-label="Shape language" data-target="build" data-attr="shape">
-      <button data-value="circle" aria-pressed="true">Circle</button><button data-value="square" aria-pressed="false">Square</button><button data-value="triangle" aria-pressed="false">Triangle</button>
+      <button data-value="round" aria-pressed="true">Round</button><button data-value="square" aria-pressed="false">Square</button><button data-value="pointed" aria-pressed="false">Pointed</button>
     </div>
-    <p class="small build-only">Circles feel friendly, squares sturdy, triangles sharp or threatening.</p>
+    <p class="small build-only">Round reads friendly, square sturdy, pointed sharp or less trustworthy.</p>
     <h2 class="build-only">Proportions</h2>
     <label class="slider build-only"><span class="row"><span>Head size</span><output>100%</output></span>
-      <input type="range" min="70" max="150" step="5" value="100" data-target="build" data-var="--head-set" data-scale="0.01" data-unit="%"></label>
+      <input type="range" id="headSize" min="70" max="140" step="5" value="100" data-unit="%"></label>
     <label class="slider build-only"><span class="row"><span>Eye size</span><output>100%</output></span>
-      <input type="range" min="40" max="200" step="5" value="100" data-target="build" data-var="--eye-set" data-scale="0.01" data-unit="%"></label>
+      <input type="range" id="eyeSize" min="40" max="160" step="5" value="100" data-unit="%"></label>
+    <p class="small build-only">A bigger face and eyes read younger and cuter.</p>
     <h2 class="build-only">Pose</h2>
     <div class="seg build-only" role="group" aria-label="Pose" data-target="build" data-attr="pose">
       <button data-value="stiff" aria-pressed="true">Stiff</button><button data-value="strong" aria-pressed="false">Line of action</button>
     </div>
     <div class="ask compare-only" id="ask">
-      <p class="q">Same parts, two ways. Which is more appealing?</p>
+      <p class="q">Same dragon, two ways. Which is more appealing?</p>
       <div class="choices"><button data-pick="left">Left</button><button data-pick="right">Right</button></div>
       <p class="answer" id="answer" aria-live="polite"></p>
     </div>
