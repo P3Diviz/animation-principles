@@ -13,8 +13,13 @@
 .ball{width:20cqw;height:20cqw;position:absolute;border-radius:50%;left:40%;
   background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%);
   transform-origin:center center;animation:bounce var(--dur,.5s) alternate infinite ease}
+/* 30%: a little stretch at speed, just after leaving the floor (added at Paul's request; 0%, 40% and
+   100% are his values unchanged). It only changes the shape, not the position, and the ball is high
+   enough by then that the stretched shape stays above the floor. */
 @keyframes bounce{
   0%{top:calc((248 + 40 * var(--amount,1)) / 4.8 * 1cqh);transform:scale(calc(1 + .7 * var(--amount,1)),calc(1 - .5 * var(--amount,1)))}
+  10%{transform:scale(calc(1 + .41 * var(--amount,1)),calc(1 - .3 * var(--amount,1)))}   /* where Paul's ball already is at 10%, so the first frames are unchanged */
+  30%{transform:scale(calc(1 - .1 * var(--amount,1)),calc(1 + .15 * var(--amount,1)))}
   40%{height:20cqw;border-radius:50%;transform:scaleX(1)}
   100%{top:0%}}
 .shadow{width:20cqw;height:3.75cqw;border-radius:50%;position:absolute;top:80.208cqh;left:40%;z-index:-1;transform-origin:bottom center;
