@@ -1,0 +1,22 @@
+/* 09 Timing: ball drop, spacing ghosts, guess the weight. */
+.scene{--ar:16/9}
+.fall{position:absolute;top:9%;bottom:16%;width:0}
+.fall .floor{position:absolute;left:-14cqw;width:28cqw;top:100%;height:1px;background:rgba(255,255,255,.14)}
+.ball{position:absolute;left:0;top:0;width:9cqh;aspect-ratio:1;translate:-50% -100%;border-radius:50%;
+  background:radial-gradient(circle at 50% 20%,#F0F0FF 0%,#9999FF 40%,#4B4BB8 85%)}
+.ghosts span{position:absolute;left:0;top:0;width:9cqh;aspect-ratio:1;translate:-50% -100%;border-radius:50%;border:1px solid rgba(153,153,255,.45)}
+.ghosts{display:none}
+.stage[data-ghosts="on"] .ghosts{display:block}
+.fall .label{position:absolute;top:calc(100% + 10px);left:0;translate:-50% 0;color:var(--text-2);font-size:12px;white-space:nowrap}
+
+#fallMain{left:50%}
+#fallL{left:30%}
+#fallR{left:70%}
+
+/* Mode: one drop, or two side by side for Guess the weight */
+#fallL,#fallR{display:none}
+main[data-mode="guess"] #fallMain{display:none}
+main[data-mode="guess"] #fallL,main[data-mode="guess"] #fallR{display:block}
+main[data-mode="guess"] .drop-only{display:none}
+main:not([data-mode="guess"]) .guess-only{display:none}
+.presets button{flex:1 1 auto}

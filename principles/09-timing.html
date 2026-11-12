@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>09 Timing</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/shell.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages/09.css">
+<link rel="stylesheet" href="../css/glass.css">
+<script type="module" src="../js/core/menu.js"></script>
+<script type="module" src="../js/core/present.js"></script>
+<script type="module" src="../js/pages/09-timing.js"></script>
+</head>
+<body class="principle">
+<header class="hdr"><a class="brand" href="../index.html">Principles of Animation</a><nav><a href="../index.html">Home</a><button class="link" id="menuBtn" aria-expanded="false" aria-controls="menu">Principles <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a href="../spot-it.html">Spot it</a><a href="../playground.html">Playground</a><button class="pill" id="presentBtn">Present <span class="mono" style="opacity:.7">P</span></button></nav></header>
+<nav class="menu" id="menu" aria-label="All principles" hidden>
+  <div class="menu-cols">
+    <a href="01-squash-and-stretch.html"><span class="mono">01</span>Squash and stretch</a>
+    <a href="07-arc.html"><span class="mono">07</span>Arc</a>
+    <a href="02-anticipation.html"><span class="mono">02</span>Anticipation</a>
+    <a href="08-secondary-action.html"><span class="mono">08</span>Secondary action</a>
+    <a href="03-staging.html"><span class="mono">03</span>Staging</a>
+    <a href="09-timing.html" aria-current="page"><span class="mono">09</span>Timing</a>
+    <a href="04-straight-ahead-pose-to-pose.html"><span class="mono">04</span>Straight ahead and pose to pose</a>
+    <a href="10-exaggeration.html"><span class="mono">10</span>Exaggeration</a>
+    <a href="05-follow-through.html"><span class="mono">05</span>Follow through and overlapping action</a>
+    <a href="11-appeal.html"><span class="mono">11</span>Appeal</a>
+    <a href="06-slow-in-slow-out.html"><span class="mono">06</span>Slow in and slow out</a>
+    <a href="12-solid-drawing.html"><span class="mono">12</span>Solid drawing</a>
+  </div>
+  <a class="menu-all" href="../principles.html">See all twelve</a>
+</nav>
+<div class="present-hint">Present mode. Press P or Esc to exit</div>
+<main class="page" id="main" data-view="2d" data-mode="drop" data-motion="gravity" data-rate="ones">
+  <section class="stage-area">
+    <div class="stage-head">
+      <h1><span class="mono">09</span>Timing</h1>
+    </div>
+    <div class="stage has-scene" id="stage" data-ghosts="on">
+      <div class="scene">
+        <div class="fall" id="fallMain">
+          <!-- Spacing ghosts: one per frame of the fall (up to 40 frames). Written in HTML; JS sets their top. -->
+          <div class="ghosts" id="ghosts"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="floor"></div><div class="ball" id="ballMain"></div>
+          <span class="label mono" id="fallLabel">14 frames</span>
+        </div>
+        <div class="fall" id="fallL"><div class="floor"></div><div class="ball" id="ballL"></div><span class="label">Left</span></div>
+        <div class="fall" id="fallR"><div class="floor"></div><div class="ball" id="ballR"></div><span class="label">Right</span></div>
+      </div>
+    </div>
+    <div class="timeline">
+      <button class="play" id="play" aria-label="Pause"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect class="i-pause" x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect class="i-pause" x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><path class="i-play" d="M3 1.5 12 7 3 12.5Z" fill="currentColor" style="display:none"/></svg></button>
+      <span class="tc" id="tc">00:00:00:00</span>
+      <div class="track" id="track">
+        <div class="bar"></div><div class="span" id="span" style="left:0;width:50%"></div><div class="ticks"></div>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <svg class="key" viewBox="0 0 14 14" aria-hidden="true"><path/><path/></svg>
+        <div class="head" id="head"></div>
+      </div>
+    </div>
+  </section>
+  <aside class="panel">
+    <h2>Mode</h2>
+    <div class="seg" role="group" aria-label="Mode" data-target="main" data-attr="mode">
+      <button data-value="drop" aria-pressed="true">Drop</button><button data-value="guess" aria-pressed="false">Guess the weight</button>
+    </div>
+    <h2>Motion</h2>
+    <div class="seg" role="group" aria-label="Motion" data-target="main" data-attr="motion">
+      <button data-value="linear" aria-pressed="false">Linear</button><button data-value="gravity" aria-pressed="true">Gravity</button>
+    </div>
+    <h2 class="drop-only">Weight</h2>
+    <div class="seg presets drop-only" id="weights" role="group" aria-label="Weight presets">
+      <button data-w="balloon" aria-pressed="false">Balloon</button>
+      <button data-w="football" aria-pressed="true">Football</button>
+      <button data-w="bowling" aria-pressed="false">Bowling ball</button>
+    </div>
+    <label class="slider drop-only"><span class="row"><span>Frames to fall</span><output>14</output></span>
+      <input type="range" id="frames" min="6" max="40" step="1" value="14"></label>
+    <h2>Frame rate</h2>
+    <div class="seg" role="group" aria-label="Frame rate" data-target="main" data-attr="rate">
+      <button data-value="ones" aria-pressed="true">25 fps</button><button data-value="twos" aria-pressed="false">On twos</button>
+    </div>
+    <div class="pills drop-only" style="margin-top:8px"><button class="pill" data-target="stage" data-attr="ghosts" aria-pressed="true">Spacing ghosts</button></div>
+    <p class="small drop-only" id="readout">Football: 14 frames to fall, 0.56 seconds.</p>
+    <div class="ask guess-only" id="guess">
+      <h2>Guess the weight</h2>
+      <p class="q">Same height, same size. Which ball is heavier?</p>
+      <div class="choices"><button data-pick="L">Left</button><button data-pick="R">Right</button></div>
+      <p class="answer" id="guessAnswer" aria-live="polite"></p>
+      <div><button class="btn secondary small-btn" id="nextPair">Next pair</button></div>
+    </div>
+  </aside>
+</main>
+<footer class="notes">
+  <section><h3>What to notice</h3><p>Fewer frames feels light and fast; more frames feels heavy or slow.</p></section>
+  <section><h3>In After Effects</h3><p>Move keyframes closer or further apart. <span class="kbd">Alt</span>+drag scales a group of keys.</p></section>
+  <section><h3>Try this</h3><p>Make the football feel like a balloon by changing frames only.</p></section>
+  <div class="prevnext"><a href="08-secondary-action.html" aria-label="Previous: 08 Secondary action">‹ 08</a><a href="10-exaggeration.html" aria-label="Next: 10 Exaggeration">10 ›</a></div>
+</footer>
+</body>
+</html>
