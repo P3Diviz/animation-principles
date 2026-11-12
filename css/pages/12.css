@@ -8,10 +8,10 @@
 .stage[data-step="stick"] .sk{display:inline}
 .stage[data-step="stick"] .draig{display:none}
 
-/* Construction: circle and ellipse outlines in the accent colour over a faded Draig */
-.cons{fill:none;stroke:var(--accent);stroke-width:3}
+/* Construction: Draig built only from simple forms (spheres, ellipses, cones), outlined in the accent colour */
+.cons{fill:none;stroke:var(--accent);stroke-width:3;stroke-linejoin:round}
 .stage[data-step="cons"] .cons{display:inline}
-.stage[data-step="cons"] .draig{opacity:.35}
+.stage[data-step="cons"] .draig{display:none}
 
 /* Flat: the gradients swapped for flat fills, the plush filter and soft highlights removed */
 .stage[data-step="flat"] .draig [fill="url(#dg-red)"]{fill:#E0283F}

@@ -54,7 +54,10 @@ function draw() {
     const e = $('c-arm' + side);
     e.setAttribute('cx', cx); e.setAttribute('cy', cy); e.setAttribute('transform', `rotate(${deg} ${cx} ${cy})`);
   }
-  $('c-face').setAttribute('transform', `translate(${shift} 0)`);
+  $('c-face').setAttribute('transform', `translate(${shift} 0) rotate(${P.tilt} 200 220)`);
+  $('c-pupilL').setAttribute('transform', `translate(${shift * .15} 0)`); $('c-pupilR').setAttribute('transform', `translate(${shift * .15} 0)`);
+  $('c-wingL').setAttribute('transform', `rotate(${P.wingL} 100 205)`); $('c-wingR').setAttribute('transform', `rotate(${P.wingR} 300 205)`);
+  $('c-tail').setAttribute('transform', `rotate(${P.tail} 290 340)`);
   $('c-centre').setAttribute('d', centreLine(200, 96, 380, 132, t));
 }
 

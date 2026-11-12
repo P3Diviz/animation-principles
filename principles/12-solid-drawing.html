@@ -245,11 +245,18 @@
 
             <!-- Construction: simple solids over the drawing -->
             <g class="cons" id="aid-cons">
+              <!-- Behind the body: wings and tail, each turned about the same pivot as Draig's -->
+              <g id="c-wingL"><polygon points="104,214 22,110 70,98 108,128 118,196"/><line x1="100" y1="206" x2="70" y2="100"/></g>
+              <g id="c-wingR"><polygon points="296,214 378,110 330,98 292,128 282,196"/><line x1="300" y1="206" x2="330" y2="100"/></g>
+              <g id="c-tail"><path d="M280 342 C 334 356 376 338 380 298 C 383 272 370 256 356 250"/><polygon points="356,258 330,214 352,178 382,210"/></g>
+              <polygon points="154,120 112,60 172,110"/><polygon points="246,120 288,60 228,110"/>
+              <g id="c-crest"><polygon points="184,104 200,70 216,104"/><polygon points="170,110 178,86 188,108"/><polygon points="230,110 222,86 212,108"/></g>
               <ellipse id="c-body" cx="200" cy="238" rx="132" ry="142"/>
               <path id="c-centre"/>
               <path d="M68 238 A132 36 0 0 0 332 238"/>
               <g id="c-face">
                 <ellipse cx="160" cy="186" rx="40" ry="44"/><ellipse cx="240" cy="186" rx="40" ry="44"/>
+                <circle id="c-pupilL" cx="163" cy="192" r="25"/><circle id="c-pupilR" cx="237" cy="192" r="25"/>
                 <ellipse cx="200" cy="252" rx="70" ry="40"/>
                 <path d="M120 186 A80 14 0 0 0 280 186"/>
               </g>
