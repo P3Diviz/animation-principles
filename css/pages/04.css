@@ -1,4 +1,4 @@
-/* 04 Straight ahead and pose to pose. 50 frames (2 s); one frame = 2%. */
+/* 04 Straight ahead and pose to pose. 50 frames (2 s). */
 .scene{--ar:2}
 .lbl{font:500 13px var(--font);fill:var(--text-2)}
 .divider{stroke:rgba(255,255,255,.08)}
@@ -10,37 +10,19 @@
 .strip{animation:sprite .64s steps(8) infinite both}
 @keyframes sprite{from{transform:translateX(0)}to{transform:translateX(-960px)}}
 
-/* ===== Right: pose to pose. Each joint has its own keyframes at the same key poses. =====
-   Keys: frame 0 stand, 10 crouch, 16 take-off, 24 top of the jump, 32 land, 40 stand. */
-.j{animation-duration:2s;animation-iteration-count:infinite;animation-fill-mode:both;animation-delay:var(--d,0s);
-  animation-timing-function:cubic-bezier(.33,0,.67,1)}       /* in-betweens: Easy Ease between keys */
-.stage[data-mode="keys"] .j{animation-timing-function:steps(1,end)}   /* keys only: hold each pose (Hold Keyframe) */
-.hip{animation-name:p-hip} .torso{animation-name:p-torso}
-.armF{animation-name:p-armF} .armB{animation-name:p-armB}
-.thighF{animation-name:p-thighF} .shinF{animation-name:p-shinF}
-.thighB{animation-name:p-thighB} .shinB{animation-name:p-shinB}
-@keyframes p-hip{0%{transform:translate(0,290px)}20%{transform:translate(0,330px)}32%{transform:translate(0,290px)}48%{transform:translate(0,170px)}64%{transform:translate(0,330px)}80%,100%{transform:translate(0,290px)}}
-@keyframes p-torso{0%{transform:rotate(0)}20%{transform:rotate(30deg)}32%{transform:rotate(-6deg)}48%{transform:rotate(15deg)}64%{transform:rotate(30deg)}80%,100%{transform:rotate(0)}}
-@keyframes p-armF{0%{transform:rotate(10deg)}20%{transform:rotate(60deg)}32%{transform:rotate(-160deg)}48%{transform:rotate(-90deg)}64%{transform:rotate(-30deg)}80%,100%{transform:rotate(10deg)}}
-@keyframes p-armB{0%{transform:rotate(-10deg)}20%{transform:rotate(70deg)}32%{transform:rotate(-150deg)}48%{transform:rotate(-70deg)}64%{transform:rotate(-20deg)}80%,100%{transform:rotate(-10deg)}}
-@keyframes p-thighF{0%{transform:rotate(0)}20%{transform:rotate(-70deg)}32%{transform:rotate(4deg)}48%{transform:rotate(-80deg)}64%{transform:rotate(-70deg)}80%,100%{transform:rotate(0)}}
-@keyframes p-shinF{0%{transform:rotate(0)}20%{transform:rotate(110deg)}32%{transform:rotate(6deg)}48%{transform:rotate(100deg)}64%{transform:rotate(110deg)}80%,100%{transform:rotate(0)}}
-@keyframes p-thighB{0%{transform:rotate(0)}20%{transform:rotate(-62deg)}32%{transform:rotate(12deg)}48%{transform:rotate(-60deg)}64%{transform:rotate(-62deg)}80%,100%{transform:rotate(0)}}
-@keyframes p-shinB{0%{transform:rotate(0)}20%{transform:rotate(100deg)}32%{transform:rotate(12deg)}48%{transform:rotate(110deg)}64%{transform:rotate(100deg)}80%,100%{transform:rotate(0)}}
-.front{fill:#C9C9D3} .back{fill:#8E8EA0}
+/* ===== Right: pose to pose. Draig is posed from key poses by js/pages/04-straight-ahead.js ===== */
 
-/* ===== Onion skin: the drawings either side, as outlines ===== */
+/* Onion skin: the drawings either side, as pale ghosts */
 .onion{display:none}
 .stage[data-onion="on"] .onion{display:inline}
-.o-prev{--d:.08s} .o-next{--d:-.08s}
 .strip.o-prev{animation-delay:.08s} .strip.o-next{animation-delay:-.08s}
 .strip.onion{--fo:none;--fi:none;--fs:rgba(153,153,255,.6)}
-.fig-ghost .front,.fig-ghost .back{fill:none;stroke:rgba(153,153,255,.55);stroke-width:1.4}
+.ghost{opacity:.22;filter:saturate(0) brightness(2.4)}
+.stage[data-own="on"] .ghost{display:none}
 
 /* ===== Make your own: three draggable keys ===== */
 .own{display:none}
 .stage[data-own="on"] .own{display:inline}
-.stage[data-own="on"] .p2p-fig{display:none}
 .own-path{fill:none;stroke:rgba(153,153,255,.45);stroke-dasharray:4 5}
 .key-h{cursor:grab;outline:none}
 .key-h circle{fill:#9999FF;stroke:#F5F5F7;stroke-width:0}
