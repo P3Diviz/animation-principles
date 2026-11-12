@@ -1,0 +1,41 @@
+/* 11 Appeal: a character built from primitives, so its proportions can change.
+   --head and --eye scale the head and eyes; data-shape picks the body; data-pose the line of action. */
+.scene{--ar:2}
+.char{--head:var(--head-set,1);--eye:var(--eye-set,1);--sx:56}
+.char *{transition:transform .5s var(--ease),opacity .4s var(--ease)}
+.skin,.body,.limb{fill:#C9C9D3}
+.limb{fill:#B4B4C2}
+.eye-white{fill:#F5F5F7} .pupil{fill:#0A0A15}
+.mouth{fill:none;stroke:#0A0A15;stroke-width:3;stroke-linecap:round}
+.loa{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:6 6;opacity:0}
+
+/* Shape language */
+.body{display:none}
+.char[data-shape="circle"] .b-circle,.char[data-shape="square"] .b-square,.char[data-shape="triangle"] .b-tri{display:inline}
+.char[data-shape="square"]{--sx:66}
+.char[data-shape="triangle"]{--sx:24}
+.char[data-shape="triangle"] .b-tri{stroke:#C9C9D3;stroke-width:14;stroke-linejoin:round}
+
+/* Joints: arms hang from the shoulders, the head scales from the neck */
+.armw-l{transform:translate(calc(var(--sx) * -1px),232px)}
+.armw-r{transform:translate(calc(var(--sx) * 1px),232px)}
+.headg{transform:translate(0,198px) scale(var(--head)) translate(0,-198px)}
+.eye-l{transform:translate(-17px,146px) scale(var(--eye)) translate(17px,-146px)}
+.eye-r{transform:translate(17px,146px) scale(var(--eye)) translate(-17px,-146px)}
+
+/* Pose: stiff and symmetrical, or a strong line of action (lean, head tilt, one arm up) */
+.char[data-pose="strong"] .poser{transform:translate(0,360px) rotate(7deg) translate(0,-360px)}
+.char[data-pose="strong"] .headg{transform:translate(0,198px) rotate(-12deg) scale(var(--head)) translate(0,-198px)}
+.char[data-pose="strong"] .arm-l{transform:rotate(28deg)}
+.char[data-pose="strong"] .arm-r{transform:rotate(-145deg)}
+.char[data-pose="strong"] .leg-l{transform:rotate(14deg)}
+.char[data-pose="strong"] .leg-r{transform:rotate(-6deg)}
+.char[data-pose="strong"] .loa{opacity:.8}
+
+/* Modes: build one character, or compare two */
+#compare{display:none}
+main[data-mode="compare"] #build{display:none}
+main[data-mode="compare"] #compare{display:inline}
+main[data-mode="compare"] .build-only{display:none}
+main:not([data-mode="compare"]) .compare-only{display:none}
+.cap{font:500 13px var(--font);fill:var(--text-2);text-anchor:middle}
