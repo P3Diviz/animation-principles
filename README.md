@@ -28,6 +28,7 @@ The site is unlisted, not private: anyone with the link can open it. Every page 
 | `principles/NN-*.html` | One page per principle |
 | `css/` | `tokens.css`, `base.css`, `shell.css`, `components.css`, `glass.css`, and `pages/` for each page |
 | `js/core/` | Shared modules: menu, present mode, toggles, sliders, timeline, Bézier maths |
+| `js/three/` | Shared 3D modules: stage, Mixamo rig, lights and light plot, camera shots, silhouette test, clip constants |
 | `js/pages/` | One small script per page |
 | `assets/fonts/` | Inter and JetBrains Mono, self-hosted (SIL Open Font License) |
 | `docs/` | Build handover and the approved reference pages |
@@ -38,4 +39,4 @@ Download these from Mixamo (FBX Binary, 30 fps) and put them in `assets/models/`
 - `YBot.fbx` and `XBot.fbx`: With Skin, T-pose
 - `Idle.fbx`, `Jump.fbx`, `Walking.fbx`, `Throw.fbx`, `RunToStop.fbx`: Without Skin (tick In Place where offered)
 
-That's all. No other software is needed. Pages show a stand-in mannequin until the files are there.
+That's all. No other software is needed. All seven are already in the repo; if one goes missing, pages show a stand-in mannequin (or a still model) instead of breaking.

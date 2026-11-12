@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/03.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/03-staging.js"></script>
@@ -36,10 +41,13 @@
 </nav>
 <div class="present-hint">Present mode. Press P or Esc to exit</div>
 <main class="page" id="main" data-view="2d">
-  <section class="stage-area" id="stageArea" data-level="rendered" data-key="on" data-fill="on" data-rim="on" data-shot="wide" data-silhouette="off" data-clutter="off">
+  <section class="stage-area" id="stageArea" data-level="rendered" data-key="on" data-fill="on" data-rim="on" data-shot="wide" data-silhouette="off" data-clutter="off" data-subject="ybot">
     <div class="stage-head">
       <h1><span class="mono">03</span>Staging</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/03-staging-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage">
       <div class="scene">
         <svg viewBox="0 0 800 450" aria-label="Draig on a simple set with a crate and a ball">
@@ -309,23 +317,38 @@
     </div>
   </section>
   <aside class="panel">
-    <h2>Drawing</h2>
-    <div class="seg" role="group" aria-label="Drawing level" data-target="stageArea" data-attr="level">
+    <!-- 2D only: drawing level. 3D only: who the subject is. -->
+    <h2 class="only-2d">Drawing</h2>
+    <div class="seg only-2d" role="group" aria-label="Drawing level" data-target="stageArea" data-attr="level">
       <button data-value="line" aria-pressed="false">Line</button><button data-value="flat" aria-pressed="false">Flat colour</button><button data-value="rendered" aria-pressed="true">Rendered</button>
+    </div>
+    <h2 class="only-3d top">Subject</h2>
+    <div class="seg only-3d" role="group" aria-label="Subject" data-target="stageArea" data-attr="subject">
+      <button data-value="ybot" aria-pressed="true">Y Bot</button><button data-value="xbot" aria-pressed="false">X Bot</button>
     </div>
     <h2>Light plot, from above</h2>
     <!-- Top-down plan of the set: the figure in the middle, crate and ball, the camera at the bottom.
-         The camera wedge narrows with the shot; a light that's off fades to 25%. -->
+         The camera wedge narrows with the shot; a light that's off fades to 25%.
+         In 3D the lamps can be dragged and the plan shows both figures (12 plot units per scene unit). -->
     <div class="plotrow">
     <svg class="plot" id="plot" viewBox="-100 -100 200 200" aria-label="Top-down plan of the set showing the lights and the camera">
-      <circle r="72" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="3 4"/>
+      <circle id="ring" r="72" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="3 4"/>
       <path class="wedge" d="M0 1 L-28 0 L28 0 Z" fill="rgba(245,245,247,.05)" stroke="rgba(245,245,247,.25)" vector-effect="non-scaling-stroke"/>
-      <rect x="30" y="-12" width="16" height="16" rx="2" fill="#4A4A66"/>
-      <circle cx="-36" cy="10" r="5" fill="#9999FF" opacity=".7"/>
-      <circle r="7" fill="#C9C9D3"/>
-      <g class="lamp" id="lamp-key"><line x1="-48" y1="54" x2="0" y2="0" stroke="#FFD9A8" stroke-width="1.2" opacity=".6"/><circle cx="-48" cy="54" r="8" fill="#FFD9A8"/></g>
-      <g class="lamp" id="lamp-fill"><line x1="55" y1="46" x2="0" y2="0" stroke="#A9B6FF" stroke-width="1.2" opacity=".6"/><circle cx="55" cy="46" r="8" fill="#A9B6FF"/></g>
-      <g class="lamp" id="lamp-rim"><line x1="63" y1="-35" x2="0" y2="0" stroke="#9999FF" stroke-width="1.2" opacity=".6"/><circle cx="63" cy="-35" r="8" fill="#9999FF"/></g>
+      <g class="plan-2d">
+        <rect x="30" y="-12" width="16" height="16" rx="2" fill="#4A4A66"/>
+        <circle cx="-36" cy="10" r="5" fill="#9999FF" opacity=".7"/>
+      </g>
+      <g class="plan-3d">
+        <rect x="-5.4" y="-5.4" width="10.8" height="10.8" rx="1.5" fill="#4A4A66" transform="translate(20.4 -7.2) rotate(-28.6)"/>
+        <circle cx="-16.8" cy="7.2" r="4" fill="#9999FF" opacity=".7"/>
+        <circle class="fig fig-x" cx="-19.2" cy="-21.6" r="6" fill="#C9C9D3"/>
+      </g>
+      <circle class="fig fig-y" r="7" fill="#C9C9D3"/>
+      <g id="lamps">
+        <g class="lamp" id="lamp-key"><line x1="-48" y1="54" x2="0" y2="0" stroke="#FFD9A8" stroke-width="1.2" opacity=".6"/><circle cx="-48" cy="54" r="8" fill="#FFD9A8"/></g>
+        <g class="lamp" id="lamp-fill"><line x1="55" y1="46" x2="0" y2="0" stroke="#A9B6FF" stroke-width="1.2" opacity=".6"/><circle cx="55" cy="46" r="8" fill="#A9B6FF"/></g>
+        <g class="lamp" id="lamp-rim"><line x1="63" y1="-35" x2="0" y2="0" stroke="#9999FF" stroke-width="1.2" opacity=".6"/><circle cx="63" cy="-35" r="8" fill="#9999FF"/></g>
+      </g>
     </svg>
     <div class="lights">
       <div class="pills">
@@ -333,7 +356,8 @@
         <button class="pill fill" data-target="stageArea" data-attr="fill" aria-pressed="true">Fill</button>
         <button class="pill" data-target="stageArea" data-attr="rim" aria-pressed="true">Rim</button>
       </div>
-      <p class="small">Shown in Rendered.</p>
+      <p class="small only-2d">Shown in Rendered.</p>
+      <p class="small only-3d">Drag the lights.</p>
     </div>
     </div>
     <h2>Camera</h2>

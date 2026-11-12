@@ -2,7 +2,7 @@
 
 For Claude Code, working in Paul's VS Code workspace and GitHub repo. Read this whole file before writing any code. Last updated 12 November 2026.
 
-> **Status: Tier 1 is complete and checked by Paul. Next job: Tier 2 (3D).** Section 17 records what was built, every decision Paul made during Tier 1 (these override the earlier sections where they differ), how the 2D pages work, and what Tier 2 must plug into. Read it before starting.
+> **Status: Tier 1 is complete and checked by Paul. Tier 2 (3D) has started: shared 3D modules and 03 Staging 3D are done (section 17.4a); next is step 5 in section 14.** Section 17 records what was built, every decision Paul made during Tier 1 (these override the earlier sections where they differ), how the 2D pages work, and what Tier 2 must plug into. Read it before starting.
 
 ## 0. Start here
 
@@ -464,6 +464,15 @@ If time runs out, a principle page without its 3D version hides the 2D/3D switch
 - **03 Staging 3D**: the 2D page already has the light plot in the panel. In the 3D view it becomes draggable and drives the lights (the reference's `lights.js` code), plus the Y Bot / X Bot subject switch from section 11.
 - **3D timeline**: section 7 says the timeline works with any Web Animation. For mixer-driven 3D, use the same clock pattern as Draig (`rigClock`), so one timeline drives 2D and 3D; set the mixer time from the clock.
 - **Split the Staging reference** into `js/three/stage.js`, `rig.js`, `lights.js`, `cameras.js`, `silhouette.js`, `clips.js` as section 7 describes, keeping its tuned light values, fog and floor colour.
+
+### 17.4a Tier 2 progress
+**Done: shared `js/three/` modules and 03 Staging 3D.**
+- `stage.js` (renderer, scene, fog, floor, resize, `start()`/`stop()`; the loop also pauses while the tab is hidden; `reducedMotion`), `rig.js` (`createRig('YBot'|'XBot')` with `play`, `setTime`, `timeScale`, `stepped`, `update`; model paths resolve from the module, so any page depth works; fallbacks and `rig.note` as in section 11), `lights.js` (`createLights` with the reference values, lights orbit a focus point; `bindLightPlot` for dragging and arrow keys, `enable(false)` restores the HTML's static plan), `cameras.js` (`createShots`, eased, frame-rate independent, snaps under reduced motion; `follow: true` shots move with the focus), `silhouette.js`, `clips.js` (constants; empty apart from Idle so far).
+- **Pattern for 3D pages:** the page script (`03-staging.js`) loads its 3D module (`03-staging-3d.js`) with `import()` the first time 3D is picked, so the 2D view never waits for Three.js or the models. Toggles stay on the stage area's data attributes, shared by both views; the 3D module listens for `statechange`. The stage area gets `is-3d` only in the 3D view. Panel controls that belong to one view carry `only-2d` / `only-3d`.
+- **03 specifics:** Y Bot at the origin, X Bot at (-1.6, 0, -1.8); Subject switch eases the lights and the Mid/Close shots to the chosen figure, and dims the other figure in the plot. Clutter in 3D is a set of grey shelves and props. In 3D the plot is larger, and lamps are focusable sliders (arrow keys, Shift for bigger steps).
+- **Changed from the reference:** Wide, Mid and Close were framed for the taller stand-in mannequin, so they are reframed for the 1.8-unit bots (the plot wedge lengths 90/58/36 are kept). Light values, fog and floor are unchanged.
+- **For Paul to decide:** the 3D lights keep the reference's layout (key front right, fill front left, rim back left). The 2D plot is its mirror (key front left), so lamps swap sides when switching view. Mirroring the 3D angles would make them match.
+- Checked in headless Chrome: no scroll or clipped panel at 1280×720, 1366×768, 1920×1080, normal and present; drag, arrow keys, every toggle, Subject, back to 2D; missing XBot and missing YBot; reduced motion. No console errors.
 
 ### 17.5 Working notes
 
