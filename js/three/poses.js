@@ -40,6 +40,24 @@ export function turnBone(bone, worldAxis, angle) {
   bone.quaternion.premultiply(qb);
 }
 
+// Point a bone in a direction (world space): turn it so the line from it to `child` (the next bone
+// down the limb) points along `dir`. weight 0..1 blends from where the animation had it.
+const pA = new THREE.Vector3(), pB = new THREE.Vector3(), now = new THREE.Vector3(), aim = new THREE.Vector3();
+const qd = new THREE.Quaternion(), qi = new THREE.Quaternion(), qp = new THREE.Quaternion();
+export function aimBone(bone, child, dir, weight = 1) {
+  if (weight <= 0) return;
+  bone.updateWorldMatrix(true, true);
+  bone.getWorldPosition(pA); child.getWorldPosition(pB);
+  now.subVectors(pB, pA).normalize();
+  aim.copy(dir).normalize();
+  qd.setFromUnitVectors(now, aim);                       // the turn needed, in world space
+  qd.slerp(qi.identity(), 1 - weight);
+  bone.parent.getWorldQuaternion(qp);                    // into the parent's space, then apply
+  qd.premultiply(qp.clone().invert()).multiply(qp);
+  bone.quaternion.premultiply(qd);
+  bone.updateWorldMatrix(false, true);
+}
+
 // Lowest point of the feet above the floor, in world units (toes and feet).
 const v = new THREE.Vector3();
 export function feetHeight(rig) {

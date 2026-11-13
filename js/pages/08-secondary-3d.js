@@ -1,16 +1,18 @@
 // 08 Secondary action, 3D view: Y Bot's Mixamo walk is the main action. The secondary action is
 // added on top, after the mixer has posed him, by turning the head, neck, spine and arm bones:
-//   Subtle: one glance at the camera, then a small wave.
+//   Subtle: he looks round at us and gives a small wave while he does.
 //   Too much: the head never settles, both arms wave and the body twists. The walk gets lost.
 import * as THREE from 'three';
 import { studio, addBot } from '../three/studio.js';
 import { clipTravel, loadClip } from '../three/rig.js';
-import { turnBone } from '../three/poses.js';
+import { turnBone, aimBone } from '../three/poses.js';
 import { clock3d, clockSeconds } from '../three/view.js';
 
 export const FRAMES = 78;                          // three walk cycles, 3.1 s
 const START = -2.6;
 const UP = new THREE.Vector3(0, 1, 0), FORWARD = new THREE.Vector3(1, 0, 0);   // he walks along +x
+const TOWARDS_US = new THREE.Vector3(0, 0, 1);                                  // the camera is on his right
+const armDir = new THREE.Vector3(), foreDir = new THREE.Vector3();
 const deg = Math.PI / 180;
 const clamp = t => Math.max(0, Math.min(1, t));
 const smooth = t => { t = clamp(t); return t * t * (3 - 2 * t); };
@@ -33,13 +35,16 @@ export function create({ stageEl, canvas, status }) {
 
   function secondary(s, level) {
     if (level === 'subtle') {
-      // A glance at the camera (he looks round towards us), then back
-      const g = span(s, .9, 1.2) - span(s, 1.6, 1.9);
+      // He looks round at us, and gives a little wave with the hand nearest us while he does
+      const g = span(s, .9, 1.25) - span(s, 2.05, 2.4);
       turn('Neck', UP, -20 * g); turn('Head', UP, -30 * g);
-      // A small wave with the near hand
-      const w = span(s, 2, 2.2) - span(s, 2.7, 2.95);
-      turn('RightArm', FORWARD, -75 * w);
-      turn('RightForeArm', FORWARD, (-35 + 20 * Math.sin(s * 14)) * w);
+      const w = span(s, 1, 1.35) - span(s, 1.9, 2.25);
+      if (w > 0) {
+        // Upper arm out to his side (towards us) and a little up; forearm upright, rocking from the elbow
+        aimBone(rig.bone('RightArm'), rig.bone('RightForeArm'), armDir.copy(TOWARDS_US).multiplyScalar(.9).addScaledVector(UP, .05).addScaledVector(FORWARD, .2), w);
+        const rock = 22 * deg * Math.sin((s - 1) * 15);   // the wave: side to side, about 2.4 times a second
+        aimBone(rig.bone('RightForeArm'), rig.bone('RightHand'), foreDir.copy(UP).addScaledVector(FORWARD, Math.tan(rock)).addScaledVector(TOWARDS_US, .15), w);
+      }
     }
     if (level === 'much') {
       // Never still: the head looks everywhere, both arms wave, the body twists
