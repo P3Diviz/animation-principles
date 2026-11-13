@@ -22,8 +22,14 @@ export function createLights(scene) {
   const key = lights.key.light;
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
-  Object.assign(key.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5 });
-  key.shadow.bias = -.0005;
+  // The shadow camera's depth range is kept tight round the set (the light sits about 8 units from
+  // what it lights). The bias is measured against that range: with the default range (0.5 to 500)
+  // the same bias pushed every shadow about 25 cm away from whatever cast it, so feet and balls
+  // didn't meet their shadows. normalBias stops speckled self-shadowing without that gap.
+  Object.assign(key.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: .5, far: 20 });
+  key.shadow.camera.updateProjectionMatrix();
+  key.shadow.bias = -.0002;
+  key.shadow.normalBias = .02;
 
   const focus = new THREE.Vector3();
 
