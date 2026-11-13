@@ -25,22 +25,35 @@ export function create({ stageEl, canvas, status }) {
 
   let rig = null, speed = 0;
   // His left-hand fingers and thumb, and how they sit in the bind pose (straight and open)
-  const FINGERS = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'].flatMap(f => [1, 2, 3].map(n => 'LeftHand' + f + n));
-  let openHand = [];
+  const fingers = side => ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'].flatMap(f => [1, 2, 3].map(n => side + 'Hand' + f + n));
+  const openHand = { Left: [], Right: [] };
   addBot(stage, status, 'YBot', null, { at: [START, 0, 0], turn: Math.PI / 2 }).then(async r => {
     if (!r.bones.length) return;
-    openHand = FINGERS.map(n => r.bone(n)).filter(Boolean).map(b => [b, b.quaternion.clone()]);   // before any clip plays
+    for (const side in openHand)                                    // before any clip plays
+      openHand[side] = fingers(side).map(n => r.bone(n)).filter(Boolean).map(b => [b, b.quaternion.clone()]);
     await r.play('Walking', { inPlace: true });
     speed = clipTravel(await loadClip('Walking')) * r.scale / r.duration;   // walk at the speed the steps travel
     rig = r;
   });
 
-  // Which way his left palm faces: across the knuckles crossed with along the hand
+  // Which way a palm faces: along the hand crossed with across the knuckles (the other way round
+  // for the right hand, which is the mirror image)
   const k1 = new THREE.Vector3(), k2 = new THREE.Vector3(), k3 = new THREE.Vector3(), k4 = new THREE.Vector3(), palmN = new THREE.Vector3();
-  function palmFacing() {
-    rig.bone('LeftHand').getWorldPosition(k1); rig.bone('LeftHandMiddle1').getWorldPosition(k2);
-    rig.bone('LeftHandIndex1').getWorldPosition(k3); rig.bone('LeftHandPinky1').getWorldPosition(k4);
-    return palmN.crossVectors(k2.sub(k1), k3.sub(k4)).normalize();
+  const palmFacing = side => () => {
+    rig.bone(side + 'Hand').getWorldPosition(k1); rig.bone(side + 'HandMiddle1').getWorldPosition(k2);
+    rig.bone(side + 'HandIndex1').getWorldPosition(k3); rig.bone(side + 'HandPinky1').getWorldPosition(k4);
+    k2.sub(k1); k3.sub(k4);
+    return side === 'Left' ? palmN.crossVectors(k2, k3).normalize() : palmN.crossVectors(k3, k2).normalize();
+  };
+
+  // A wave with one arm: upper arm pointing along `upper`, forearm upright and rocking by `rock`
+  // (radians) side to side, fingers open, palm turned towards us. w blends it in.
+  function wave(side, upper, rock, w) {
+    const arm = rig.bone(side + 'Arm'), fore = rig.bone(side + 'ForeArm'), hand = rig.bone(side + 'Hand');
+    openHand[side].forEach(([b, open]) => b.quaternion.slerp(open, w));   // fingers open out of the walk's relaxed curl
+    aimBone(arm, fore, upper, w);
+    aimBone(fore, hand, foreDir.copy(UP).addScaledVector(FORWARD, Math.tan(rock) + .1), w);
+    rollBone(fore, hand, palmFacing(side), TOWARDS_US, w);
   }
 
   // Turn a bone about a world axis by a number of degrees
@@ -52,27 +65,22 @@ export function create({ stageEl, canvas, status }) {
       const g = span(s, .9, 1.25) - span(s, 2.05, 2.4);
       turn('Neck', UP, -20 * g); turn('Head', UP, -30 * g);
       const w = span(s, 1, 1.35) - span(s, 1.9, 2.25);
-      if (w > 0) {
-        // His far (left) arm: upper arm forward, out to his left and a little up, so the hand comes up
-        // ahead of him beside his face, not across it. Forearm upright, rocking side to side in the
-        // plane we see; then the forearm is rolled so his palm faces us.
-        const arm = rig.bone('LeftArm'), fore = rig.bone('LeftForeArm'), hand = rig.bone('LeftHand');
-        openHand.forEach(([b, open]) => b.quaternion.slerp(open, w));    // fingers open out of the walk's relaxed curl
-        aimBone(arm, fore, armDir.copy(FORWARD).multiplyScalar(.6).addScaledVector(TOWARDS_US, -.55).addScaledVector(UP, .3), w);
-        const rock = 18 * deg * Math.sin((s - 1) * 15);   // the wave: side to side, about 2.4 times a second
-        aimBone(fore, hand, foreDir.copy(UP).addScaledVector(FORWARD, Math.tan(rock) + .1), w);
-        rollBone(fore, hand, palmFacing, TOWARDS_US, w);
-      }
+      // His far (left) arm: upper arm forward, out to his left and a little up, so the hand comes up
+      // ahead of him beside his face, not across it; the forearm rocks about 2.4 times a second
+      if (w > 0) wave('Left', armDir.copy(FORWARD).multiplyScalar(.6).addScaledVector(TOWARDS_US, -.55).addScaledVector(UP, .3),
+                      18 * deg * Math.sin((s - 1) * 15), w);
     }
     if (level === 'much') {
-      // Never still: the head looks everywhere, both arms wave, the body twists
+      // Never still: the head looks everywhere, the body twists, and both arms wave wildly above
+      // his shoulders, each out to its own side, rocking fast and out of step with each other
       turn('Spine1', UP, 18 * Math.sin(s * 5));
       turn('Neck', UP, 30 * Math.sin(s * 7)); turn('Head', UP, 35 * Math.sin(s * 7 + .6));
       turn('Head', FORWARD, 15 * Math.sin(s * 4.3));
-      turn('RightArm', FORWARD, -140 + 30 * Math.sin(s * 11));
-      turn('RightForeArm', FORWARD, 40 * Math.sin(s * 15));
-      turn('LeftArm', FORWARD, 130 + 30 * Math.sin(s * 9 + 1));
-      turn('LeftForeArm', FORWARD, 40 * Math.sin(s * 13 + 2));
+      const lift = .7 + .25 * Math.sin(s * 3.1);                       // the arms pump up and down a little too
+      wave('Right', armDir.copy(TOWARDS_US).multiplyScalar(.55).addScaledVector(UP, lift).addScaledVector(FORWARD, .25 * Math.sin(s * 4)),
+           32 * deg * Math.sin(s * 19), 1);
+      wave('Left', armDir.copy(TOWARDS_US).multiplyScalar(-.55).addScaledVector(UP, lift).addScaledVector(FORWARD, .3 + .2 * Math.sin(s * 3.7)),
+           32 * deg * Math.sin(s * 17 + 2), 1);
     }
   }
 
