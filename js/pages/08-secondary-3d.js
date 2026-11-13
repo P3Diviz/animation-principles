@@ -47,13 +47,15 @@ export function create({ stageEl, canvas, status }) {
   };
 
   // A wave with one arm: upper arm pointing along `upper`, forearm upright and rocking by `rock`
-  // (radians) side to side, fingers open, palm turned towards us. w blends it in.
-  function wave(side, upper, rock, w) {
+  // (radians) side to side, fingers open, palm turned to face `palm` (world). w blends it in.
+  // The natural turn is inwards: towards his middle (for his left hand, seen from here, that's us).
+  const INWARD = { Left: new THREE.Vector3(0, 0, 1), Right: new THREE.Vector3(0, 0, -1) };
+  function wave(side, upper, rock, w, palm = INWARD[side]) {
     const arm = rig.bone(side + 'Arm'), fore = rig.bone(side + 'ForeArm'), hand = rig.bone(side + 'Hand');
     openHand[side].forEach(([b, open]) => b.quaternion.slerp(open, w));   // fingers open out of the walk's relaxed curl
     aimBone(arm, fore, upper, w);
     aimBone(fore, hand, foreDir.copy(UP).addScaledVector(FORWARD, Math.tan(rock) + .1), w);
-    rollBone(fore, hand, palmFacing(side), TOWARDS_US, w);
+    rollBone(fore, hand, palmFacing(side), palm, w);
   }
 
   // Turn a bone about a world axis by a number of degrees
@@ -72,7 +74,8 @@ export function create({ stageEl, canvas, status }) {
     }
     if (level === 'much') {
       // Never still: the head looks everywhere, the body twists, and both arms wave wildly above
-      // his shoulders, each out to its own side, rocking fast and out of step with each other
+      // his shoulders, each out to its own side, rocking fast and out of step with each other,
+      // palms turned naturally inwards towards each other
       turn('Spine1', UP, 18 * Math.sin(s * 5));
       turn('Neck', UP, 30 * Math.sin(s * 7)); turn('Head', UP, 35 * Math.sin(s * 7 + .6));
       turn('Head', FORWARD, 15 * Math.sin(s * 4.3));
@@ -89,7 +92,8 @@ export function create({ stageEl, canvas, status }) {
     const s = clockSeconds(clock);
     rig.model.position.x = START + speed * s;
     rig.setTime(s);
-    secondary(s, settings.dataset.sec);  });
+    secondary(s, settings.dataset.sec);
+  });
 
   return { clock, frames: FRAMES, keys: [0, 26, 52], show: () => stage.start(), hide: () => stage.stop() };
 }
