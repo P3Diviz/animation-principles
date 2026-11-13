@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { studio, addBot } from '../three/studio.js';
 import { std } from '../three/stage.js';
 import { clipTravel, loadClip } from '../three/rig.js';
+import { capturePose, scalePose, feetHeight } from '../three/poses.js';
 import { clock3d, clockSeconds } from '../three/view.js';
 import { THROW } from '../three/clips.js';
 
@@ -17,9 +18,11 @@ const $ = id => document.getElementById(id);
 const BONES = { hand: 'RightHand', head: 'Head', foot: 'RightFoot' };
 const FLIGHT = .9, DISTANCE = 3.2, BALL_R = .065;  // straight throw: seconds, metres; ball radius (fits his hand)
 const G = 9.8;
+const BALL_SPEED = .65;                             // arc: share of the hand's speed the ball leaves with (keeps it on the stage)
+const lerp = (a, b, t) => a + (b - a) * t;
 const TRAIL = 13;                                   // trail length in frames (about half a second)
 const ACTIONS = {
-  throw: { clip: 'Throw', frames: 100, start: -2,    // keys come from the ball's flight once it's worked out
+  throw: { clip: 'Throw', frames: 106, start: -2,    // keys come from the ball's flight once it's worked out
            keys: [THROW.windUp, THROW.releaseUp, THROW.releaseUp + FLIGHT] },
 
   walk:  { clip: 'Walking', frames: 52, start: -1.75, inPlace: true, keys: [0, .52, 1.04, 1.56] }   // a contact every step
@@ -54,11 +57,40 @@ export function create({ stageEl, canvas, status }) {
 
   let rig = null, samples = [], ballSamples = [], speed = 0, flight = null;
 
-  // Where the figure stands at loop time s (the walk travels at a steady speed)
+  // ----- How hard he throws (Arc only: the height slider; Straight is always a full throw) -----
+  // A gentler throw has a smaller wind-up and follow-through (every joint's movement from his
+  // standing pose scaled down) and a slower forward swing (the throw section of the clip slowed).
+  const THROW_FROM = 1.3, THROW_TO = 1.9;             // the forward throw, in clip time
+  const power = () => main.dataset.path === 'straight' ? 1 : height.value / 100;
+  const swingRate = () => lerp(.65, 1, power());       // speed of the forward throw
+  const bodySize = () => lerp(.55, 1, power());        // size of the wind-up and follow-through
+  // Loop time -> clip time, with the forward throw played at swingRate()
+  function clipTime(s) {
+    const r = swingRate(), slow = (THROW_TO - THROW_FROM) / r;
+    if (s < THROW_FROM) return s;
+    if (s < THROW_FROM + slow) return THROW_FROM + (s - THROW_FROM) * r;
+    return THROW_TO + (s - THROW_FROM - slow);
+  }
+  // ...and back: when (loop time) the clip reaches clip time c
+  function loopTime(c) {
+    if (c < THROW_FROM) return c;
+    const r = swingRate();
+    if (c < THROW_TO) return THROW_FROM + (c - THROW_FROM) / r;
+    return c + (THROW_TO - THROW_FROM) / r - (THROW_TO - THROW_FROM);
+  }
+  let standing = null, restFeet = 0;
+
+  // Where the figure stands, and his pose, at loop time s (the walk travels at a steady speed)
   function place(s) {
     const a = action();
-    rig.model.position.x = a.start + (a.inPlace ? speed * s : 0);
-    rig.setTime(a.inPlace ? s : Math.min(s, rig.duration - .01));   // the walk cycles; the throw holds its last pose
+    rig.model.position.set(a.start + (a.inPlace ? speed * s : 0), 0, 0);
+    if (a.inPlace) { rig.setTime(s); return; }                      // the walk cycles
+    rig.setTime(Math.min(clipTime(s), rig.duration - .01));        // the throw holds its last pose
+    const k = bodySize();
+    if (k < 1 && standing) {
+      scalePose(rig, standing, k);
+      rig.model.position.y = restFeet - feetHeight(rig);           // keep his feet on the floor
+    }
   }
   const bonePos = (name, out) => { rig.model.updateMatrixWorld(true); return rig.bone(name).getWorldPosition(out); };
 
@@ -79,7 +111,7 @@ export function create({ stageEl, canvas, status }) {
   // Straight: it leaves at THROW.release and goes in a straight line to a point on the floor.
   function planFlight() {
     const arc = main.dataset.path !== 'straight';
-    const t0 = arc ? THROW.releaseUp : THROW.release;
+    const t0 = loopTime(arc ? THROW.releaseUp : THROW.release);
     place(t0); const p0 = palmPos(new THREE.Vector3());
     // The hand's speed and direction as it lets go
     place(t0 - .01); const before = palmPos(new THREE.Vector3());
@@ -93,8 +125,11 @@ export function create({ stageEl, canvas, status }) {
       return { arc, t0, p0, end, T: p0.distanceTo(end) / Math.max(6, vel.length()) };
     }
     const up = Math.max(15 * Math.PI / 180, Math.atan2(vel.y, vel.dot(flat)));   // the hand's upward angle
-    const rise = .12 + .55 * height.value / 100;                        // how high it goes above the hand (m); at 100% it still lands on the stage
-    const vy = Math.sqrt(2 * G * rise), vh = vy / Math.tan(up);          // same direction as the hand
+    // It leaves at the speed his palm is moving (so a gentle throw goes a short way and a hard one a
+    // long way), at the hand's upward angle. Scaled by BALL_SPEED so the hardest throw still lands on
+    // the stage; the same scale at every power, so they stay in proportion.
+    const v0 = vel.length() * BALL_SPEED;
+    const vy = v0 * Math.sin(up), vh = v0 * Math.cos(up);
     const T = (vy + Math.sqrt(vy * vy + 2 * G * (p0.y - BALL_R))) / G;   // until it reaches the floor
     return { arc, t0, p0, flat, vy, vh, T };
   }
@@ -132,6 +167,10 @@ export function create({ stageEl, canvas, status }) {
     const a = action();
     await rig.play(a.clip, { inPlace: !!a.inPlace });
     if (a.inPlace) speed = clipTravel(await loadClip(a.clip)) * rig.scale / rig.duration;
+    else {                                               // his standing pose, before the throw: the reference for a gentler throw
+      rig.model.position.set(a.start, 0, 0);
+      rig.setTime(0); standing = capturePose(rig); restFeet = feetHeight(rig);
+    }
     clock.effect.updateTiming({ duration: a.frames * 1000 / FPS });
     sample();
     view.onTiming();
