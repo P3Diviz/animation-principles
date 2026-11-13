@@ -24,8 +24,13 @@ export function create({ stageEl, canvas, status }) {
   const settings = document.getElementById('stage');
 
   let rig = null, speed = 0;
-  addBot(stage, status, 'YBot', 'Walking', { at: [START, 0, 0], turn: Math.PI / 2, inPlace: true }).then(async r => {
+  // His left-hand fingers and thumb, and how they sit in the bind pose (straight and open)
+  const FINGERS = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'].flatMap(f => [1, 2, 3].map(n => 'LeftHand' + f + n));
+  let openHand = [];
+  addBot(stage, status, 'YBot', null, { at: [START, 0, 0], turn: Math.PI / 2 }).then(async r => {
     if (!r.bones.length) return;
+    openHand = FINGERS.map(n => r.bone(n)).filter(Boolean).map(b => [b, b.quaternion.clone()]);   // before any clip plays
+    await r.play('Walking', { inPlace: true });
     speed = clipTravel(await loadClip('Walking')) * r.scale / r.duration;   // walk at the speed the steps travel
     rig = r;
   });
@@ -52,6 +57,7 @@ export function create({ stageEl, canvas, status }) {
         // ahead of him beside his face, not across it. Forearm upright, rocking side to side in the
         // plane we see; then the forearm is rolled so his palm faces us.
         const arm = rig.bone('LeftArm'), fore = rig.bone('LeftForeArm'), hand = rig.bone('LeftHand');
+        openHand.forEach(([b, open]) => b.quaternion.slerp(open, w));    // fingers open out of the walk's relaxed curl
         aimBone(arm, fore, armDir.copy(FORWARD).multiplyScalar(.6).addScaledVector(TOWARDS_US, -.55).addScaledVector(UP, .3), w);
         const rock = 18 * deg * Math.sin((s - 1) * 15);   // the wave: side to side, about 2.4 times a second
         aimBone(fore, hand, foreDir.copy(UP).addScaledVector(FORWARD, Math.tan(rock) + .1), w);
