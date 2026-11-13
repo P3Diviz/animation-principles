@@ -140,8 +140,10 @@ export function create({ stageEl, canvas, status }) {
   function swing(dt) {
     if (main.dataset.follow === 'off') { ang.fill(0); spin.fill(0); return; }
     const s = +stiffInput.value / 100;              // 0 loose .. 1 stiff
-    const bend = lerp(14, 420, s * s), bendDamp = lerp(3, 16, s);
-    const damp = lerp(3.4, 5, s);                   // stiff fabric settles a little sooner
+    // Spread evenly along the slider: each step up doubles-ish how firmly the bands hold together
+    const bend = 6 * Math.pow(50, s), bendDamp = lerp(2.5, 14, s);
+    const damp = lerp(3.4, 5.5, s);                 // stiff fabric settles sooner
+    const forwardLimit = lerp(-50, -15, s) * deg;   // stiff fabric doesn't swing as far forward
     let pivotAccel = accel;
     for (let k = 0; k < 3; k++) {
       const a = ang[k], L = BANDS[k];
@@ -153,7 +155,9 @@ export function create({ stageEl, canvas, status }) {
     }
     for (let k = 0; k < 3; k++) {
       spin[k] += turn[k] * dt;
-      ang[k] = clamp(ang[k] + spin[k] * dt, -50 * deg, 85 * deg);
+      ang[k] = ang[k] + spin[k] * dt;
+      if (ang[k] < forwardLimit) { ang[k] = forwardLimit; spin[k] = Math.max(0, spin[k]); }
+      ang[k] = Math.min(ang[k], 85 * deg);
     }
   }
 
@@ -181,14 +185,15 @@ export function create({ stageEl, canvas, status }) {
     onSpine.copy(bones.Hips).addScaledVector(spine, k);
     v.subVectors(p, onSpine);
     const lat = v.dot(side) / BACK_HALF_WIDTH, behind = v.dot(back);
-    let depth = .06;                                                   // beside him: not as far forward as his arms
+    let depth = lerp(.06, .17, stiffNow);                              // beside him: not as far forward as his arms
+                                                                       // (stiff fabric doesn't wrap round as far)
     if (Math.abs(lat) < 1) {
       let d = LEG_DEPTH;
       if (k >= -.3) {
         const f = clamp((k + .3) * 10, 0, BACK_DEPTH.length - 1), i = Math.min(Math.floor(f), BACK_DEPTH.length - 2);
         d = lerp(BACK_DEPTH[i], BACK_DEPTH[i + 1], f - i);
       } else if (k > -.5) d = lerp(LEG_DEPTH, BACK_DEPTH[0], (k + .5) / .2);   // seat into legs
-      depth = (d + MARGIN) * Math.sqrt(1 - lat * lat);
+      depth = (d + MARGIN + .05 * stiffNow) * Math.sqrt(1 - lat * lat);   // stiff fabric stands a little off him
     }
     if (behind < depth) p.addScaledVector(back, depth - behind);
   }
@@ -226,7 +231,9 @@ export function create({ stageEl, canvas, status }) {
   // Build the cloth: each column runs down from the shoulders at the bands' angles, and is pushed
   // out round his body and legs as it goes, so the rest of the column drapes from there.
   const p = new THREE.Vector3(), dir = new THREE.Vector3(), out = new THREE.Vector3();
+  let stiffNow = .4;                                  // the Stiffness slider, 0 .. 1, read once per frame
   function drawCloth() {
+    stiffNow = +stiffInput.value / 100;
     const rowLen = TOTAL / (ROWS - 1);
     for (let i = 0; i < COLS; i++) {
       const u = i / (COLS - 1) - .5, edge = Math.abs(u) * 2;    // 0 in the middle, 1 at the edges
@@ -245,7 +252,7 @@ export function create({ stageEl, canvas, status }) {
         p.copy(out).addScaledVector(side, -u * (BOTTOM_W - TOP_W) * f);
         // + a slight outward drape, so it falls over his back and hips
         const a = angleAt(f * TOTAL);
-        dir.copy(back).multiplyScalar(Math.sin(a) + .06 * edge + .17 * (1 - f)).addScaledVector(UP, -Math.cos(a));
+        dir.copy(back).multiplyScalar(Math.sin(a) + .06 * edge + lerp(.17, .26, stiffNow) * (1 - f)).addScaledVector(UP, -Math.cos(a));
         p.addScaledVector(dir.normalize(), rowLen);
       }
     }
