@@ -58,6 +58,22 @@ export function aimBone(bone, child, dir, weight = 1) {
   bone.updateWorldMatrix(false, true);
 }
 
+// Roll a bone about its own length (bone to child) so that a direction it carries (for example the
+// palm's facing, given by facing()) turns towards `want` (world space). weight 0..1 blends it in.
+const ax = new THREE.Vector3(), f1 = new THREE.Vector3(), f2 = new THREE.Vector3();
+export function rollBone(bone, child, facing, want, weight = 1) {
+  if (weight <= 0) return;
+  bone.updateWorldMatrix(true, true);
+  bone.getWorldPosition(pA); child.getWorldPosition(pB);
+  ax.subVectors(pB, pA).normalize();
+  f1.copy(facing()).projectOnPlane(ax).normalize();      // the facing now, across the bone
+  f2.copy(want).projectOnPlane(ax).normalize();          // the facing we want, across the bone
+  if (f1.lengthSq() < .5 || f2.lengthSq() < .5) return;
+  const angle = Math.atan2(f1.clone().cross(f2).dot(ax), f1.dot(f2));
+  turnBone(bone, ax, angle * weight);
+  bone.updateWorldMatrix(false, true);
+}
+
 // Lowest point of the feet above the floor, in world units (toes and feet).
 const v = new THREE.Vector3();
 export function feetHeight(rig) {

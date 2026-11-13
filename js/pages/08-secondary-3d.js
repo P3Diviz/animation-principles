@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { studio, addBot } from '../three/studio.js';
 import { clipTravel, loadClip } from '../three/rig.js';
-import { turnBone, aimBone } from '../three/poses.js';
+import { turnBone, aimBone, rollBone } from '../three/poses.js';
 import { clock3d, clockSeconds } from '../three/view.js';
 
 export const FRAMES = 78;                          // three walk cycles, 3.1 s
@@ -30,6 +30,14 @@ export function create({ stageEl, canvas, status }) {
     rig = r;
   });
 
+  // Which way his left palm faces: across the knuckles crossed with along the hand
+  const k1 = new THREE.Vector3(), k2 = new THREE.Vector3(), k3 = new THREE.Vector3(), k4 = new THREE.Vector3(), palmN = new THREE.Vector3();
+  function palmFacing() {
+    rig.bone('LeftHand').getWorldPosition(k1); rig.bone('LeftHandMiddle1').getWorldPosition(k2);
+    rig.bone('LeftHandIndex1').getWorldPosition(k3); rig.bone('LeftHandPinky1').getWorldPosition(k4);
+    return palmN.crossVectors(k2.sub(k1), k3.sub(k4)).normalize();
+  }
+
   // Turn a bone about a world axis by a number of degrees
   const turn = (name, axis, d) => { if (d) turnBone(rig.bone(name), axis, d * deg); };
 
@@ -40,10 +48,14 @@ export function create({ stageEl, canvas, status }) {
       turn('Neck', UP, -20 * g); turn('Head', UP, -30 * g);
       const w = span(s, 1, 1.35) - span(s, 1.9, 2.25);
       if (w > 0) {
-        // Upper arm out to his side (towards us) and a little up; forearm upright, rocking from the elbow
-        aimBone(rig.bone('RightArm'), rig.bone('RightForeArm'), armDir.copy(TOWARDS_US).multiplyScalar(.9).addScaledVector(UP, .05).addScaledVector(FORWARD, .2), w);
-        const rock = 22 * deg * Math.sin((s - 1) * 15);   // the wave: side to side, about 2.4 times a second
-        aimBone(rig.bone('RightForeArm'), rig.bone('RightHand'), foreDir.copy(UP).addScaledVector(FORWARD, Math.tan(rock)).addScaledVector(TOWARDS_US, .15), w);
+        // His far (left) arm: upper arm forward, out to his left and a little up, so the hand comes up
+        // ahead of him beside his face, not across it. Forearm upright, rocking side to side in the
+        // plane we see; then the forearm is rolled so his palm faces us.
+        const arm = rig.bone('LeftArm'), fore = rig.bone('LeftForeArm'), hand = rig.bone('LeftHand');
+        aimBone(arm, fore, armDir.copy(FORWARD).multiplyScalar(.6).addScaledVector(TOWARDS_US, -.55).addScaledVector(UP, .3), w);
+        const rock = 18 * deg * Math.sin((s - 1) * 15);   // the wave: side to side, about 2.4 times a second
+        aimBone(fore, hand, foreDir.copy(UP).addScaledVector(FORWARD, Math.tan(rock) + .1), w);
+        rollBone(fore, hand, palmFacing, TOWARDS_US, w);
       }
     }
     if (level === 'much') {
@@ -63,8 +75,7 @@ export function create({ stageEl, canvas, status }) {
     const s = clockSeconds(clock);
     rig.model.position.x = START + speed * s;
     rig.setTime(s);
-    secondary(s, settings.dataset.sec);
-  });
+    secondary(s, settings.dataset.sec);  });
 
   return { clock, frames: FRAMES, keys: [0, 26, 52], show: () => stage.start(), hide: () => stage.stop() };
 }
