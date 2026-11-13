@@ -81,13 +81,19 @@ export function create({ stageEl, canvas, status }) {
     const arc = main.dataset.path !== 'straight';
     const t0 = arc ? THROW.releaseUp : THROW.release;
     place(t0); const p0 = palmPos(new THREE.Vector3());
-    if (!arc) return { arc, t0, p0, end: new THREE.Vector3(p0.x + DISTANCE, BALL_R, p0.z), T: FLIGHT };
+    // The hand's speed and direction as it lets go
     place(t0 - .01); const before = palmPos(new THREE.Vector3());
     place(t0 + .01); const after = palmPos(new THREE.Vector3());
-    const dir = after.sub(before).normalize();
-    const flat = new THREE.Vector3(dir.x, 0, dir.z).normalize();
-    const up = Math.max(15 * Math.PI / 180, Math.asin(dir.y));            // the hand's upward angle
-    const rise = .12 + .36 * height.value / 100;                         // how high it goes above the hand (m); at 100% it still lands on the stage
+    const vel = after.sub(before).multiplyScalar(50);
+    // He throws along the way he faces (straight across the screen), never towards the camera
+    const flat = new THREE.Vector3(0, 0, 1).applyQuaternion(rig.model.quaternion).setY(0).normalize();
+    if (!arc) {
+      // Straight: at the speed his hand was moving, in a straight line to the floor ahead
+      const end = p0.clone().addScaledVector(flat, DISTANCE).setY(BALL_R);
+      return { arc, t0, p0, end, T: p0.distanceTo(end) / Math.max(6, vel.length()) };
+    }
+    const up = Math.max(15 * Math.PI / 180, Math.atan2(vel.y, vel.dot(flat)));   // the hand's upward angle
+    const rise = .12 + .55 * height.value / 100;                        // how high it goes above the hand (m); at 100% it still lands on the stage
     const vy = Math.sqrt(2 * G * rise), vh = vy / Math.tan(up);          // same direction as the hand
     const T = (vy + Math.sqrt(vy * vy + 2 * G * (p0.y - BALL_R))) / G;   // until it reaches the floor
     return { arc, t0, p0, flat, vy, vh, T };
