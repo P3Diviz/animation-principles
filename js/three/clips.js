@@ -19,8 +19,10 @@ export const JUMP = {
 // Key poses for blocking the jump on 04 (stand, crouch, take-off, top, land, settle)
 export const JUMP_KEYS = [0, JUMP.deepest, JUMP.takeOff, JUMP.top, JUMP.land, JUMP.settled];
 
-// Throw (3.83 s), right-handed: wind-up from 0.3, a step forward, the ball leaves the hand at 1.68.
-export const THROW = { windUp: .3, release: 1.68 };
+// Throw (3.83 s), right-handed: wind-up from 0.3, a step forward. The palm passes head height at
+// 1.54 moving up and forward at about 37° (releaseUp: where an arcing throw leaves the hand), and is
+// heading down at 1.68 (release: where a straight, downward throw leaves it).
+export const THROW = { windUp: .3, releaseUp: 1.54, release: 1.68 };
 
 // Walking (1.03 s): one full cycle (two steps). The file travels forward 1.72 m per cycle.
 // RunToStop (1.8 s): runs 2.6 m forward and stops by 1.0, then holds.

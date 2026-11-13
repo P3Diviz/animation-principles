@@ -1,7 +1,10 @@
 // 07 Arc, 3D view: X Bot throws a ball (Mixamo Throw) or walks (Mixamo Walking).
 // A motion trail follows one bone (hand, head or foot): the last half second of its path,
 // fading out. Show motion path adds the whole path with a dot per frame, like After Effects.
-// The thrown ball follows Straight / Arc and the arc height slider, shared with the 2D view.
+// The ball sits in his palm. Arc: it leaves his hand as the hand comes up past his head and flies
+// as a real thrown ball (a parabola) starting along the hand's own line of motion; the arc height
+// slider sets how high it goes (a higher throw also goes further). Straight: it leaves later, as
+// the hand comes down, and travels in a straight line to the floor.
 import * as THREE from 'three';
 import { studio, addBot } from '../three/studio.js';
 import { std } from '../three/stage.js';
@@ -12,10 +15,13 @@ import { THROW } from '../three/clips.js';
 const FPS = 25;
 const $ = id => document.getElementById(id);
 const BONES = { hand: 'RightHand', head: 'Head', foot: 'RightFoot' };
-const FLIGHT = .9, DISTANCE = 3.2, BALL_R = .09;   // the ball's flight: seconds, metres, radius
+const FLIGHT = .9, DISTANCE = 3.2, BALL_R = .065;  // straight throw: seconds, metres; ball radius (fits his hand)
+const G = 9.8;
 const TRAIL = 13;                                   // trail length in frames (about half a second)
 const ACTIONS = {
-  throw: { clip: 'Throw', frames: 100, start: -2, keys: [THROW.windUp, THROW.release, THROW.release + FLIGHT] },
+  throw: { clip: 'Throw', frames: 100, start: -2,    // keys come from the ball's flight once it's worked out
+           keys: [THROW.windUp, THROW.releaseUp, THROW.releaseUp + FLIGHT] },
+
   walk:  { clip: 'Walking', frames: 52, start: -1.75, inPlace: true, keys: [0, .52, 1.04, 1.56] }   // a contact every step
 };
 const TRAIL_COLOUR = new THREE.Color('#9999FF'), BG = new THREE.Color('#0A0A15');
@@ -46,7 +52,7 @@ export function create({ stageEl, canvas, status }) {
   const ballPath = new THREE.Line(ballPathGeo, pathMat), ballDots = new THREE.Points(ballPathGeo, dots.material);
   [trail, path, dots, ballPath, ballDots].forEach(o => { o.frustumCulled = false; stage.scene.add(o); });
 
-  let rig = null, samples = [], ballSamples = [], speed = 0, release = null, releaseVel = null;
+  let rig = null, samples = [], ballSamples = [], speed = 0, flight = null;
 
   // Where the figure stands at loop time s (the walk travels at a steady speed)
   function place(s) {
@@ -56,14 +62,44 @@ export function create({ stageEl, canvas, status }) {
   }
   const bonePos = (name, out) => { rig.model.updateMatrixWorld(true); return rig.bone(name).getWorldPosition(out); };
 
-  // The ball: in the hand until the release, then straight or in an arc to the floor
+  // The middle of his palm, where the ball sits: between the wrist and the knuckles, lifted off the
+  // palm by the ball's radius (the palm faces along index-to-pinky crossed with wrist-to-knuckles)
+  const pa = new THREE.Vector3(), pb = new THREE.Vector3(), pc = new THREE.Vector3(), pn = new THREE.Vector3();
+  function palmPos(out) {
+    bonePos('RightHand', out); bonePos('RightHandMiddle1', pa);
+    bonePos('RightHandIndex1', pb); bonePos('RightHandPinky1', pc);
+    pn.crossVectors(pb.sub(pc), pc.subVectors(pa, out)).normalize();
+    return out.lerp(pa, .55).addScaledVector(pn, BALL_R * .9);
+  }
+  const trackPos = (name, out) => name === 'RightHand' ? palmPos(out) : bonePos(name, out);   // the hand trail follows the palm
+
+  // Work out the ball's flight once (when a control changes).
+  // Arc: it leaves the hand at THROW.releaseUp, moving the way the palm is moving there. Its speed is
+  // set so it rises the slider's height above the hand, and from then on it's a real projectile.
+  // Straight: it leaves at THROW.release and goes in a straight line to a point on the floor.
+  function planFlight() {
+    const arc = main.dataset.path !== 'straight';
+    const t0 = arc ? THROW.releaseUp : THROW.release;
+    place(t0); const p0 = palmPos(new THREE.Vector3());
+    if (!arc) return { arc, t0, p0, end: new THREE.Vector3(p0.x + DISTANCE, BALL_R, p0.z), T: FLIGHT };
+    place(t0 - .01); const before = palmPos(new THREE.Vector3());
+    place(t0 + .01); const after = palmPos(new THREE.Vector3());
+    const dir = after.sub(before).normalize();
+    const flat = new THREE.Vector3(dir.x, 0, dir.z).normalize();
+    const up = Math.max(15 * Math.PI / 180, Math.asin(dir.y));            // the hand's upward angle
+    const rise = .12 + .36 * height.value / 100;                         // how high it goes above the hand (m); at 100% it still lands on the stage
+    const vy = Math.sqrt(2 * G * rise), vh = vy / Math.tan(up);          // same direction as the hand
+    const T = (vy + Math.sqrt(vy * vy + 2 * G * (p0.y - BALL_R))) / G;   // until it reaches the floor
+    return { arc, t0, p0, flat, vy, vh, T };
+  }
+
+  // Where the ball is at loop time s (null while it's still in his hand)
   function ballAt(s, out) {
-    if (s < THROW.release) return null;
-    const u = Math.min(1, (s - THROW.release) / FLIGHT);
-    const end = v.set(release.x + DISTANCE, BALL_R, release.z);
-    out.lerpVectors(release, end, u);
-    if (main.dataset.path !== 'straight') out.y += 4 * (height.value / 100 * 1.6) * u * (1 - u);
-    return out;
+    const fl = flight;
+    if (!fl || s < fl.t0) return null;
+    const u = Math.min(s - fl.t0, fl.T);
+    if (!fl.arc) return out.lerpVectors(fl.p0, fl.end, u / fl.T);
+    return out.copy(fl.p0).addScaledVector(fl.flat, fl.vh * u).setY(fl.p0.y + fl.vy * u - G * u * u / 2);
   }
 
   // Sample the chosen bone every frame of the loop (and the ball's flight), for the trail and the path
@@ -71,11 +107,12 @@ export function create({ stageEl, canvas, status }) {
     if (!rig) return;
     const a = action(), n = a.frames, name = BONES[main.dataset.bone] || BONES.hand;
     samples = [];
-    for (let f = 0; f < n; f++) { place(f / FPS); samples.push(bonePos(name, new THREE.Vector3())); }
-    if (a.clip === 'Throw') { place(THROW.release); release = bonePos('RightHand', new THREE.Vector3()); }
+    for (let f = 0; f < n; f++) { place(f / FPS); samples.push(trackPos(name, new THREE.Vector3())); }
     ballSamples = [];
-    if (a.clip === 'Throw') for (let f = Math.ceil(THROW.release * FPS); f <= (THROW.release + FLIGHT) * FPS; f++) ballSamples.push(ballAt(f / FPS, new THREE.Vector3()).clone());
+    flight = a.clip === 'Throw' ? planFlight() : null;
+    if (flight) for (let f = Math.ceil(flight.t0 * FPS); f <= (flight.t0 + flight.T) * FPS + 1; f++) ballSamples.push(ballAt(f / FPS, new THREE.Vector3()));
     fill(pathGeo, samples); fill(ballPathGeo, ballSamples);
+    view.onTiming();
   }
   function fill(geo, list) {
     const p = geo.attributes.position;
@@ -126,14 +163,18 @@ export function create({ stageEl, canvas, status }) {
     ball.visible = throwing;
     if (throwing) {
       const at = ballAt(s, ball.position);
-      if (!at) ball.position.copy(bonePos('RightHand', v));   // still in the hand
+      if (!at) palmPos(ball.position);                         // still in his palm
     }
   });
 
   const view = {
     clock, show: () => stage.start(), hide: () => stage.stop(),
     get frames() { return action().frames; },
-    get keys() { return action().keys.map(t => Math.round(t * FPS)); },
+    // Throw: wind-up, release, landing (they move with Straight / Arc and the height). Walk: each step.
+    get keys() {
+      const times = flight ? [THROW.windUp, flight.t0, flight.t0 + flight.T] : action().keys;
+      return times.map(t => Math.round(t * FPS));
+    },
     onTiming() {}                                   // the page sets this, to update the timeline
   };
   return view;
