@@ -134,12 +134,27 @@ export function create({ stageEl, canvas, status }) {
     return { arc, t0, p0, flat, vy, vh, T };
   }
 
+  // An animator's timing on the arc: the same path, but more frames near the top (it hangs there)
+  // and fewer at either end (it leaves the hand fast and speeds up into the floor). e is the time
+  // since the release; the flight still takes the same total time. HANG: how much it slows at the
+  // top (0 = plain physics); SNAP: how sharply it speeds up away from the top.
+  const HANG = .45, SNAP = 1.5;
+  function arcTime(e, fl) {
+    const top = clamp01(fl.vy / G / fl.T) * fl.T;                   // when it reaches the top of the arc
+    let w;
+    if (e < top) w = top * (1 - Math.pow(1 - e / top, SNAP));       // rising: slowing into the top
+    else { const d = fl.T - top; w = top + d * Math.pow((e - top) / d, SNAP); }   // falling: speeding up
+    return e + HANG * (w - e);
+  }
+  const clamp01 = x => Math.max(0, Math.min(1, x));
+
   // Where the ball is at loop time s (null while it's still in his hand)
   function ballAt(s, out) {
     const fl = flight;
     if (!fl || s < fl.t0) return null;
-    const u = Math.min(s - fl.t0, fl.T);
-    if (!fl.arc) return out.lerpVectors(fl.p0, fl.end, u / fl.T);
+    const e = Math.min(s - fl.t0, fl.T);
+    if (!fl.arc) return out.lerpVectors(fl.p0, fl.end, e / fl.T);
+    const u = arcTime(e, fl);
     return out.copy(fl.p0).addScaledVector(fl.flat, fl.vh * u).setY(fl.p0.y + fl.vy * u - G * u * u / 2);
   }
 
