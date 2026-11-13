@@ -16,7 +16,7 @@ import { std, reducedMotion } from '../three/stage.js';
 import { RUN_STOP } from '../three/clips.js';
 
 const $ = id => document.getElementById(id);
-const COLS = 9, ROWS = 16;                       // cloth mesh grid
+const COLS = 13, ROWS = 24;                      // cloth mesh grid (fine enough that a leg can't slip between points)
 const BANDS = [.28, .28, .27];                   // lengths of the three bands (shoulders to below the knee)
 const TOTAL = BANDS.reduce((a, b) => a + b);
 const TOP_W = .36, BOTTOM_W = .66;               // width across the shoulders and at the hem
@@ -29,10 +29,16 @@ const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const lerp = (a, b, t) => a + (b - a) * t;
 const idx = (i, j) => j * COLS + i;
 
-// Capsules round his body that the cloth drapes over: [from bone, to bone, radius]
-const BODY = [['Hips', 'Spine2', .15], ['Spine2', 'Neck', .12],
-              ['LeftUpLeg', 'LeftLeg', .09], ['LeftLeg', 'LeftFoot', .07],
-              ['RightUpLeg', 'RightLeg', .09], ['RightLeg', 'RightFoot', .07]];
+// His back, measured off the Y Bot's surface: how far it reaches behind the spine at each height,
+// from 30% of the hips-to-neck distance below the hips (k = -0.3, his seat) up to the neck (k = 1).
+const BACK_DEPTH = [.117, .126, .149, .161, .159, .135, .131, .110, .119, .116, .130, .138, .138, .130];
+const BACK_HALF_WIDTH = .21;                     // his torso, side to side (without the arms)
+const MARGIN = .03;                              // the cloth rests this far off him
+// His legs and arms, as capsules the cloth goes round: [from bone, to bone, radius]
+const LIMBS = [['LeftUpLeg', 'LeftLeg', .095], ['LeftLeg', 'LeftFoot', .075],
+               ['RightUpLeg', 'RightLeg', .095], ['RightLeg', 'RightFoot', .075],
+               ['LeftArm', 'LeftForeArm', .06], ['LeftForeArm', 'LeftHand', .055],
+               ['RightArm', 'RightForeArm', .06], ['RightForeArm', 'RightHand', .055]];
 
 export function create({ stageEl, canvas, status }) {
   // Three-quarter view from behind him, so the cloak shows its surface rather than its edge
@@ -63,8 +69,10 @@ export function create({ stageEl, canvas, status }) {
   const pin = new THREE.Vector3(), lastPin = new THREE.Vector3();
   const back = new THREE.Vector3(), side = new THREE.Vector3(), fwd = new THREE.Vector3();
   const bones = {};
-  ['Hips', 'Spine2', 'Neck', 'LeftArm', 'RightArm', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot']
+  ['Hips', 'Neck', 'LeftArm', 'RightArm', 'LeftForeArm', 'RightForeArm', 'LeftHand', 'RightHand',
+   'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot']
     .forEach(n => { bones[n] = new THREE.Vector3(); });
+  const spine = new THREE.Vector3();               // hips to neck, this frame
 
   let rig = null, t = 0, dragX = 0, targetX = 0, spare = 0, fresh = true;
   const mode = () => main.dataset.mode === 'drag' ? 'drag' : 'watch';
@@ -94,8 +102,9 @@ export function create({ stageEl, canvas, status }) {
     back.set(0, 0, -1).applyQuaternion(q);       // he faces +z in his own space
     fwd.copy(back).negate();
     side.crossVectors(UP, back).normalize();
-    pin.lerpVectors(bones.LeftArm, bones.RightArm, .5).addScaledVector(back, .1);
+    pin.lerpVectors(bones.LeftArm, bones.RightArm, .5).addScaledVector(back, .12);
     pin.y = bones.Neck.y - .04;
+    spine.subVectors(bones.Neck, bones.Hips);
   }
 
   // His forward speed and acceleration, from the pin's movement (smoothed, so the bounce of each
@@ -157,7 +166,34 @@ export function create({ stageEl, canvas, status }) {
     return lerp(ang[k], ang[k + 1], f * f * (3 - 2 * f));
   }
 
-  // Push a point out of a capsule round the bone segment a-b
+  // Keep a point behind his back. His torso is treated as an oval round the spine: within its
+  // width, the cloth must be at least the measured depth behind the spine (less towards the
+  // sides, so it wraps round him). It's only ever pushed backwards, so it can't pop out the front.
+  // Below his seat the same oval carries on down his legs (the backs of the thighs and calves), so
+  // the cloak can't swing forward between them. Beside him, the cloak can wrap round his sides,
+  // but never further forward than the middle of his body.
+  const onSpine = new THREE.Vector3();
+  const LEG_DEPTH = .11;
+  function keepBehindBack(p) {
+    const len = spine.length() || 1;
+    const k = w.subVectors(p, bones.Hips).dot(spine) / (len * len);   // 0 at the hips, 1 at the neck
+    if (k > 1.05) return;
+    onSpine.copy(bones.Hips).addScaledVector(spine, k);
+    v.subVectors(p, onSpine);
+    const lat = v.dot(side) / BACK_HALF_WIDTH, behind = v.dot(back);
+    let depth = 0;                                                     // beside him: just not in front of him
+    if (Math.abs(lat) < 1) {
+      let d = LEG_DEPTH;
+      if (k >= -.3) {
+        const f = clamp((k + .3) * 10, 0, BACK_DEPTH.length - 1), i = Math.min(Math.floor(f), BACK_DEPTH.length - 2);
+        d = lerp(BACK_DEPTH[i], BACK_DEPTH[i + 1], f - i);
+      } else if (k > -.5) d = lerp(LEG_DEPTH, BACK_DEPTH[0], (k + .5) / .2);   // seat into legs
+      depth = (d + MARGIN) * Math.sqrt(1 - lat * lat);
+    }
+    if (behind < depth) p.addScaledVector(back, depth - behind);
+  }
+
+  // Push a point out of a capsule round a limb (bone segment a-b), always out behind it
   function pushOut(p, a, b, r) {
     v.subVectors(b, a);
     const len2 = v.lengthSq() || 1;
@@ -167,6 +203,8 @@ export function create({ stageEl, canvas, status }) {
     const d = v.length();
     if (d >= r) return false;
     if (d < 1e-6) v.copy(back); else v.multiplyScalar(1 / d);
+    const fwdPart = v.dot(back);
+    if (fwdPart < 0) v.addScaledVector(back, -2 * fwdPart);   // in front of the limb: go round behind it instead
     p.copy(w).addScaledVector(v, r);
     return true;
   }
@@ -183,7 +221,10 @@ export function create({ stageEl, canvas, status }) {
         const f = j / (ROWS - 1);
         // the cloak widens towards the hem: spread this point out sideways from the column line
         out.copy(p).addScaledVector(side, u * (BOTTOM_W - TOP_W) * f);
-        for (const [a, b, r] of BODY) pushOut(out, bones[a], bones[b], r);
+        // limbs, then his back and legs, then limbs again (so one push can't leave it inside another)
+        for (const [a, b, r] of LIMBS) pushOut(out, bones[a], bones[b], r + MARGIN);
+        keepBehindBack(out);
+        for (const [a, b, r] of LIMBS) pushOut(out, bones[a], bones[b], r + MARGIN);
         if (out.y < .02) out.y = .02;
         posAttr.setXYZ(idx(i, j), out.x, out.y, out.z);
         // carry on down from where the cloth actually is (after any push), minus the widening
