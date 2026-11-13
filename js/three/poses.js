@@ -15,15 +15,21 @@ export function capturePose(rig) {
 // Push the current pose further from a reference pose (exaggeration), or pull it back towards it.
 // k = 1 leaves the pose as it is; k = 2 doubles every joint's turn away from the reference;
 // k = 0 is the reference pose itself. The hips' movement is scaled by `lift` (default k).
-export function scalePose(rig, ref, k, lift = k) {
+// share(bone), if given, says how much of the push each bone takes (1 = all of it, 0 = none):
+// for example less for the spine, so the torso doesn't fold over.
+// maxExtra (radians), if given, caps how much further any joint is pushed: small moves are pushed
+// in full, but a joint that already turns a long way (an arm swung overhead) isn't flung past it.
+export function scalePose(rig, ref, k, lift = k, share = null, maxExtra = Infinity) {
   rig.bones.forEach((b, i) => {
+    const kb = share ? 1 + (k - 1) * share(b) : k;
     // The turn from the reference to now, as an angle about an axis. Scale the angle.
     qa.copy(ref.rot[i]).invert().multiply(b.quaternion);
     if (qa.w < 0) { qa.x = -qa.x; qa.y = -qa.y; qa.z = -qa.z; qa.w = -qa.w; }   // the short way round
     const angle = 2 * Math.acos(Math.min(1, qa.w));
     if (angle < 1e-5) return;
     axisV.set(qa.x, qa.y, qa.z).normalize();
-    qb.setFromAxisAngle(axisV, angle * k);
+    const extra = Math.max(-maxExtra, Math.min(maxExtra, angle * (kb - 1)));
+    qb.setFromAxisAngle(axisV, angle + extra);
     b.quaternion.copy(ref.rot[i]).multiply(qb);
   });
   const hips = rig.bone('Hips');
