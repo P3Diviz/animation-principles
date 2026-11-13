@@ -1,7 +1,7 @@
 # Principles of Animation site
 
 Read `docs/Animation_Handover.md` in full before any work. It holds every decision for this site.
-**Tier 1 is complete and Tier 2 (3D) is nearly done. Read section 17, then start at 17.6** (the next job, open questions for Paul, and testing lessons). Paul's decisions in section 17 override earlier sections.
+**Tier 1 is complete and Tier 2 (3D) is nearly done. Read section 17, then start at 17.6** (the next job, decisions Paul has settled, and testing lessons). Paul's decisions in section 17 override earlier sections.
 
 - Match the approved pages in `docs/reference/`. Don't redesign them.
 - Follow the build order in section 14 and commit after each page. Paul pushes from GitHub Desktop (section 17.5).

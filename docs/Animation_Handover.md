@@ -471,7 +471,7 @@ If time runs out, a principle page without its 3D version hides the 2D/3D switch
 - **Pattern for 3D pages:** the page script (`03-staging.js`) loads its 3D module (`03-staging-3d.js`) with `import()` the first time 3D is picked, so the 2D view never waits for Three.js or the models. Toggles stay on the stage area's data attributes, shared by both views; the 3D module listens for `statechange`. The stage area gets `is-3d` only in the 3D view. Panel controls that belong to one view carry `only-2d` / `only-3d`.
 - **03 specifics:** Y Bot at the origin, X Bot at (-1.6, 0, -1.8); Subject switch eases the lights and the Mid/Close shots to the chosen figure, and dims the other figure in the plot. Clutter in 3D is a set of grey shelves and props. In 3D the plot is larger, and lamps are focusable sliders (arrow keys, Shift for bigger steps).
 - **Changed from the reference:** Wide, Mid and Close were framed for the taller stand-in mannequin, so they are reframed for the 1.8-unit bots (the plot wedge lengths 90/58/36 are kept). Light values, fog and floor are unchanged.
-- **For Paul to decide:** the 3D lights keep the reference's layout (key front right, fill front left, rim back left). The 2D plot is its mirror (key front left), so lamps swap sides when switching view. Mirroring the 3D angles would make them match.
+- **Paul's decision:** the 3D lights keep the reference's layout (key front right, fill front left, rim back left), even though the 2D plot is its mirror (key front left) and the lamps swap sides when switching view.
 - Checked in headless Chrome: no scroll or clipped panel at 1280×720, 1366×768, 1920×1080, normal and present; drag, arrow keys, every toggle, Subject, back to 2D; missing XBot and missing YBot; reduced motion. No console errors.
 
 **Done: every Mixamo bot page (02, 04, 05, 07, 08, 09, 10, 12).** Still to do: procedural 3D for 01, 06, 11 (step 5).
@@ -497,10 +497,10 @@ If time runs out, a principle page without its 3D version hides the 2D/3D switch
 
 Then Tier 3 (section 14): Spot it, then Playground. When a page is built, give its header links an `href` on all 14 pages (section 17.2, item 2).
 
-**Open questions for Paul (ask, don't decide):**
-- 03 Staging: mirror the 3D lights so the key is front left, as in the 2D plot? (17.4a)
-- 07 Arc: at 0% the ball barely rises before it drops; make the gentlest throw a little stronger?
-- 05 Follow through: 75% stiffness looks about the same as 50%; push the top of the slider further?
+**Settled by Paul (13 November 2026): leave these as they are, don't raise them again:**
+- 03 Staging: the 3D lights keep the reference layout (key front right), the mirror of the 2D plot.
+- 07 Arc: the gentlest (0%) throw stays a low toss that barely rises.
+- 05 Follow through: the stiffness spread stays as it is (75% close to 50%).
 
 **Lessons from testing (they cost time this session):**
 - Paul checks every 3D view by eye in Chrome and spots anything unnatural (twisted joints, sliding feet, cloth through the body, shadows off the feet). Check poses close up, from more than one angle, at the extremes of every slider, and while paused, before saying a page is done.
