@@ -171,7 +171,7 @@ export function create({ stageEl, canvas, status }) {
   // sides, so it wraps round him). It's only ever pushed backwards, so it can't pop out the front.
   // Below his seat the same oval carries on down his legs (the backs of the thighs and calves), so
   // the cloak can't swing forward between them. Beside him, the cloak can wrap round his sides,
-  // but never further forward than the middle of his body.
+  // but stops just behind the middle of his body, so it never reaches the front of his arms.
   const onSpine = new THREE.Vector3();
   const LEG_DEPTH = .11;
   function keepBehindBack(p) {
@@ -181,7 +181,7 @@ export function create({ stageEl, canvas, status }) {
     onSpine.copy(bones.Hips).addScaledVector(spine, k);
     v.subVectors(p, onSpine);
     const lat = v.dot(side) / BACK_HALF_WIDTH, behind = v.dot(back);
-    let depth = 0;                                                     // beside him: just not in front of him
+    let depth = .06;                                                   // beside him: not as far forward as his arms
     if (Math.abs(lat) < 1) {
       let d = LEG_DEPTH;
       if (k >= -.3) {
@@ -209,6 +209,20 @@ export function create({ stageEl, canvas, status }) {
     return true;
   }
 
+  // Seen from behind, a limb blocks everything in front of it: cloth within its width (side to side)
+  // and along its length must stay behind it, so the cloak can't wrap round in front of an arm or leg.
+  function keepBehindLimb(p, a, b, r) {
+    v.subVectors(b, a);
+    const len2 = v.lengthSq() || 1;
+    const k = w.subVectors(p, a).dot(v) / len2;
+    if (k < 0 || k > 1) return;
+    w.copy(a).addScaledVector(v, k);                // the point on the limb at this cloth point's height
+    v.subVectors(p, w);
+    if (Math.abs(v.dot(side)) >= r) return;         // beside the limb: free to hang there
+    const behind = v.dot(back);
+    if (behind < r) p.addScaledVector(back, r - behind);
+  }
+
   // Build the cloth: each column runs down from the shoulders at the bands' angles, and is pushed
   // out round his body and legs as it goes, so the rest of the column drapes from there.
   const p = new THREE.Vector3(), dir = new THREE.Vector3(), out = new THREE.Vector3();
@@ -224,7 +238,7 @@ export function create({ stageEl, canvas, status }) {
         // limbs, then his back and legs, then limbs again (so one push can't leave it inside another)
         for (const [a, b, r] of LIMBS) pushOut(out, bones[a], bones[b], r + MARGIN);
         keepBehindBack(out);
-        for (const [a, b, r] of LIMBS) pushOut(out, bones[a], bones[b], r + MARGIN);
+        for (const [a, b, r] of LIMBS) { pushOut(out, bones[a], bones[b], r + MARGIN); keepBehindLimb(out, bones[a], bones[b], r + MARGIN); }
         if (out.y < .02) out.y = .02;
         posAttr.setXYZ(idx(i, j), out.x, out.y, out.z);
         // carry on down from where the cloth actually is (after any push), minus the widening
