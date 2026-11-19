@@ -47,8 +47,8 @@ function setAmount(v) {
     : v <= 110 ? 'Cartoon: squash, stretch and popping eyes sell the shock while it still feels like the same dragon.'
     : 'Too far: the eyes and stretch break the character. It stops being believable and becomes noise.';
   part('note3d').textContent = v < 35 ? 'Realistic: the fright as it was captured. True to life, but small from the back of the room.'
-    : v <= 110 ? 'Cartoon: a deeper cower, a bigger startled leap, arms flung wider. Still the same fright.'
-    : 'Too far: the joints bend further than a body can. It stops being believable.';
+    : v <= 110 ? 'Cartoon: a bigger flinch, a bigger leap up and bigger looks round. He starts and ends the same.'
+    : 'Too far: every movement is so big it turns into noise. It stops being believable.';
   redraw();
 }
 amount.addEventListener('input', () => setAmount(+amount.value));
