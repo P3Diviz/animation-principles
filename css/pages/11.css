@@ -13,7 +13,7 @@ main:not([data-mode="compare"]) .compare-only{display:none}
 .cap{font:500 13px var(--font);fill:var(--text-2);text-anchor:middle}
 .hint3d{position:absolute;right:24px;bottom:16px;color:var(--text-2);font-size:12px;pointer-events:none;text-align:right}
 .hint3d .type3d{display:block;color:var(--text);font-size:14px;font-weight:500;margin-bottom:2px}   /* the 3D body type */
-/* 3D has no Compare: its controls show whatever mode the 2D view was left in */
-main[data-view="3d"][data-mode="compare"] h2.pose{display:block}
-main[data-view="3d"][data-mode="compare"] .seg.pose{display:flex}
+/* 3D has no Compare, and its controls are only-3d (not build-only), so they show whatever mode the
+   2D view was left in */
 main[data-view="3d"] .slider output#bodyName{min-width:7ch;text-align:right}
+.panel .seg.only-3d + .seg.only-3d{margin-top:6px}   /* Still / Moving, just under the poses */

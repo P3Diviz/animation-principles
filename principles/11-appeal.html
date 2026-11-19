@@ -53,7 +53,7 @@
         <svg viewBox="0 0 800 400" aria-label="Draig, built from simple shapes">
           <line class="floor" x1="60" y1="372" x2="740" y2="372"/>
           <!-- Build: one Draig to change -->
-          <g id="build" class="who" data-shape="round" data-pose="stiff" transform="translate(244 75.6) scale(.78)">
+          <g id="build" class="who" data-shape="round" data-pose="stiff" data-pose3d="stiff" data-motion3d="still" data-line3d="off" transform="translate(244 75.6) scale(.78)">
             <!--DRAIG-->
             <svg viewBox="0 0 400 420" class="draig" width="400" height="420" overflow="visible" id="dragon" role="img" aria-label="A small red Welsh dragon with green eyes">
             <!-- Draig: original character for the Principles of Animation site (no licence restrictions).
@@ -639,10 +639,21 @@
     <h2 class="only-3d top">Body type</h2>
     <label class="slider only-3d"><span class="row"><span>Skinny to muscular to cuddly</span><output id="bodyName">Muscular</output></span>
       <input type="range" id="body3d" min="0" max="200" step="5" value="100" aria-valuetext="Muscular"></label>
-    <h2 class="build-only pose">Pose</h2>
-    <div class="seg build-only pose" role="group" aria-label="Pose" data-target="build" data-attr="pose">
+    <h2 class="build-only only-2d">Pose</h2>
+    <div class="seg build-only only-2d" role="group" aria-label="Pose" data-target="build" data-attr="pose">
       <button data-value="stiff" aria-pressed="true">Stiff</button><button data-value="strong" aria-pressed="false">Line of action</button>
     </div>
+    <!-- 3D: a pose for each build (any build can take any pose), held still or moving -->
+    <h2 class="only-3d">Pose</h2>
+    <div class="seg presets only-3d" role="group" aria-label="Pose" data-target="build" data-attr="pose3d">
+      <button data-value="stiff" aria-pressed="true">Stiff</button><button data-value="laughing" aria-pressed="false">Laughing</button>
+      <button data-value="hero" aria-pressed="false">Hero</button><button data-value="hunched" aria-pressed="false">Hunched</button>
+    </div>
+    <div class="seg only-3d" role="group" aria-label="Motion" data-target="build" data-attr="motion3d">
+      <button data-value="still" aria-pressed="true">Still</button><button data-value="moving" aria-pressed="false">Moving</button>
+    </div>
+    <div class="pills only-3d"><button class="pill" data-target="build" data-attr="line3d" aria-pressed="false">Line of action</button></div>
+    <p class="small only-3d">Each build has a pose that suits it. Try every pairing.</p>
     <div class="ask compare-only only-2d" id="ask">
       <p class="q">Same dragon, two ways. Which is more appealing?</p>
       <div class="choices"><button data-pick="left">Left</button><button data-pick="right">Right</button></div>
