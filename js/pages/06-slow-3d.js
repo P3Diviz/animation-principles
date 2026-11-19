@@ -59,12 +59,16 @@ export function carPose(P, t, table = pitchTable(P)) {
 // A small blocky racing car, facing +x: nose cone and front wing, a low tub with sidepods,
 // the driver's helmet, an engine cover with an air intake, and a rear wing. Big rear wheels,
 // smaller front ones, each with a pale hub bar so you can see it turn.
-function buildCar(stage) {
+export function buildCar(stage) {
   const car = new THREE.Group();
   car.scale.setScalar(CAR);
-  const body = new THREE.Group();                            // pitches on the suspension
-  body.position.y = .2;                                      // about the axles
-  car.add(body);
+  // The body pitches on the suspension. It dives about the front axle when braking and squats about
+  // the rear axle when pulling away, as a real car does, so the long low front wing never swings
+  // into the floor (measured on every frame of every preset and the extreme handles: the lowest point
+  // stays 8 mm above the floor, at the full 6° dive). `pivot` holds the
+  // turning point; `body` is offset back by the same amount, so moving the pivot moves nothing.
+  const pivot = new THREE.Group(); pivot.position.y = .2; car.add(pivot);
+  const body = new THREE.Group(); pivot.add(body);
   const clay = std('#C9C9D3', .45), wing = std('#6E6E84', .5), dark = std('#2A2A3A', .6), helmet = std('#8E8EA0', .25);
   const box = (w, h, d, mat, x, y, z) => stage.add(new THREE.BoxGeometry(w, h, d), mat, x, y - .2, z, body);
 
@@ -81,8 +85,8 @@ function buildCar(stage) {
   stage.add(new THREE.CylinderGeometry(.05, .14, .6, 4), clay, 0, 0, 0, noseGroup)
     .rotation.set(Math.PI / 4, 0, -Math.PI / 2);             // point it forward (+x), square side up
   // Front wing with end plates
-  box(.22, .025, .92, wing, 1.12, .06, 0);
-  box(.22, .09, .02, wing, 1.12, .09, .46); box(.22, .09, .02, wing, 1.12, .09, -.46);
+  box(.22, .025, .92, wing, 1.12, .1, 0);
+  box(.22, .09, .02, wing, 1.12, .12, .46); box(.22, .09, .02, wing, 1.12, .12, -.46);
   // Rear wing on a pillar, with end plates
   box(.24, .035, .86, wing, -.9, .56, 0);
   box(.04, .24, .05, wing, -.82, .42, 0);
@@ -102,7 +106,14 @@ function buildCar(stage) {
     car.add(g); wheels.push(g);
   }
   stage.scene.add(car);
-  return { car, body, wheels };
+  // Pitch the body: positive lifts the nose (turning about the rear axle), negative dives (front axle)
+  const FRONT = .62, REAR = -.55;
+  function pitch(degrees) {
+    const x = degrees < 0 ? FRONT : REAR;
+    pivot.position.x = x; body.position.x = -x;
+    pivot.rotation.z = degrees * Math.PI / 180;
+  }
+  return { car, pitch, wheels };
 }
 
 export function create({ stageEl, canvas, status }) {
@@ -122,7 +133,7 @@ export function create({ stageEl, canvas, status }) {
     // 15 m beyond), measured from this camera's distance
     stage.scene.fog.near = d + 3; stage.scene.fog.far = d + 18;
   }
-  const { car, body, wheels } = buildCar(stage);
+  const { car, pitch, wheels } = buildCar(stage);
   const clock = clock3d(canvas, FRAMES);
   let P = [.33, 0, .67, 1], table = pitchTable(P);
 
@@ -143,7 +154,7 @@ export function create({ stageEl, canvas, status }) {
     const { x, lean } = carPose(P, clockSeconds(clock), table);
     car.position.x = START + x;
     wheels.forEach(wh => { wh.rotation.z = -x / wh.userData.r; });   // rolling: turn by distance / radius
-    body.rotation.z = lean * Math.PI / 180;
+    pitch(lean);
   });
 
   return {
