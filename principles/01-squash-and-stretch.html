@@ -11,6 +11,11 @@
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages/01.css">
 <link rel="stylesheet" href="../css/glass.css">
+<script type="importmap">
+{ "imports": {
+    "three": "../vendor/three/three.module.min.js",
+    "three/addons/": "../vendor/three/addons/" } }
+</script>
 <script type="module" src="../js/core/menu.js"></script>
 <script type="module" src="../js/core/present.js"></script>
 <script type="module" src="../js/pages/01-squash.js"></script>
@@ -39,7 +44,10 @@
   <section class="stage-area">
     <div class="stage-head">
       <h1><span class="mono">01</span>Squash and stretch</h1>
+      <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
+    <!-- 3D view: Three.js draws into this canvas (js/pages/01-squash-3d.js) -->
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas"></canvas><span class="loading" id="status" role="status"></span></div>
     <div class="stage has-scene" id="stage" data-squash="on" data-volume="off">
       <div class="scene"><div class="ball"></div><div class="ghost"></div><div class="shadow"></div></div>
     </div>
@@ -63,13 +71,13 @@
       <input type="range" id="amount" min="0" max="150" step="5" value="100" data-target="stage" data-var="--amount" data-scale="0.01" data-unit="%"></label>
     <h2>Material</h2>
     <div class="seg presets" id="materials" role="group" aria-label="Material presets">
-      <button data-amount="100" data-dur="0.5" aria-pressed="true">Rubber ball</button>
-      <button data-amount="5" data-dur="0.64" aria-pressed="false">Bowling ball</button>
-      <button data-amount="150" data-dur="0.76" aria-pressed="false">Water balloon</button>
+      <button data-amount="100" data-dur="0.5" data-look="rubber" aria-pressed="true">Rubber ball</button>
+      <button data-amount="5" data-dur="0.64" data-look="bowling" aria-pressed="false">Bowling ball</button>
+      <button data-amount="150" data-dur="0.76" data-look="water" aria-pressed="false">Water balloon</button>
     </div>
     <p class="small" id="materialNote">Rubber ball: 100% squash, 25 frames.</p>
     <div class="pills"><button class="pill" data-target="stage" data-attr="volume" aria-pressed="false">Volume check</button></div>
-    <p class="small">The dashed circle is the ball at rest: same area, new shape.</p>
+    <p class="small">The dashed circle is the ball at rest: same <span class="only-2d">area</span><span class="only-3d">volume</span>, new shape.</p>
     <div class="explain">
       <h2>The principle</h2>
       <p>Squash and stretch gives a drawing weight and flexibility. A soft object flattens when it hits something and stretches when it moves fast, but its volume stays the same.</p>
