@@ -64,6 +64,23 @@ export function aimBone(bone, child, dir, weight = 1) {
   bone.updateWorldMatrix(false, true);
 }
 
+// Swing a bone about its own joint so that a point it carries (world space, for example the tip of
+// a finger further down the arm) moves towards `target`. Like aimBone, the turn is worked out from
+// the pose each time it's called, so it never turns the limb about a fixed world axis.
+const j = new THREE.Vector3(), from = new THREE.Vector3(), to = new THREE.Vector3();
+export function swingBone(bone, point, target) {
+  bone.updateWorldMatrix(true, false);
+  bone.getWorldPosition(j);
+  from.subVectors(point, j).normalize();
+  to.subVectors(target, j).normalize();
+  if (from.lengthSq() < .5 || to.lengthSq() < .5) return;
+  qd.setFromUnitVectors(from, to);                       // the turn needed, in world space
+  bone.parent.getWorldQuaternion(qp);                    // into the parent's space, then apply
+  qd.premultiply(qp.clone().invert()).multiply(qp);
+  bone.quaternion.premultiply(qd);
+  bone.updateWorldMatrix(false, true);
+}
+
 // Roll a bone about its own length (bone to child) so that a direction it carries (for example the
 // palm's facing, given by facing()) turns towards `want` (world space). weight 0..1 blends it in.
 const ax = new THREE.Vector3(), f1 = new THREE.Vector3(), f2 = new THREE.Vector3();

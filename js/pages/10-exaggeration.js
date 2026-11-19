@@ -19,13 +19,20 @@ const tl = bindTimeline({
 
 // 2D / 3D: the timeline follows the clock of the view on screen
 bindView(() => import('./10-exaggeration-3d.js'), {
-  onSwitch(is3d, v) {
+  async onSwitch(is3d, v) {
     view3d = is3d ? v : null;
     if (is3d) handOver([clock], [v.clock]); else if (v) handOver([v.clock], [clock]);
-    tl.setFrames(is3d ? v.frames : 75);
-    tl.setKeys(is3d ? v.keys : [20, 24, 27, 48]);
-    part('span').style.left = is3d ? (v.keys[0] / v.frames * 100) + '%' : '26.667%';
-    part('span').style.width = is3d ? ((v.keys[1] - v.keys[0]) / v.frames * 100) + '%' : '36.667%';
+    if (is3d) await v.ready;                    // the clip's length and moments are known once it's loaded
+    if (!is3d || view3d !== v) {                // 2D (or the learner switched back while it loaded)
+      if (is3d) return;
+      tl.setFrames(75); tl.setKeys([20, 24, 27, 48]);
+      part('span').style.left = '26.667%'; part('span').style.width = '36.667%';
+      return;
+    }
+    // 3D: keys at the leap, the stance, sinking back and cowering; the highlight runs from the leap to sinking back
+    tl.setFrames(v.frames); tl.setKeys(v.keys);
+    part('span').style.left = (v.keys[0] / v.frames * 100) + '%';
+    part('span').style.width = ((v.keys[2] - v.keys[0]) / v.frames * 100) + '%';
   }
 });
 
@@ -39,8 +46,8 @@ function setAmount(v) {
   part('note').textContent = v < 35 ? 'Realistic: a small flinch. True to life, but easy to miss from the back of the room.'
     : v <= 110 ? 'Cartoon: squash, stretch and popping eyes sell the shock while it still feels like the same dragon.'
     : 'Too far: the eyes and stretch break the character. It stops being believable and becomes noise.';
-  part('note3d').textContent = v < 35 ? 'Realistic: the jump as it was captured. True to life, but small from the back of the room.'
-    : v <= 110 ? 'Cartoon: a deeper crouch, a bigger reach and a higher jump. Still the same jump.'
+  part('note3d').textContent = v < 35 ? 'Realistic: the fright as it was captured. True to life, but small from the back of the room.'
+    : v <= 110 ? 'Cartoon: a deeper cower, a bigger startled leap, arms flung wider. Still the same fright.'
     : 'Too far: the joints bend further than a body can. It stops being believable.';
   redraw();
 }
