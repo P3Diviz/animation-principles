@@ -15,7 +15,7 @@
 // lifts them they keep its height. Hands are kept out of his legs (see keepHandsOut).
 import * as THREE from 'three';
 import { studio, addBot } from '../three/studio.js';
-import { capturePose, scalePose, feetHeight, swingBone } from '../three/poses.js';
+import { capturePose, scalePose, feetHeight, swingBone, turnBone } from '../three/poses.js';
 import { clock3d, clockSeconds } from '../three/view.js';
 
 const $ = id => document.getElementById(id);
@@ -26,16 +26,27 @@ const CALM_AT = 1.4;                                        // a settled moment 
 const SMOOTH_MOVE = 50;
 const PUSH = .9, CAP = 40;                                  // k = 1 + amount x PUSH; at most CAP° past the capture at Cartoon
 // The startled leap gets an animator's hop: keeping his feet on the floor stops the hips rising any
-// higher, so at the leap he leaves the floor by HOP x (k - 1) / PUSH metres (12 cm at Cartoon)
-const HOP = .12;
+// higher, so at the leap he leaves the floor by HOP x (k - 1) / PUSH metres (20 cm at Cartoon, 30 at
+// Too far), with his knees bending to tuck his feet up and back while he's off the floor (Paul: the
+// feet looked pinned to the floor)
+const HOP = .2, TUCK = .7;                                  // tuck: how far the feet come up, against the hop
 const hop = t => t < 1.75 || t > 2.3 ? 0 : t < 1.97 ? Math.sin((t - 1.75) / .22 * Math.PI / 2) : Math.cos((t - 1.97) / .33 * Math.PI / 2);
+// The scare while he's still sitting (1.15-1.8 s: he hunches forward, hands to his knees) gets a sharp
+// forward jerk, bigger for each setting (Paul): LEAN degrees through the spine at Cartoon, and a head jolt
+// (15° and the full movement push together folded him to his knees at Cartoon: "a little more" each)
+const LEAN = 8, JOLT = 6, SEATED_PUSH = .6;                 // the movement push is 60% while he's still sitting
+const jerk = t => t < 1.15 || t > 1.85 ? 0 : t < 1.32 ? Math.sin((t - 1.15) / .17 * Math.PI / 2) : t < 1.55 ? 1 : Math.cos((t - 1.55) / .3 * Math.PI / 2);
 
 // Moments in the clip (seconds): sitting, the startled leap up, the frightened stance, sinking back down
 export const SCARED = { leap: 1.9, stand: 2.6, sink: 7.3, cower: 8.5 };
 // How much of each moment is "sitting still" (for the Starting pose slider): all of it before the
 // flinch, none of it while he's up, easing between
 const smooth = (x, a, b) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-const seated = t => Math.max(1 - smooth(t, 1.3, 2.1), smooth(t, 7.4, 8.5));
+// Sitting still: up to 1.1 s (after that the scare begins, and it should grow too), and again once
+// he has sat back down
+const seated = t => Math.max(1 - smooth(t, 1, 1.2), smooth(t, 7.6, 8.6));
+// For the Starting pose slider: the whole time he's sitting, the scare while seated included
+const sittingPart = t => Math.max(1 - smooth(t, 1.3, 2.1), smooth(t, 7.4, 8.5));
 
 export function create({ stageEl, canvas, status }) {
   const { stage } = studio(stageEl, canvas, { pos: [2.6, 1.3, 4.6], look: [0, .85, .2] });
@@ -108,13 +119,33 @@ export function create({ stageEl, canvas, status }) {
     rig.setTime(t);
     // Bigger movement while he's up; none at all while he sits (he fidgets a little there, and the
     // start and end must stay exactly as captured)
-    const k = 1 + (exaggeration() - 1) * (1 - seated(t));
+    const k = 1 + (exaggeration() - 1) * (1 - seated(t)) * (1 - (1 - SEATED_PUSH) * sittingPart(t));
     if (k > 1.0001) scalePose(rig, smoothedAt(t), k, k, share, (k - 1) / PUSH * CAP * Math.PI / 180);
-    const s = sitting.value / 100, toCalm = 1 - (1 - s) * seated(t);
+    const s = sitting.value / 100, toCalm = 1 - (1 - s) * sittingPart(t);
     if (toCalm < 1) scalePose(rig, calm, toCalm);           // the still parts: from standing (0) to sitting (1)
+    const more = (k - 1) / PUSH;                             // 0 as captured, 1 at Cartoon, 1.5 at Too far
+    if (more > 0 && jerk(t) > 0) {                          // the forward jerk, about his own hip line
+      rig.model.updateMatrixWorld(true);
+      rig.bone('LeftUpLeg').getWorldPosition(A); rig.bone('RightUpLeg').getWorldPosition(B);
+      const across = A.sub(B).normalize(), a = more * jerk(t) * Math.PI / 180;   // towards his left: a positive turn leans him forward
+      ['Spine', 'Spine1', 'Spine2'].forEach(n => turnBone(rig.bone(n), across, a * LEAN / 3));
+      turnBone(rig.bone('Head'), across, a * JOLT);
+    }
     const captured = feetAt(t);
     const floor = captured < restFeet + .03 || toCalm < 1 ? restFeet : captured;   // on the floor, or lifted as in the clip
-    rig.model.position.y = floor - feetHeight(rig) + HOP * (k - 1) / PUSH * hop(t);
+    const up = HOP * more * hop(t);
+    rig.model.position.y = floor - feetHeight(rig) + up;
+    if (up > .005) tuckFeet(up * TUCK);
+  }
+  // While he's off the floor, bend each knee so the foot comes up and back by `lift` metres
+  function tuckFeet(lift) {
+    rig.model.updateMatrixWorld(true);
+    for (const side of SIDES) {
+      rig.bone(side + 'Foot').getWorldPosition(P); rig.bone(side + 'ToeBase').getWorldPosition(C);
+      const ahead = C.sub(P).setY(0).normalize();           // the way the foot points
+      T.copy(P).add(new THREE.Vector3(0, lift, 0)).addScaledVector(ahead, -lift * .6);
+      swingBone(rig.bone(side + 'Leg'), P, T);
+    }
   }
 
   // Hands out of the legs. In the captured clip his hands sink into his thighs while he sits (Paul
@@ -154,10 +185,10 @@ export function create({ stageEl, canvas, status }) {
   // Worked out frame by frame, the hand fix would jump wherever the deepest point moves from one leg
   // to the other, or a hand sweeps quickly past a thigh (measured: steps of 32 cm in a frame, against
   // 14 cm without the fix). So, as the springs on 05 do, it's worked out ahead for every frame of the
-  // clip whenever a slider changes (about 150 ms) and played back (scrubbing stays exact). Eight rounds:
+  // clip whenever a slider changes (about 200 ms) and played back (scrubbing stays exact). Twelve rounds:
   // apply the fixes so far, find what is still inside a leg, work out a further fix, smooth it, add it.
-  // (Fewer left the hand up to 8 cm into the thigh for a few frames of the exaggerated flinch.)
-  const SIDES = ['Left', 'Right'], SMOOTH = 3, ROUNDS = 8;
+  // (Fewer left the hand up to 9 cm into the thigh for a few frames of the exaggerated scare.)
+  const SIDES = ['Left', 'Right'], SMOOTH = 3, ROUNDS = 12;
   const angle = q => 2 * Math.acos(Math.min(1, Math.abs(q.w)));
   // A sequence of turns, smoothed: each frame's strongest turn is spread to its neighbours first (so
   // the deepest moments keep their full lift), then averaged (so it eases in and out ahead of them)
