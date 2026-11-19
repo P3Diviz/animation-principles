@@ -9,7 +9,10 @@
 //
 // The 3D module exports create({ stageEl, canvas, status }) and returns { show(), hide(), ... }.
 // onSwitch lets the page hand its timeline over to the 3D view's clock and back.
-import { reducedMotion } from './stage.js';
+// From the timeline, not stage.js: stage.js imports Three.js, and this file is loaded by every page
+// at the start, so importing it here made every page download and parse Three.js (675 KB) before
+// anyone had asked for 3D. Three.js now loads only when 3D is picked.
+import { reducedMotion } from '../core/timeline.js';
 
 const $ = id => document.getElementById(id);
 
