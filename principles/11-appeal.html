@@ -47,7 +47,7 @@
       <div class="seg compact" role="group" aria-label="View" data-target="main" data-attr="view"><button data-value="2d" aria-pressed="true">2D</button><button data-value="3d" aria-pressed="false">3D</button></div>
     </div>
     <!-- 3D view: Three.js draws into this canvas (js/pages/11-appeal-3d.js) -->
-    <div class="stage stage-3d" id="stage3d"><canvas id="canvas" tabindex="0" aria-label="Draig in 3D. Drag, or use the arrow keys, to walk round him"></canvas><span class="loading" id="status" role="status"></span><p class="hint3d">Drag to walk round him</p></div>
+    <div class="stage stage-3d" id="stage3d"><canvas id="canvas" tabindex="0" aria-label="Draig in 3D. Drag, or use the arrow keys, to walk round him"></canvas><span class="loading" id="status" role="status"></span><p class="hint3d"><span class="type3d" id="type3d">Chubby</span>Drag to walk round him</p></div>
     <div class="stage has-scene" id="stage">
       <div class="scene">
         <svg viewBox="0 0 800 400" aria-label="Draig, built from simple shapes">
@@ -629,8 +629,7 @@
     <h2 class="build-only">Shape language</h2>
     <div class="seg build-only" role="group" aria-label="Shape language" data-target="build" data-attr="shape">
       <button data-value="round" aria-pressed="true">Round</button><button data-value="square" aria-pressed="false">Square</button><button data-value="pointed" aria-pressed="false">Pointed</button>
-    </div>
-    <h2 class="build-only">Proportions</h2>
+    </div>    <h2 class="build-only">Proportions</h2>
     <label class="slider build-only"><span class="row"><span>Head size</span><output>100%</output></span>
       <input type="range" id="headSize" min="70" max="140" step="5" value="100" data-unit="%"></label>
     <label class="slider build-only"><span class="row"><span>Eye size</span><output>100%</output></span>
