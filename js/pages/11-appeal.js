@@ -46,9 +46,11 @@ apply('-c', { shape: 'round', pose: 'strong', head: 1.15, eye: 1.2 });
 const choices = [...$('ask').querySelectorAll('[data-pick]')];
 // There's no wrong answer, but most people pick the right one. The reveal explains why.
 const WHY = 'The right one has a round, friendly shape, a bigger face and eyes, and a strong line of action through the pose. The left is boxy, stiff and symmetrical, with small eyes that are hard to read.';
+// The 3D figures have no faces, so their reveal talks about body shape and pose
+const WHY_3D = 'The right one has a soft, rounded build, a bigger head, and a strong line of action from his back foot to his raised hand. The left is blocky and stands stiff and symmetrical, so the pose says nothing.';
 choices.forEach(c => c.addEventListener('click', () => {
   choices.forEach(x => x.dataset.result = x.dataset.pick === 'right' ? 'right' : 'wrong');
-  $('answer').textContent = (c.dataset.pick === 'right' ? 'Most people agree. ' : 'Interesting: most people pick the right. ') + WHY;
+  $('answer').textContent = (c.dataset.pick === 'right' ? 'Most people agree. ' : 'Interesting: most people pick the right. ') + ($('main').dataset.view === '3d' ? WHY_3D : WHY);
 }));
 
 // 2D / 3D: the 3D Draig (11-appeal-3d.js) follows the same controls. No timeline on this page.
