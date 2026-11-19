@@ -5,6 +5,7 @@
 .marks{position:absolute;left:0;right:0;top:14px;height:10px}
 .marks span{position:absolute;top:0;width:2px;height:10px;margin-left:-1px;border-radius:1px;background:var(--accent);opacity:.6}
 .stage-caption{position:absolute;left:8%;top:calc(50% + 34px);color:var(--text-2);font-size:12px}
+.stage-3d .stage-caption{left:auto;right:24px;top:auto;bottom:16px;pointer-events:none}   /* 3D: in the corner, clear of the car */
 /* Keyboard: the handles take focus; arrow keys nudge them */
 .graph .h:focus{outline:none}
 .graph .h:focus-visible{stroke:#F5F5F7;stroke-width:2}

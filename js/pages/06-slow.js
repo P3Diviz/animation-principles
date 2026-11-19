@@ -1,6 +1,8 @@
 // 06 Slow in and slow out: Graph Editor, presets, spacing marks and keyframe icons.
 import { evaluate } from '../core/bezier.js';
 import { bindTimeline, setKeyIcon } from '../core/timeline.js';
+import '../core/toggles.js';
+import { bindView, handOver } from '../three/view.js';
 
 const FPS = 25, FRAMES = 45, MOVE = 30, MS = 1000 / FPS;   // 30-frame move (1.2 s), 15-frame hold
 let P = [.33, 0, .67, 1];                                   // cubic-bezier handles (Easy Ease)
@@ -8,6 +10,7 @@ const $ = id => document.getElementById(id);
 const X = x => 20 + x * 160, Y = y => 170 - y * 140;        // graph units -> SVG units
 const ball = $('ball'), marks = [...$('marks').children], presets = [...$('presets').children];
 let anim = null;
+let view3d = null;   // the 3D view while it's showing (06-slow-3d.js)
 
 // Web Animations API, so the shared timeline can scrub it. Rebuilt when the curve changes,
 // keeping its place and play state.
@@ -38,6 +41,7 @@ function update() {
   setKeyIcon($('k0'), 'linear', outEased ? 'eased' : 'linear');
   setKeyIcon($('k1'), inEased ? 'eased' : 'linear', 'linear');
   buildAnimation();
+  view3d?.setCurve(P);
 }
 
 const unpress = () => presets.forEach(x => x.setAttribute('aria-pressed', 'false'));
@@ -76,4 +80,13 @@ graph.addEventListener('pointermove', e => {
 graph.addEventListener('pointerup', () => drag = null);
 
 update();
-bindTimeline({ track: $('track'), head: $('head'), tc: $('tc'), play: $('play'), getAnims: () => ball.getAnimations(), frames: FRAMES });
+bindTimeline({ track: $('track'), head: $('head'), tc: $('tc'), play: $('play'), getAnims: () => view3d ? [view3d.clock] : ball.getAnimations(), frames: FRAMES });
+
+// 2D / 3D: the same curve drives both; the timeline follows the clock of the view on screen
+bindView(() => import('./06-slow-3d.js'), {
+  onSwitch(is3d, v) {
+    view3d = is3d ? v : null;
+    if (is3d) { v.setCurve(P); v.clock.currentTime = anim.currentTime; handOver([anim], [v.clock]); }
+    else if (v) { anim.currentTime = v.clock.currentTime; handOver([v.clock], [anim]); }
+  }
+});
