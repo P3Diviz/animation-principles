@@ -11,3 +11,4 @@ main[data-mode="compare"] #compare{display:inline}
 main[data-mode="compare"] .build-only{display:none}
 main:not([data-mode="compare"]) .compare-only{display:none}
 .cap{font:500 13px var(--font);fill:var(--text-2);text-anchor:middle}
+.hint3d{position:absolute;right:24px;bottom:16px;color:var(--text-2);font-size:12px;pointer-events:none}

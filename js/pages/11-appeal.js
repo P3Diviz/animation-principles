@@ -2,6 +2,7 @@
 import '../core/toggles.js';
 import { showSlider } from '../core/sliders.js';
 import { rotatePart, posePart, scalePart } from '../core/draig.js';
+import { bindView } from '../three/view.js';
 
 const $ = id => document.getElementById(id);
 
@@ -49,3 +50,6 @@ choices.forEach(c => c.addEventListener('click', () => {
   choices.forEach(x => x.dataset.result = x.dataset.pick === 'right' ? 'right' : 'wrong');
   $('answer').textContent = (c.dataset.pick === 'right' ? 'Most people agree. ' : 'Interesting: most people pick the right. ') + WHY;
 }));
+
+// 2D / 3D: the 3D Draig (11-appeal-3d.js) follows the same controls. No timeline on this page.
+bindView(() => import('./11-appeal-3d.js'));
