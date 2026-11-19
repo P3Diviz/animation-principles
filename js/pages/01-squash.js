@@ -8,7 +8,7 @@ const $ = id => document.getElementById(id);
 const stage = $('stage'), amount = $('amount'), note = $('materialNote');
 const materials = [...$('materials').querySelectorAll('button')];
 let view3d = null;   // the 3D view while it's showing (01-squash-3d.js)
-let frames = 25;
+let frames = 25;     // the 2D bounce's length; the 3D view has its own for each material
 
 const cssAnims = () => stage.getAnimations({ subtree: true });
 const tl = bindTimeline({
@@ -21,18 +21,27 @@ const tl = bindTimeline({
 function setDuration(seconds) {
   stage.style.setProperty('--dur', seconds + 's');
   frames = Math.round(seconds * 2 * 25);
-  view3d?.setFrames(frames);
-  tl.setFrames(frames);
-  tl.setKeys([0, frames / 2]);
-  return frames;
+  showTimeline();
+}
+// The timeline shows the bounce of the view on screen
+function showTimeline() {
+  const n = view3d ? view3d.frames : frames;
+  tl.setFrames(n);
+  tl.setKeys([0, n / 2]);
+}
+
+const pressed = () => materials.find(b => b.getAttribute('aria-pressed') === 'true');
+function showNote() {
+  const b = pressed();
+  if (b) note.textContent = `${b.textContent}: ${b.dataset.amount}% squash, ${view3d ? view3d.frames : frames} frames.`;
 }
 
 materials.forEach(b => b.addEventListener('click', () => {
   materials.forEach(x => x.setAttribute('aria-pressed', x === b));
   setSlider(amount, b.dataset.amount);
-  setDuration(+b.dataset.dur);
   view3d?.setLook(b.dataset.look);
-  note.textContent = `${b.textContent}: ${b.dataset.amount}% squash, ${frames} frames.`;
+  setDuration(+b.dataset.dur);
+  showNote();
 }));
 
 // Moving the slider by hand leaves the presets (the 3D ball keeps its surface)
@@ -58,18 +67,22 @@ bindView(() => import('./01-squash-3d.js'), {
   onSwitch(is3d, v) {
     if (is3d) {
       view3d = v;
-      v.setFrames(frames);
-      v.setLook(materials.find(b => b.getAttribute('aria-pressed') === 'true')?.dataset.look || 'rubber');
-      if (before2d) { v.clock.currentTime = before2d.t; before2d.running ? v.clock.play() : v.clock.pause(); }
+      // The 3D ball keeps the material it last had (moving the slider by hand leaves it as it was)
+      if (pressed()) v.setLook(pressed().dataset.look);
+      // The same point in the bounce: the two views' loops can differ in length
+      if (before2d) {
+        v.clock.currentTime = (before2d.t % (frames * 40)) / frames * v.frames;
+        before2d.running ? v.clock.play() : v.clock.pause();
+      }
     } else {
       view3d = null;
       if (!v) return;
-      // The 2D ball starts again from scratch: put it on the 3D clock's frame and play state
-      const t = v.clock.currentTime, running = v.clock.playState === 'running';
+      // The 2D ball starts again from scratch: put it at the 3D ball's point in the bounce, and play state
+      const t = (v.clock.currentTime % (v.frames * 40)) / v.frames * frames, running = v.clock.playState === 'running';
       v.clock.pause();
-      cssAnims().forEach(a => { a.currentTime = t % (frames * 40); running ? a.play() : a.pause(); });
+      cssAnims().forEach(a => { a.currentTime = t; running ? a.play() : a.pause(); });
     }
-    tl.setFrames(frames);
-    tl.setKeys([0, frames / 2]);
+    showTimeline();
+    showNote();
   }
 });
